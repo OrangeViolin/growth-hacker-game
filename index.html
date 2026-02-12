@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Hacker Game | 增长黑客游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .welcome-screen, .game-screen, .result-screen {
+            display: none;
+        }
+
+        .welcome-screen.active, .game-screen.active, .result-screen.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .company-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .company-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .company-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .challenge {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .challenge-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .question {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 25px 0 20px 0;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .option-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .option-desc {
+            color: #6c757d;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideDown 0.5s;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+        }
+
+        .feedback.warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .feedback.success .feedback-title {
+            color: #155724;
+        }
+
+        .feedback.warning .feedback-title {
+            color: #856404;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-left: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .result-score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .result-rating {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .skills-learned {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .bilingual {
+            display: block;
+        }
+
+        .en {
+            color: #333;
+        }
+
+        .zh {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Growth Hacker Game</h1>
+            <p>增长黑客实战游戏</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">
+                    <span class="en">Score</span><br>
+                    <span class="zh">得分</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="current-scenario">0</div>
+                <div class="stat-label">
+                    <span class="en">Scenario</span><br>
+                    <span class="zh">场景</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="correct-answers">0</div>
+                <div class="stat-label">
+                    <span class="en">Correct</span><br>
+                    <span class="zh">正确</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen active">
+                <h2 style="font-size: 2em; margin-bottom: 20px; text-align: center;">
+                    <span class="en">Welcome to Growth Hacker Game!</span><br>
+                    <span class="zh">欢迎来到增长黑客游戏！</span>
+                </h2>
+                <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;">
+                    <span class="en">You'll face 20 different company scenarios. Each scenario presents a growth challenge. Your mission is to choose the best growth hacking strategy based on the AARRR framework:</span><br>
+                    <span class="zh">你将面对20个不同的公司场景。每个场景都有一个增长挑战。你的任务是基于AARRR框架选择最佳的增长黑客策略：</span>
+                </p>
+                <ul style="font-size: 1.1em; line-height: 2; margin: 30px 40px; list-style: none;">
+                    <li>📊 <strong>Acquisition</strong> (获取用户) - Getting users to your product</li>
+                    <li>🎯 <strong>Activation</strong> (激活用户) - Delivering a great first experience</li>
+                    <li>🔄 <strong>Retention</strong> (留存用户) - Keeping users coming back</li>
+                    <li>💰 <strong>Revenue</strong> (变现) - Monetizing your users</li>
+                    <li>📢 <strong>Referral</strong> (推荐) - Getting users to tell others</li>
+                </ul>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="startGame()">
+                        <span class="en">Start Game</span> / <span class="zh">开始游戏</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Screen -->
+            <div class="game-screen">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+
+                <div class="company-card" id="company-card"></div>
+
+                <div class="question" id="question"></div>
+
+                <div class="options" id="options"></div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div style="text-align: center;">
+                    <button class="btn" id="next-btn" onclick="nextScenario()" style="display: none;">
+                        <span class="en">Next Scenario</span> / <span class="zh">下一个场景</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div class="result-screen">
+                <div class="result-summary">
+                    <h2>
+                        <span class="en">Game Complete!</span><br>
+                        <span class="zh">游戏完成！</span>
+                    </h2>
+                    <div class="result-score" id="final-score"></div>
+                    <div class="result-rating" id="rating"></div>
+                    <p id="result-message"></p>
+
+                    <div class="skills-learned">
+                        <h3 style="margin-bottom: 15px;">
+                            <span class="en">Skills You've Practiced:</span><br>
+                            <span class="zh">你练习过的技能：</span>
+                        </h3>
+                        <div id="skills-list"></div>
+                    </div>
+
+                    <button class="btn" onclick="restartGame()">
+                        <span class="en">Play Again</span> / <span class="zh">再玩一次</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game data with 20 scenarios
+        const scenarios = [
+            {
+                id: 1,
+                company: { en: "MealPrep", zh: "美食订购" },
+                industry: { en: "Food Delivery", zh: "外卖配送" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "5,000",
+                revenue: "$10K MRR",
+                challenge: {
+                    en: "Only 15% of visitors sign up. High bounce rate on landing page.",
+                    zh: "只有15%的访问者注册。着陆页跳出率很高。"
+                },
+                question: {
+                    en: "How do you improve user acquisition?",
+                    zh: "如何提高用户获取率？"
+                },
+                options: [
+                    {
+                        title: { en: "A/B test landing page headlines & CTA buttons", zh: "A/B测试着陆页标题和CTA按钮" },
+                        desc: { en: "Optimize conversion with data-driven testing", zh: "用数据驱动测试优化转化率" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Excellent! A/B testing is a core growth hacking technique. Small changes in headlines and CTAs can dramatically increase conversion rates. This is 'Acquisition' optimization.",
+                            zh: "✅ 很好！A/B测试是核心的增长黑客技术。标题和CTA的小改变能大幅提高转化率。这是'获取'优化。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Buy more ads on social media", zh: "在社交媒体上购买更多广告" },
+                        desc: { en: "Increase traffic through paid advertising", zh: "通过付费广告增加流量" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More traffic won't help if your landing page doesn't convert. Fix the conversion problem first before spending more on ads. Growth hackers optimize before scaling.",
+                            zh: "⚠️ 如果着陆页不能转化，更多流量也没用。在投放更多广告前先解决转化问题。增长黑客先优化再扩大规模。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Redesign entire website", zh: "重新设计整个网站" },
+                        desc: { en: "Complete visual and UX overhaul", zh: "完全的视觉和用户体验改造" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Full redesigns are expensive and risky. Growth hackers use rapid iteration and testing instead of big bang changes. Start with small, measurable improvements.",
+                            zh: "⚠️ 完全重设计成本高且风险大。增长黑客使用快速迭代和测试，而不是大爆炸式改变。从小的、可衡量的改进开始。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 2,
+                company: { en: "FitTrack", zh: "健身追踪" },
+                industry: { en: "Health & Fitness", zh: "健康健身" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "50,000",
+                revenue: "$100K MRR",
+                challenge: {
+                    en: "Users sign up but 70% never complete profile setup. Low activation rate.",
+                    zh: "用户注册但70%从未完成个人资料设置。激活率低。"
+                },
+                question: {
+                    en: "How do you improve user activation?",
+                    zh: "如何提高用户激活率？"
+                },
+                options: [
+                    {
+                        title: { en: "Simplify onboarding to 3 steps with progress bar", zh: "将入门简化为3步并显示进度条" },
+                        desc: { en: "Reduce friction and show clear progress", zh: "减少摩擦并显示明确进度" },
+                        correct: true,
+                        skill: "Activation",
+                        feedback: {
+                            en: "✅ Perfect! This is 'Activation' optimization. Simplified onboarding with visual progress reduces abandonment. Growth hackers obsess over the first user experience.",
+                            zh: "✅ 完美！这是'激活'优化。简化的入门流程和可视化进度能减少放弃率。增长黑客关注第一次用户体验。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Send more email reminders", zh: "发送更多邮件提醒" },
+                        desc: { en: "Remind users to complete their profile", zh: "提醒用户完成资料" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Email reminders help, but won't fix a broken onboarding flow. Fix the root cause first - make setup so easy and compelling that reminders aren't needed.",
+                            zh: "⚠️ 邮件提醒有帮助，但无法修复糟糕的入门流程。先修复根本原因 - 让设置变得如此简单和吸引人，以至于不需要提醒。"
+                        },
+                        points: 4
+                    },
+                    {
+                        title: { en: "Offer $5 discount for completing profile", zh: "完成资料给$5折扣" },
+                        desc: { en: "Incentivize completion with rewards", zh: "用奖励激励完成" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Bribes can work short-term but don't build sustainable growth. Better to remove friction than pay users to tolerate it. This also hurts margins.",
+                            zh: "⚠️ 贿赂短期有效但无法建立可持续增长。最好消除摩擦而不是付钱让用户容忍它。这也会损害利润率。"
+                        },
+                        points: 3
+                    }
+                ]
+            },
+            {
+                id: 3,
+                company: { en: "LearnCode", zh: "编程学习" },
+                industry: { en: "Education", zh: "教育" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "100,000",
+                revenue: "$200K MRR",
+                challenge: {
+                    en: "Users complete first lesson but only 20% come back for lesson 2. Poor retention.",
+                    zh: "用户完成第一课但只有20%回来上第二课。留存率差。"
+                },
+                question: {
+                    en: "How do you improve retention?",
+                    zh: "如何提高留存率？"
+                },
+                options: [
+                    {
+                        title: { en: "Send personalized push notification after 24h", zh: "24小时后发送个性化推送通知" },
+                        desc: { en: "Re-engage with timely, relevant reminders", zh: "用及时、相关的提醒重新吸引" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Notifications help but don't address why users don't return. Build habit loops and provide immediate value that makes users want to return organically.",
+                            zh: "⚠️ 通知有帮助但没解决用户为何不回来。建立习惯循环，提供让用户自然想回来的即时价值。"
+                        },
+                        points: 5
+                    },
+                    {
+                        title: { en: "Implement streak system & daily challenges", zh: "实施连续打卡系统和每日挑战" },
+                        desc: { en: "Gamify learning to build daily habits", zh: "游戏化学习以建立每日习惯" },
+                        correct: true,
+                        skill: "Retention",
+                        feedback: {
+                            en: "✅ Brilliant! This is 'Retention' through habit formation. Streaks create psychological commitment. Growth hackers build addictive product loops, not just reminder systems.",
+                            zh: "✅ 很棒！这是通过习惯养成的'留存'。连续打卡创造心理承诺。增长黑客构建让人上瘾的产品循环，而不只是提醒系统。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Add more lessons to the platform", zh: "向平台添加更多课程" },
+                        desc: { en: "Provide more content options", zh: "提供更多内容选项" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More content doesn't solve the engagement problem. Users aren't finishing lesson 1, so lesson 100 won't help. Focus on making the core loop engaging first.",
+                            zh: "⚠️ 更多内容无法解决参与问题。用户没完成第1课，第100课也没用。先专注于让核心循环有吸引力。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 4,
+                company: { en: "TaskMaster", zh: "任务大师" },
+                industry: { en: "Productivity", zh: "生产力工具" },
+                stage: { en: "Mature", zh: "成熟阶段" },
+                users: "500,000",
+                revenue: "$1M MRR",
+                challenge: {
+                    en: "80% of users are on free plan. Conversion to paid is only 2%.",
+                    zh: "80%的用户使用免费计划。付费转化率只有2%。"
+                },
+                question: {
+                    en: "How do you improve revenue conversion?",
+                    zh: "如何提高收入转化？"
+                },
+                options: [
+                    {
+                        title: { en: "Remove free plan entirely", zh: "完全取消免费计划" },
+                        desc: { en: "Force users to pay from day one", zh: "强制用户从第一天就付费" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Risky! Free users are potential customers and provide viral growth. Removing free tier will kill acquisition. Better to optimize the free-to-paid journey.",
+                            zh: "⚠️ 有风险！免费用户是潜在客户并提供病毒式增长。取消免费层会扼杀获取。最好优化免费到付费的旅程。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Trigger upgrade prompt when hitting usage limits", zh: "触达使用限制时触发升级提示" },
+                        desc: { en: "Convert at moment of highest intent", zh: "在意图最高的时刻转化" },
+                        correct: true,
+                        skill: "Revenue",
+                        feedback: {
+                            en: "✅ Excellent! This is 'Revenue' optimization through contextual upselling. Convert users when they see value and need more. Growth hackers monetize at the right moment.",
+                            zh: "✅ 很好！这是通过情境化销售的'变现'优化。在用户看到价值并需要更多时转化。增长黑客在正确时刻变现。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Raise free plan price to $4.99/month", zh: "将免费计划价格提至$4.99/月" },
+                        desc: { en: "Charge low price for basic features", zh: "为基础功能收取低价" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Contradictory - you can't charge for a 'free' plan. If you mean converting free to paid, that eliminates your acquisition funnel. Keep free tier as a top-of-funnel tool.",
+                            zh: "⚠️ 矛盾 - 你不能为'免费'计划收费。如果你的意思是将免费转为付费，这会消除你的获取漏斗。保持免费层作为漏斗顶部工具。"
+                        },
+                        points: 1
+                    }
+                ]
+            },
+            {
+                id: 5,
+                company: { en: "PhotoShare", zh: "照片分享" },
+                industry: { en: "Social Media", zh: "社交媒体" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "200,000",
+                revenue: "$150K MRR",
+                challenge: {
+                    en: "Users love the product but rarely invite friends. Viral coefficient is 0.3.",
+                    zh: "用户喜欢产品但很少邀请朋友。病毒系数是0.3。"
+                },
+                question: {
+                    en: "How do you improve referral growth?",
+                    zh: "如何提高推荐增长？"
+                },
+                options: [
+                    {
+                        title: { en: "Add 'Share to Facebook' button", zh: "添加'分享到Facebook'按钮" },
+                        desc: { en: "Make sharing easier", zh: "让分享更容易" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Share buttons alone rarely work. Users need motivation. Why should they share? What's in it for them? Growth hackers design viral loops with built-in incentives.",
+                            zh: "⚠️ 单独的分享按钮很少奏效。用户需要动机。为什么要分享？对他们有什么好处？增长黑客设计带有内置激励的病毒循环。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Auto-watermark photos with app logo", zh: "自动为照片添加应用标志水印" },
+                        desc: { en: "Brand every shared photo", zh: "为每张分享的照片打上品牌" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Users hate watermarks - it degrades their content. This will reduce sharing, not increase it. Find viral loops that add value, not annoyance.",
+                            zh: "⚠️ 用户讨厌水印 - 它降低了内容质量。这会减少分享而不是增加。找到增加价值而非烦恼的病毒循环。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Enable collaborative albums, invite needed", zh: "启用协作相册，需要邀请" },
+                        desc: { en: "Build network effects into core feature", zh: "将网络效应构建到核心功能中" },
+                        correct: true,
+                        skill: "Referral",
+                        feedback: {
+                            en: "✅ Perfect! This is 'Referral' through product-driven virality. The product is BETTER with more users. Dropbox used similar tactics. This creates organic growth loops.",
+                            zh: "✅ 完美！这是通过产品驱动的病毒性实现'推荐'。产品在有更多用户时更好。Dropbox使用了类似策略。这创造了有机增长循环。"
+                        },
+                        points: 10
+                    }
+                ]
+            },
+            {
+                id: 6,
+                company: { en: "QuickPay", zh: "快付" },
+                industry: { en: "FinTech", zh: "金融科技" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "10,000",
+                revenue: "$20K MRR",
+                challenge: {
+                    en: "High customer acquisition cost ($50 per user) vs lifetime value ($30).",
+                    zh: "客户获取成本高（每用户$50）vs 生命周期价值（$30）。"
+                },
+                question: {
+                    en: "How do you fix this unsustainable unit economics?",
+                    zh: "如何解决这种不可持续的单位经济？"
+                },
+                options: [
+                    {
+                        title: { en: "Raise VC funding to sustain losses", zh: "筹集风投资金以维持亏损" },
+                        desc: { en: "Fund growth despite negative margins", zh: "尽管利润为负仍资助增长" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Money doesn't fix broken unit economics. Growth hackers find creative, low-cost acquisition channels before scaling spend. Fix CAC or LTV first.",
+                            zh: "⚠️ 钱无法解决糟糕的单位经济。增长黑客在扩大支出前找到创造性的低成本获取渠道。先修复CAC或LTV。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Implement referral rewards ($10 for both parties)", zh: "实施推荐奖励（双方各$10）" },
+                        desc: { en: "Lower CAC through word-of-mouth", zh: "通过口碑降低CAC" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Smart! Referral programs can dramatically lower CAC. $20 total ($10 each) < $50 ad cost. PayPal grew this way. This combines Acquisition + Referral strategies.",
+                            zh: "✅ 聪明！推荐计划能大幅降低CAC。总共$20（每人$10）< $50广告成本。PayPal就这样增长的。这结合了获取+推荐策略。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Increase transaction fees to improve LTV", zh: "提高交易费用以改善LTV" },
+                        desc: { en: "Extract more revenue per customer", zh: "从每个客户提取更多收入" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Raising prices might improve margins but could kill growth if competitors are cheaper. In fintech, users are price-sensitive. Better to lower CAC first.",
+                            zh: "⚠️ 提价可能改善利润率但如果竞争对手更便宜会扼杀增长。在金融科技中，用户对价格敏感。最好先降低CAC。"
+                        },
+                        points: 4
+                    }
+                ]
+            },
+            {
+                id: 7,
+                company: { en: "NewsDigest", zh: "新闻摘要" },
+                industry: { en: "Media", zh: "媒体" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "300,000",
+                revenue: "$80K MRR",
+                challenge: {
+                    en: "Users open app once per week. Need daily engagement for ad revenue.",
+                    zh: "用户每周打开应用一次。需要每日参与才能获得广告收入。"
+                },
+                question: {
+                    en: "How do you increase engagement frequency?",
+                    zh: "如何提高参与频率？"
+                },
+                options: [
+                    {
+                        title: { en: "Send 5 push notifications daily", zh: "每天发送5条推送通知" },
+                        desc: { en: "Remind users to check news", zh: "提醒用户查看新闻" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Notification spam leads to uninstalls. Users will disable notifications or delete app. Growth hackers respect user attention and provide value, not interruptions.",
+                            zh: "⚠️ 通知垃圾导致卸载。用户会禁用通知或删除应用。增长黑客尊重用户注意力并提供价值，而非打扰。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Personalize feed with AI, send 1 notification at optimal time", zh: "用AI个性化feed，在最佳时间发送1条通知" },
+                        desc: { en: "Relevance + timing = higher engagement", zh: "相关性+时机=更高参与" },
+                        correct: true,
+                        skill: "Retention",
+                        feedback: {
+                            en: "✅ Excellent! This is sophisticated 'Retention' through personalization. Better content + smart timing > volume. Growth hackers optimize for engagement quality, not quantity.",
+                            zh: "✅ 很好！这是通过个性化的复杂'留存'。更好的内容+智能时机 > 数量。增长黑客优化参与质量，而非数量。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Add addictive mini-games to the app", zh: "向应用添加让人上瘾的小游戏" },
+                        desc: { en: "Increase time spent in app", zh: "增加在应用中花费的时间" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ This dilutes your value proposition. Users came for news, not games. Stay focused on core value. Growth hackers double down on what works, not random features.",
+                            zh: "⚠️ 这稀释了你的价值主张。用户是为新闻而来，不是游戏。专注核心价值。增长黑客加倍投入有效的，而非随机功能。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 8,
+                company: { en: "HomeFix", zh: "家修宝" },
+                industry: { en: "Home Services", zh: "家庭服务" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "8,000",
+                revenue: "$15K MRR",
+                challenge: {
+                    en: "SEO traffic is zero. Only 100 visitors/month from Google. No organic growth.",
+                    zh: "SEO流量为零。每月只有100个来自Google的访问者。没有有机增长。"
+                },
+                question: {
+                    en: "How do you bootstrap SEO growth?",
+                    zh: "如何启动SEO增长？"
+                },
+                options: [
+                    {
+                        title: { en: "Hire SEO agency for $10K/month", zh: "以$10K/月聘请SEO代理" },
+                        desc: { en: "Professional optimization", zh: "专业优化" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Too expensive for early stage. Growth hackers bootstrap first. SEO takes months to show results. Better to invest that money in testing faster channels first.",
+                            zh: "⚠️ 对早期阶段太贵了。增长黑客先自举。SEO需要几个月才能看到结果。最好先投资测试更快的渠道。"
+                        },
+                        points: 2
+                    },
+                    {
+                        title: { en: "Create city-specific landing pages (NYC plumber, LA electrician, etc.)", zh: "创建特定城市的着陆页（纽约管道工、洛杉矶电工等）" },
+                        desc: { en: "Target long-tail local search keywords", zh: "针对长尾本地搜索关键词" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Brilliant! This is programmatic SEO - a core growth hack. Create hundreds of targeted pages automatically. Yelp and TripAdvisor used this. Low cost, high impact 'Acquisition'.",
+                            zh: "✅ 很棒！这是程序化SEO - 核心的增长黑客技术。自动创建数百个定向页面。Yelp和TripAdvisor用过这招。低成本，高影响的'获取'。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Buy backlinks from link farms", zh: "从链接农场购买反向链接" },
+                        desc: { en: "Quick SEO boost", zh: "快速SEO提升" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Black hat SEO will get you penalized by Google. Short-term gains, long-term disaster. Growth hackers use sustainable, white-hat tactics that scale.",
+                            zh: "⚠️ 黑帽SEO会让你被Google惩罚。短期收益，长期灾难。增长黑客使用可持续的、白帽的可扩展策略。"
+                        },
+                        points: 0
+                    }
+                ]
+            },
+            {
+                id: 9,
+                company: { en: "MindfulApp", zh: "正念冥想" },
+                industry: { en: "Wellness", zh: "健康" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "150,000",
+                revenue: "$300K MRR",
+                challenge: {
+                    en: "Monthly churn is 15%. Users cancel subscription after 2 months on average.",
+                    zh: "月流失率为15%。用户平均2个月后取消订阅。"
+                },
+                question: {
+                    en: "How do you reduce churn?",
+                    zh: "如何减少流失？"
+                },
+                options: [
+                    {
+                        title: { en: "Offer 50% discount to users trying to cancel", zh: "给试图取消的用户提供50%折扣" },
+                        desc: { en: "Save customers with price reduction", zh: "用降价挽留客户" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Trains users to cancel to get discounts. Destroys pricing power. Better to provide so much value they won't want to cancel. Fix the product, not the price.",
+                            zh: "⚠️ 训练用户取消以获得折扣。破坏定价权。最好提供足够的价值让他们不想取消。修复产品，而非价格。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Email users who haven't used app in 7 days with personalized tips", zh: "给7天未使用应用的用户发送个性化建议邮件" },
+                        desc: { en: "Re-engage inactive users before they churn", zh: "在流失前重新吸引不活跃用户" },
+                        correct: true,
+                        skill: "Retention",
+                        feedback: {
+                            en: "✅ Smart! This is proactive 'Retention'. Catch users before they churn. Personalization increases relevance. Growth hackers monitor engagement and intervene early.",
+                            zh: "✅ 聪明！这是主动的'留存'。在用户流失前抓住他们。个性化增加相关性。增长黑客监控参与并早期干预。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Make cancellation process more difficult", zh: "让取消流程更困难" },
+                        desc: { en: "Add friction to cancellation", zh: "为取消添加摩擦" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Dark patterns create angry customers and bad reviews. They'll cancel AND leave 1-star reviews. Growth hackers build products people don't want to leave.",
+                            zh: "⚠️ 黑暗模式创造愤怒的客户和差评。他们会取消并留下1星评价。增长黑客构建人们不想离开的产品。"
+                        },
+                        points: 0
+                    }
+                ]
+            },
+            {
+                id: 10,
+                company: { en: "CodeReview", zh: "代码审查" },
+                industry: { en: "Developer Tools", zh: "开发者工具" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "5,000",
+                revenue: "$25K MRR",
+                challenge: {
+                    en: "Product is strong but no one knows about it. Zero brand awareness.",
+                    zh: "产品很强但没人知道。品牌知名度为零。"
+                },
+                question: {
+                    en: "How do you build awareness in developer community?",
+                    zh: "如何在开发者社区建立知名度？"
+                },
+                options: [
+                    {
+                        title: { en: "Sponsor tech conferences ($50K budget)", zh: "赞助技术会议（$50K预算）" },
+                        desc: { en: "Brand visibility at events", zh: "活动中的品牌可见性" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Conferences are expensive with unclear ROI. Early-stage companies should use cheaper, trackable channels first. Test before spending big.",
+                            zh: "⚠️ 会议很贵且ROI不明确。早期公司应该先使用更便宜、可跟踪的渠道。在大笔支出前先测试。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Build free open-source tool, link to product", zh: "构建免费开源工具，链接到产品" },
+                        desc: { en: "Content marketing + community building", zh: "内容营销+社区建设" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Genius! This is content-driven 'Acquisition'. Developers love open source. Provide value first, convert later. Mailchimp, Hubspot grew this way. Build trust through utility.",
+                            zh: "✅ 天才！这是内容驱动的'获取'。开发者喜欢开源。先提供价值，后转化。Mailchimp、Hubspot这样增长的。通过实用性建立信任。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Run Google Ads for 'code review tool'", zh: "为'代码审查工具'投放Google广告" },
+                        desc: { en: "Paid search advertising", zh: "付费搜索广告" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Developers use ad blockers and distrust ads. This audience responds better to authentic content and community. Growth hackers match channels to audience behavior.",
+                            zh: "⚠️ 开发者使用广告拦截器且不信任广告。这个受众对真实内容和社区反应更好。增长黑客将渠道与受众行为匹配。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 11,
+                company: { en: "PetCare", zh: "宠物护理" },
+                industry: { en: "Pet Services", zh: "宠物服务" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "80,000",
+                revenue: "$120K MRR",
+                challenge: {
+                    en: "Email open rates dropped from 25% to 8%. Users ignoring communications.",
+                    zh: "邮件打开率从25%降至8%。用户忽略沟通。"
+                },
+                question: {
+                    en: "How do you re-engage through email?",
+                    zh: "如何通过邮件重新吸引？"
+                },
+                options: [
+                    {
+                        title: { en: "Send emails more frequently (daily instead of weekly)", zh: "更频繁发送邮件（每日而非每周）" },
+                        desc: { en: "More touchpoints = more engagement", zh: "更多接触点=更多参与" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More bad emails won't help. Users already ignore you - sending more will increase unsubscribes. Quality and relevance matter, not volume.",
+                            zh: "⚠️ 更多糟糕的邮件没用。用户已经忽略你 - 发送更多会增加退订。质量和相关性重要，而非数量。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Segment users by pet type, send personalized content", zh: "按宠物类型细分用户，发送个性化内容" },
+                        desc: { en: "Relevant content for dog vs cat owners", zh: "为狗主人vs猫主人提供相关内容" },
+                        correct: true,
+                        skill: "Retention",
+                        feedback: {
+                            en: "✅ Perfect! Segmentation is a core growth hack. Cat owners don't care about dog food sales. Personalization dramatically improves open rates. This is smart 'Retention'.",
+                            zh: "✅ 完美！细分是核心的增长黑客技术。猫主人不关心狗粮促销。个性化大幅提高打开率。这是聪明的'留存'。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Use clickbait subject lines (You won't believe...)", zh: "使用标题党主题行（你不会相信...）" },
+                        desc: { en: "Increase curiosity and opens", zh: "增加好奇心和打开率" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Clickbait destroys trust. Users will open once, feel deceived, then unsubscribe. Growth hackers build long-term relationships, not one-time tricks.",
+                            zh: "⚠️ 标题党破坏信任。用户会打开一次，感到被骗，然后退订。增长黑客建立长期关系，而非一次性技巧。"
+                        },
+                        points: 1
+                    }
+                ]
+            },
+            {
+                id: 12,
+                company: { en: "InvoiceEasy", zh: "发票易" },
+                industry: { en: "SaaS", zh: "SaaS" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "40,000",
+                revenue: "$180K MRR",
+                challenge: {
+                    en: "Average user creates 1 invoice/month. Need 10+ for business viability.",
+                    zh: "平均用户每月创建1张发票。需要10+才能实现业务可行性。"
+                },
+                question: {
+                    en: "How do you increase product usage?",
+                    zh: "如何增加产品使用？"
+                },
+                options: [
+                    {
+                        title: { en: "Add invoice templates and 1-click recurring invoices", zh: "添加发票模板和一键重复发票" },
+                        desc: { en: "Remove friction from repeat usage", zh: "消除重复使用的摩擦" },
+                        correct: true,
+                        skill: "Activation",
+                        feedback: {
+                            en: "✅ Excellent! Reduce friction to increase usage. This is 'Activation' optimization. The easier you make it, the more they'll use it. Growth hackers obsess over removing friction.",
+                            zh: "✅ 很好！减少摩擦以增加使用。这是'激活'优化。你让它越容易，他们就越会使用。增长黑客痴迷于消除摩擦。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Limit free plan to 1 invoice/month", zh: "将免费计划限制为每月1张发票" },
+                        desc: { en: "Force upgrade for more usage", zh: "强制升级以获得更多使用" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Your users WANT to use it 1x/month - that's the problem! Restricting won't make them need it more. Better to add features that make frequent use valuable.",
+                            zh: "⚠️ 你的用户想每月使用1次 - 这才是问题！限制不会让他们更需要它。最好添加让频繁使用有价值的功能。"
+                        },
+                        points: 2
+                    },
+                    {
+                        title: { en: "Email users monthly: Create your invoice!", zh: "每月给用户发邮件：创建你的发票！" },
+                        desc: { en: "Remind users to use the product", zh: "提醒用户使用产品" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ They already create 1/month - reminder won't increase that. They use it when they need it. Better to expand the use cases so they need it more often.",
+                            zh: "⚠️ 他们已经每月创建1次 - 提醒不会增加。他们需要时就会用。最好扩展用例让他们更频繁地需要它。"
+                        },
+                        points: 3
+                    }
+                ]
+            },
+            {
+                id: 13,
+                company: { en: "StreamFit", zh: "流健身" },
+                industry: { en: "Fitness Streaming", zh: "健身直播" },
+                stage: { en: "Mature", zh: "成熟阶段" },
+                users: "1,000,000",
+                revenue: "$5M MRR",
+                challenge: {
+                    en: "Growth has plateaued. Monthly new users stuck at 10K for 6 months.",
+                    zh: "增长停滞。月新用户6个月停留在1万。"
+                },
+                question: {
+                    en: "How do you reignite growth?",
+                    zh: "如何重新点燃增长？"
+                },
+                options: [
+                    {
+                        title: { en: "Expand to new market: corporate wellness programs (B2B)", zh: "扩展到新市场：企业健康计划（B2B）" },
+                        desc: { en: "Tap into enterprise sales", zh: "进入企业销售" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Smart! When consumer growth plateaus, B2B can unlock new TAM. This is 'Acquisition' through market expansion. Slack and Zoom did this. New channels = new growth.",
+                            zh: "✅ 聪明！当消费者增长停滞时，B2B可以解锁新的TAM。这是通过市场扩张的'获取'。Slack和Zoom这样做过。新渠道=新增长。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Lower prices by 50% to attract price-sensitive users", zh: "降价50%以吸引价格敏感用户" },
+                        desc: { en: "Compete on price", zh: "价格竞争" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Price cuts hurt margins and attract wrong customers. If growth stalled, price isn't the issue - distribution is. Find new channels, not new prices.",
+                            zh: "⚠️ 降价损害利润率并吸引错误的客户。如果增长停滞，价格不是问题 - 分销才是。找新渠道，而非新价格。"
+                        },
+                        points: 2
+                    },
+                    {
+                        title: { en: "Add meditation and nutrition content", zh: "添加冥想和营养内容" },
+                        desc: { en: "Expand product offerings", zh: "扩展产品供应" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More features don't solve distribution problems. If you can't reach new users, new features won't help. Focus on channels, not just product.",
+                            zh: "⚠️ 更多功能无法解决分销问题。如果你无法接触新用户，新功能也没用。专注于渠道，而非仅产品。"
+                        },
+                        points: 4
+                    }
+                ]
+            },
+            {
+                id: 14,
+                company: { en: "LocalEats", zh: "本地美食" },
+                industry: { en: "Food Discovery", zh: "美食发现" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "15,000",
+                revenue: "$8K MRR",
+                challenge: {
+                    en: "Users search for restaurants but 60% bounce without saving any.",
+                    zh: "用户搜索餐厅但60%未保存任何内容就跳出。"
+                },
+                question: {
+                    en: "How do you improve activation?",
+                    zh: "如何改善激活？"
+                },
+                options: [
+                    {
+                        title: { en: "Force users to save 3 restaurants before searching", zh: "强制用户在搜索前保存3家餐厅" },
+                        desc: { en: "Mandatory activation step", zh: "强制激活步骤" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Forced actions create friction and abandonment. Users want to search first, save later. Growth hackers reduce friction, not add it. Make saving easy and valuable.",
+                            zh: "⚠️ 强制操作产生摩擦和放弃。用户想先搜索，后保存。增长黑客减少摩擦，而非增加。让保存变得简单且有价值。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Add one-tap save button directly in search results", zh: "在搜索结果中直接添加一键保存按钮" },
+                        desc: { en: "Reduce friction to key action", zh: "减少关键操作的摩擦" },
+                        correct: true,
+                        skill: "Activation",
+                        feedback: {
+                            en: "✅ Perfect! This is friction reduction for 'Activation'. Make the valuable action (saving) as easy as possible. Pinterest mastered this with one-click pinning.",
+                            zh: "✅ 完美！这是为'激活'减少摩擦。让有价值的操作（保存）尽可能简单。Pinterest用一键pin掌握了这个。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Auto-save all searched restaurants to user profile", zh: "自动保存所有搜索的餐厅到用户资料" },
+                        desc: { en: "Automatic list building", zh: "自动列表构建" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Auto-saving everything creates noise. Users lose control and saved lists become meaningless. Let users intentionally curate. Quality > quantity.",
+                            zh: "⚠️ 自动保存一切产生噪音。用户失去控制，保存列表变得无意义。让用户有意策划。质量>数量。"
+                        },
+                        points: 3
+                    }
+                ]
+            },
+            {
+                id: 15,
+                company: { en: "BudgetWise", zh: "预算智慧" },
+                industry: { en: "Personal Finance", zh: "个人理财" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "120,000",
+                revenue: "$90K MRR",
+                challenge: {
+                    en: "Users connect bank account but never return. 1-day retention is 25%.",
+                    zh: "用户连接银行账户但从不回来。1天留存率是25%。"
+                },
+                question: {
+                    en: "How do you improve day-1 retention?",
+                    zh: "如何改善第1天留存？"
+                },
+                options: [
+                    {
+                        title: { en: "Show instant insights after bank connection (You spent $200 on coffee this month!)", zh: "银行连接后显示即时洞察（你本月在咖啡上花了$200！）" },
+                        desc: { en: "Immediate aha moment", zh: "即时的啊哈时刻" },
+                        correct: true,
+                        skill: "Activation",
+                        feedback: {
+                            en: "✅ Brilliant! This is the 'aha moment' - instant value. Users must see value immediately to return. Mint.com did this. This is perfect 'Activation' strategy.",
+                            zh: "✅ 太棒了！这是'啊哈时刻' - 即时价值。用户必须立即看到价值才会回来。Mint.com这样做过。这是完美的'激活'策略。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Send email next day: Come back and check your budget!", zh: "第二天发邮件：回来查看你的预算！" },
+                        desc: { en: "Email reminder to return", zh: "邮件提醒返回" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Emails don't fix the core problem - they didn't get value on day 1. Show value immediately so they WANT to return. Fix the product experience first.",
+                            zh: "⚠️ 邮件无法解决核心问题 - 他们第1天没获得价值。立即展示价值让他们想回来。先修复产品体验。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Require users to set budget goals before accessing dashboard", zh: "要求用户在访问仪表板前设置预算目标" },
+                        desc: { en: "Commitment through goal-setting", zh: "通过设定目标建立承诺" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More friction before value = more abandonment. Users want to see their data NOW, not do homework first. Show value, then ask for commitment.",
+                            zh: "⚠️ 价值前的更多摩擦=更多放弃。用户想现在看到数据，而非先做作业。先展示价值，然后要求承诺。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 16,
+                company: { en: "SkillSwap", zh: "技能交换" },
+                industry: { en: "Education Marketplace", zh: "教育市场" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "12,000",
+                revenue: "$18K MRR",
+                challenge: {
+                    en: "Two-sided marketplace problem: not enough teachers to match student demand.",
+                    zh: "双边市场问题：教师不足以匹配学生需求。"
+                },
+                question: {
+                    en: "How do you solve the chicken-and-egg problem?",
+                    zh: "如何解决先有鸡还是先有蛋的问题？"
+                },
+                options: [
+                    {
+                        title: { en: "Pay teachers $500 to join and create courses", zh: "支付教师$500以加入并创建课程" },
+                        desc: { en: "Incentivize supply side", zh: "激励供应方" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Expensive and attracts mercenaries, not passionate teachers. Better to recruit manually for quality first, then scale. Airbnb manually recruited hosts before scaling.",
+                            zh: "⚠️ 昂贵且吸引雇佣兵，而非热情的教师。最好先手动招募质量，然后扩大规模。Airbnb在扩大规模前手动招募房东。"
+                        },
+                        points: 2
+                    },
+                    {
+                        title: { en: "Focus on one niche (coding), manually recruit top teachers", zh: "专注一个细分领域（编程），手动招募顶级教师" },
+                        desc: { en: "Solve supply for specific vertical first", zh: "先为特定垂直领域解决供应" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Perfect! This is the marketplace playbook. Start with one niche, create dense liquidity, then expand. Uber started with black cars in SF. This is strategic 'Acquisition'.",
+                            zh: "✅ 完美！这是市场剧本。从一个细分领域开始，创造密集流动性，然后扩张。Uber从旧金山黑车开始。这是战略性'获取'。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Launch in 50 cities simultaneously", zh: "同时在50个城市启动" },
+                        desc: { en: "Maximize reach quickly", zh: "快速最大化覆盖" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Spreading thin = failing everywhere. Marketplaces need liquidity in each market. Better to dominate 1 city than be weak in 50. Focus beats dilution.",
+                            zh: "⚠️ 摊得太薄=到处失败。市场需要在每个市场都有流动性。最好主导1个城市而非在50个城市都很弱。专注胜过稀释。"
+                        },
+                        points: 1
+                    }
+                ]
+            },
+            {
+                id: 17,
+                company: { en: "ShopLocal", zh: "本地购物" },
+                industry: { en: "E-commerce", zh: "电商" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "200,000",
+                revenue: "$400K MRR",
+                challenge: {
+                    en: "Cart abandonment rate is 75%. Users add items but don't complete purchase.",
+                    zh: "购物车放弃率为75%。用户添加商品但不完成购买。"
+                },
+                question: {
+                    en: "How do you reduce cart abandonment?",
+                    zh: "如何减少购物车放弃？"
+                },
+                options: [
+                    {
+                        title: { en: "Send abandoned cart email with 10% discount after 1 hour", zh: "1小时后发送放弃购物车邮件并提供10%折扣" },
+                        desc: { en: "Recover lost sales with incentive", zh: "用激励挽回损失的销售" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Discounts train users to abandon carts to get deals. You're rewarding bad behavior. Better to fix checkout friction or use FOMO (limited stock) instead.",
+                            zh: "⚠️ 折扣训练用户放弃购物车以获得优惠。你在奖励不良行为。最好修复结账摩擦或使用FOMO（库存有限）。"
+                        },
+                        points: 4
+                    },
+                    {
+                        title: { en: "Show shipping cost upfront, add trust badges, enable guest checkout", zh: "提前显示运费，添加信任徽章，启用访客结账" },
+                        desc: { en: "Remove friction and surprise costs", zh: "消除摩擦和意外成本" },
+                        correct: true,
+                        skill: "Revenue",
+                        feedback: {
+                            en: "✅ Excellent! This tackles the top 3 abandonment reasons: surprise shipping, trust issues, forced registration. This is 'Revenue' optimization through friction reduction.",
+                            zh: "✅ 很好！这解决了放弃的三大原因：意外运费、信任问题、强制注册。这是通过减少摩擦的'变现'优化。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Add more payment options (crypto, installments)", zh: "添加更多支付选项（加密货币、分期付款）" },
+                        desc: { en: "Increase payment flexibility", zh: "增加支付灵活性" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ More options can help but likely not the core issue with 75% abandonment. Fix fundamentals first (shipping transparency, trust). Then optimize payment options.",
+                            zh: "⚠️ 更多选项有帮助但可能不是75%放弃的核心问题。先修复基础（运费透明度、信任）。然后优化支付选项。"
+                        },
+                        points: 5
+                    }
+                ]
+            },
+            {
+                id: 18,
+                company: { en: "MeetHub", zh: "会议中心" },
+                industry: { en: "Video Conferencing", zh: "视频会议" },
+                stage: { en: "Growth Stage", zh: "成长阶段" },
+                users: "250,000",
+                revenue: "$350K MRR",
+                challenge: {
+                    en: "Viral coefficient is 0.5. Each user invites 0.5 users on average. Not viral enough.",
+                    zh: "病毒系数是0.5。每个用户平均邀请0.5个用户。病毒性不够。"
+                },
+                question: {
+                    en: "How do you increase viral coefficient above 1.0?",
+                    zh: "如何将病毒系数提高到1.0以上？"
+                },
+                options: [
+                    {
+                        title: { en: "Make product invite-only with waitlist", zh: "让产品仅限邀请，设置等待名单" },
+                        desc: { en: "Create scarcity and FOMO", zh: "创造稀缺性和FOMO" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Artificial scarcity can backfire. Users want to share useful tools, not exclusive clubs. For video conferencing, accessibility matters more than exclusivity.",
+                            zh: "⚠️ 人为稀缺可能适得其反。用户想分享有用的工具，而非专属俱乐部。对于视频会议，可访问性比专属性更重要。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Require 3 participants minimum to start meeting", zh: "要求至少3个参与者才能开始会议" },
+                        desc: { en: "Force invitation for core feature", zh: "为核心功能强制邀请" },
+                        correct: true,
+                        skill: "Referral",
+                        feedback: {
+                            en: "✅ Smart! Build invitations into the core product. The product only works with others = natural virality. Zoom did this. This is 'Referral' through product design.",
+                            zh: "✅ 聪明！将邀请构建到核心产品中。产品只有与他人一起才能工作=自然病毒性。Zoom这样做过。这是通过产品设计的'推荐'。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Offer $10 credit for each referral", zh: "每次推荐提供$10积分" },
+                        desc: { en: "Monetary incentive for sharing", zh: "分享的金钱激励" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Paid referrals can work but are expensive and attract wrong users (people who want $10, not the product). Better to build viral loops into product itself.",
+                            zh: "⚠️ 付费推荐可行但昂贵且吸引错误用户（想要$10的人，而非产品）。最好将病毒循环构建到产品本身。"
+                        },
+                        points: 4
+                    }
+                ]
+            },
+            {
+                id: 19,
+                company: { en: "GreenThumb", zh: "绿拇指" },
+                industry: { en: "Gardening App", zh: "园艺应用" },
+                stage: { en: "Early Stage", zh: "早期阶段" },
+                users: "20,000",
+                revenue: "$12K MRR",
+                challenge: {
+                    en: "Seasonal problem: high engagement Apr-Sep, almost zero Oct-Mar.",
+                    zh: "季节性问题：4-9月参与度高，10-3月几乎为零。"
+                },
+                question: {
+                    en: "How do you combat seasonality?",
+                    zh: "如何对抗季节性？"
+                },
+                options: [
+                    {
+                        title: { en: "Pivot to indoor plants and winter gardening content", zh: "转向室内植物和冬季园艺内容" },
+                        desc: { en: "Year-round relevance", zh: "全年相关性" },
+                        correct: true,
+                        skill: "Retention",
+                        feedback: {
+                            en: "✅ Smart! Expand use cases to reduce seasonality. This is 'Retention' through year-round engagement. Stitch Fix added men's clothing to combat women's seasonal buying patterns.",
+                            zh: "✅ 聪明！扩展用例以减少季节性。这是通过全年参与的'留存'。Stitch Fix增加了男装以对抗女性的季节性购买模式。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Pause operations Oct-Mar to save costs", zh: "10-3月暂停运营以节省成本" },
+                        desc: { en: "Embrace seasonality", zh: "接受季节性" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Shutting down = losing users forever. Subscription businesses need year-round engagement. Better to find winter use cases than abandon users for 6 months.",
+                            zh: "⚠️ 关闭=永远失去用户。订阅业务需要全年参与。最好找到冬季用例而非放弃用户6个月。"
+                        },
+                        points: 1
+                    },
+                    {
+                        title: { en: "Discount subscriptions by 50% during winter", zh: "冬季订阅打5折" },
+                        desc: { en: "Retain users with lower price", zh: "用更低价格留住用户" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ Discounts don't create value when there's no use case. They'll still churn. Better to add features they'll use in winter than discount unused features.",
+                            zh: "⚠️ 当没有用例时折扣不会创造价值。他们仍会流失。最好添加他们冬季会使用的功能，而非打折未使用的功能。"
+                        },
+                        points: 2
+                    }
+                ]
+            },
+            {
+                id: 20,
+                company: { en: "QuickDoc", zh: "快速文档" },
+                industry: { en: "Document Editing", zh: "文档编辑" },
+                stage: { en: "Mature", zh: "成熟阶段" },
+                users: "2,000,000",
+                revenue: "$10M MRR",
+                challenge: {
+                    en: "Market leader with 60% market share. Growth slowing. Need new growth vector.",
+                    zh: "60%市场份额的市场领导者。增长放缓。需要新的增长向量。"
+                },
+                question: {
+                    en: "How do you find new growth at scale?",
+                    zh: "如何在规模化时找到新增长？"
+                },
+                options: [
+                    {
+                        title: { en: "Build API for developers to integrate QuickDoc", zh: "为开发者构建API以集成QuickDoc" },
+                        desc: { en: "Platform play - embed everywhere", zh: "平台策略 - 无处不在嵌入" },
+                        correct: true,
+                        skill: "Acquisition",
+                        feedback: {
+                            en: "✅ Brilliant! Platform strategy = exponential reach. Stripe and Twilio grew this way. Let others distribute your product. This is advanced 'Acquisition' through ecosystem.",
+                            zh: "✅ 太棒了！平台策略=指数级覆盖。Stripe和Twilio这样增长的。让其他人分发你的产品。这是通过生态系统的高级'获取'。"
+                        },
+                        points: 10
+                    },
+                    {
+                        title: { en: "Acquire smaller competitors", zh: "收购较小的竞争对手" },
+                        desc: { en: "Consolidation strategy", zh: "整合策略" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ M&A is expensive and risky for growth. You already have 60% - buying the remaining 40% won't create new markets. Better to expand TAM than consolidate existing market.",
+                            zh: "⚠️ 并购对增长来说昂贵且有风险。你已有60% - 购买剩余40%不会创造新市场。最好扩大TAM而非整合现有市场。"
+                        },
+                        points: 3
+                    },
+                    {
+                        title: { en: "Launch entirely new product category (spreadsheets)", zh: "推出全新产品类别（电子表格）" },
+                        desc: { en: "Diversify product portfolio", zh: "多样化产品组合" },
+                        correct: false,
+                        feedback: {
+                            en: "⚠️ New products are risky. Google did this successfully with Docs/Sheets, but it requires huge resources. API/platform is lower risk and leverages existing strengths.",
+                            zh: "⚠️ 新产品有风险。Google用Docs/Sheets成功做到了，但需要巨大资源。API/平台风险更低且利用现有优势。"
+                        },
+                        points: 5
+                    }
+                ]
+            }
+        ];
+
+        let gameState = {
+            currentScenario: 0,
+            score: 0,
+            correctAnswers: 0,
+            selectedAnswer: null,
+            skillsLearned: new Set()
+        };
+
+        function startGame() {
+            gameState = {
+                currentScenario: 0,
+                score: 0,
+                correctAnswers: 0,
+                selectedAnswer: null,
+                skillsLearned: new Set()
+            };
+            updateStats();
+            document.querySelector('.welcome-screen').classList.remove('active');
+            document.querySelector('.game-screen').classList.add('active');
+            loadScenario();
+        }
+
+        function loadScenario() {
+            const scenario = scenarios[gameState.currentScenario];
+            gameState.selectedAnswer = null;
+
+            // Update progress bar
+            const progress = ((gameState.currentScenario + 1) / scenarios.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+
+            // Load company card
+            const companyCard = document.getElementById('company-card');
+            companyCard.innerHTML = `
+                <div class="company-name">${scenario.company.en} / ${scenario.company.zh}</div>
+                <div class="company-info">
+                    <div class="info-item">
+                        <div class="info-label">Industry / 行业</div>
+                        <div class="info-value">${scenario.industry.en} / ${scenario.industry.zh}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Stage / 阶段</div>
+                        <div class="info-value">${scenario.stage.en} / ${scenario.stage.zh}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Users / 用户</div>
+                        <div class="info-value">${scenario.users}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Revenue / 收入</div>
+                        <div class="info-value">${scenario.revenue}</div>
+                    </div>
+                </div>
+                <div class="challenge">
+                    <div class="challenge-title">Challenge / 挑战:</div>
+                    <div>${scenario.challenge.en}</div>
+                    <div style="color: #856404; margin-top: 5px;">${scenario.challenge.zh}</div>
+                </div>
+            `;
+
+            // Load question
+            const questionEl = document.getElementById('question');
+            questionEl.innerHTML = `
+                <div class="en">${scenario.question.en}</div>
+                <div class="zh">${scenario.question.zh}</div>
+            `;
+
+            // Load options
+            const optionsEl = document.getElementById('options');
+            optionsEl.innerHTML = '';
+            scenario.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.innerHTML = `
+                    <div class="option-title">${option.title.en} / ${option.title.zh}</div>
+                    <div class="option-desc">${option.desc.en} / ${option.desc.zh}</div>
+                `;
+                optionEl.onclick = () => selectAnswer(index);
+                optionsEl.appendChild(optionEl);
+            });
+
+            // Hide feedback and next button
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        function selectAnswer(optionIndex) {
+            if (gameState.selectedAnswer !== null) return; // Already answered
+
+            gameState.selectedAnswer = optionIndex;
+            const scenario = scenarios[gameState.currentScenario];
+            const selectedOption = scenario.options[optionIndex];
+
+            // Update score
+            gameState.score += selectedOption.points;
+            if (selectedOption.correct) {
+                gameState.correctAnswers++;
+                gameState.skillsLearned.add(selectedOption.skill);
+            }
+            updateStats();
+
+            // Visual feedback on options
+            const optionEls = document.querySelectorAll('.option');
+            optionEls.forEach((el, index) => {
+                if (scenario.options[index].correct) {
+                    el.classList.add('correct');
+                } else if (index === optionIndex) {
+                    el.classList.add('incorrect');
+                }
+                el.style.pointerEvents = 'none';
+            });
+
+            // Show feedback
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.className = 'feedback show ' + (selectedOption.correct ? 'success' : 'warning');
+            feedbackEl.innerHTML = `
+                <div class="feedback-title">${selectedOption.correct ? 'Correct!' : 'Not Optimal'} / ${selectedOption.correct ? '正确！' : '不是最优'}</div>
+                <div>${selectedOption.feedback.en}</div>
+                <div style="margin-top: 10px; opacity: 0.9;">${selectedOption.feedback.zh}</div>
+                <div style="margin-top: 15px; font-weight: bold;">Points earned / 获得分数: +${selectedOption.points}</div>
+            `;
+
+            // Show next button
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function nextScenario() {
+            gameState.currentScenario++;
+
+            if (gameState.currentScenario >= scenarios.length) {
+                showResults();
+            } else {
+                loadScenario();
+            }
+        }
+
+        function showResults() {
+            document.querySelector('.game-screen').classList.remove('active');
+            document.querySelector('.result-screen').classList.add('active');
+
+            const maxScore = scenarios.reduce((sum, s) => sum + Math.max(...s.options.map(o => o.points)), 0);
+            const percentage = Math.round((gameState.score / maxScore) * 100);
+
+            document.getElementById('final-score').textContent = gameState.score + ' / ' + maxScore;
+
+            let rating, message;
+            if (percentage >= 90) {
+                rating = '🏆 Growth Hacking Master / 增长黑客大师';
+                message = 'You have mastered the art of growth hacking! You understand acquisition, activation, retention, revenue, and referral strategies. / 你已掌握增长黑客的艺术！你理解获取、激活、留存、变现和推荐策略。';
+            } else if (percentage >= 75) {
+                rating = '⭐ Senior Growth Hacker / 高级增长黑客';
+                message = 'Strong performance! You grasp key growth principles and can apply them effectively. / 表现出色！你掌握了关键增长原则并能有效应用。';
+            } else if (percentage >= 60) {
+                rating = '📈 Growth Hacker / 增长黑客';
+                message = 'Good understanding of growth fundamentals. Keep practicing to master advanced tactics. / 对增长基础有良好理解。继续练习以掌握高级策略。';
+            } else {
+                rating = '🌱 Growth Beginner / 增长新手';
+                message = 'You\'re learning! Review the feedback and try again to improve your growth hacking skills. / 你在学习中！回顾反馈并再次尝试以提高你的增长黑客技能。';
+            }
+
+            document.getElementById('rating').textContent = rating;
+            document.getElementById('result-message').textContent = message;
+
+            // Show skills learned
+            const skillsEl = document.getElementById('skills-list');
+            const allSkills = ['Acquisition', 'Activation', 'Retention', 'Revenue', 'Referral'];
+            const skillsZh = {
+                'Acquisition': '获取',
+                'Activation': '激活',
+                'Retention': '留存',
+                'Revenue': '变现',
+                'Referral': '推荐'
+            };
+
+            skillsEl.innerHTML = allSkills.map(skill =>
+                `<span class="skill-tag" style="${gameState.skillsLearned.has(skill) ? '' : 'opacity: 0.3;'}">
+                    ${skill} / ${skillsZh[skill]}
+                </span>`
+            ).join('');
+        }
+
+        function restartGame() {
+            document.querySelector('.result-screen').classList.remove('active');
+            document.querySelector('.welcome-screen').classList.add('active');
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('current-scenario').textContent = (gameState.currentScenario + 1) + '/20';
+            document.getElementById('correct-answers').textContent = gameState.correctAnswers;
+        }
+    </script>
+</body>
+</html>
