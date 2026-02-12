@@ -6,7 +6,7 @@ An interactive learning game that teaches growth hacking skills through real-wor
 
 ## 🎮 Play Now | 立即开始
 
-**[🎯 Click here to play!](https://[YOUR-USERNAME].github.io/growth-hacker-game/)**
+**[🎯 Click here to play!](https://orangeviolin.github.io/growth-hacker-game/)**
 
 ## 📖 About | 关于
 
