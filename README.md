@@ -6,7 +6,7 @@ An interactive learning game that teaches growth hacking skills through real-wor
 
 ## 🎮 Play Now | 立即开始
 
-### 两种游戏模式 Two Game Modes:
+### 三种游戏模式 Three Game Modes:
 
 **📚 [学习模式 Learning Mode](https://orangeviolin.github.io/growth-hacker-game/)**
 - 20个精心设计的公司场景 20 carefully crafted company scenarios
@@ -14,12 +14,21 @@ An interactive learning game that teaches growth hacking skills through real-wor
 - 适合系统学习AARRR框架 Perfect for systematically learning the AARRR framework
 - 快速上手，即玩即学 Quick start, learn as you play
 
-**🎯 [实战模式 Real-World Mode](https://orangeviolin.github.io/growth-hacker-game/custom-scenario.html)** ⭐ NEW
+**🎯 [实战模式 Real-World Mode](https://orangeviolin.github.io/growth-hacker-game/custom-scenario.html)**
 - 输入你自己的真实业务场景 Input your own real business scenario
-- 获得针对性的增长策略分析 Get customized growth strategy analysis
+- 智能引擎生成3-5个针对性策略 AI engine generates 3-5 customized strategies
 - 多角度分析优缺点，没有唯一答案 Multi-perspective analysis of pros/cons, no single right answer
+- 包含预算估算和时间规划 Includes budget estimates and timeframes
 - 可导出提示词到AI获取深度建议 Export prompts to AI for deeper insights
-- 更贴近实际应用 Closer to real-world application
+
+**🎮 [游戏模式 Game Mode](https://orangeviolin.github.io/growth-hacker-game/game-mode.html)** ⭐ NEW!
+- 🏆 像RPG游戏一样升级打怪 Level up like an RPG game
+- 📊 6个关卡对应AARRR框架 6 levels covering the AARRR framework
+- 💡 使用增长黑客书中的技能卡 Use skill cards from the Growth Hacker book
+- 🎯 两种模式：真实业务 or AI生成挑战 Two modes: Real business or AI challenges
+- 🏅 成就系统激励学习 Achievement system to motivate learning
+- 📈 实时指标追踪（用户数、收入、留存率等）Real-time metrics tracking
+- 📋 **玩完自动生成完整的推广计划！** Auto-generates complete growth plan!
 
 ## 📖 About | 关于
 
