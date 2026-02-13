@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Growth Hacker Game | 增长黑客游戏</title>
+
+    <!-- 移动端触摸优化样式 -->
+    <link rel="stylesheet" href="mobile-touch-optimized.css">
+
     <style>
         * {
             margin: 0;
@@ -17,6 +23,11 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            /* 移动端优化 */
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
@@ -57,6 +68,14 @@
             text-decoration: none;
             margin: 0 15px;
             font-weight: 500;
+            /* 移动端触摸优化 */
+            padding: 8px 12px;
+            display: inline-block;
+            min-height: 44px;
+            line-height: 1.4;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
         }
 
         .nav-links a:hover {
@@ -177,12 +196,23 @@
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
+            /* 移动端触摸优化 */
+            min-height: 80px;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
         .option:hover {
             border-color: #667eea;
             transform: translateX(5px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .option:active {
+            transform: scale(0.98);
         }
 
         .option.selected {
@@ -205,12 +235,14 @@
             font-size: 1.1em;
             margin-bottom: 8px;
             color: #333;
+            /* 移动端可读性 */
+            line-height: 1.4;
         }
 
         .option-desc {
             color: #6c757d;
-            font-size: 0.95em;
-            line-height: 1.5;
+            font-size: 1em;
+            line-height: 1.6;
         }
 
         .feedback {
@@ -265,6 +297,14 @@
             transition: all 0.3s;
             margin-top: 20px;
             font-weight: bold;
+            /* 移动端触摸优化 */
+            min-height: 48px;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:hover {
@@ -1632,6 +1672,184 @@
             document.getElementById('current-scenario').textContent = (gameState.currentScenario + 1) + '/20';
             document.getElementById('correct-answers').textContent = gameState.correctAnswers;
         }
+
+        // 移动端触摸增强
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加触摸涟漪效果
+            const touchElements = document.querySelectorAll('.btn, .option');
+            touchElements.forEach(element => {
+                element.addEventListener('click', (e) => {
+                    const ripple = document.createElement('span');
+                    const rect = element.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+
+                    element.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Toast通知函数
+            window.showGameToast = function(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `game-toast game-toast-${type}`;
+                toast.textContent = message;
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: 80px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    padding: 16px 24px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#F44336' : '#2196F3'};
+                    color: white;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 10000;
+                    animation: slideUp 0.3s ease;
+                    min-height: 48px;
+                    display: flex;
+                    align-items: center;
+                `;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.animation = 'slideDown 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            };
+
+            console.log('✅ Mobile touch enhancements loaded');
+        });
     </script>
+
+    <!-- 移动端触摸交互处理器 -->
+    <script src="mobile-touch-handler.js"></script>
+
+    <style>
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* 移动端响应式优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+                font-size: 17px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .content {
+                padding: 24px 20px;
+            }
+
+            .btn {
+                font-size: 1.15em;
+                padding: 16px 32px;
+                min-height: 52px;
+                width: 100%;
+                margin-top: 16px;
+            }
+
+            .option {
+                padding: 24px;
+                margin-bottom: 16px;
+                min-height: 100px;
+            }
+
+            .option-title {
+                font-size: 1.2em;
+            }
+
+            .option-desc {
+                font-size: 1.05em;
+            }
+
+            .nav-links {
+                padding: 12px 8px;
+            }
+
+            .nav-links a {
+                display: block;
+                margin: 8px 0;
+                padding: 12px 16px;
+                background: rgba(255,255,255,0.9);
+                border-radius: 8px;
+                text-align: center;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .stat-item {
+                flex: 1 1 45%;
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-item {
+                flex: 1 1 100%;
+            }
+
+            .option {
+                padding: 20px;
+            }
+
+            .company-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </body>
 </html>

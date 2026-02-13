@@ -906,12 +906,450 @@
             display: block;
         }
 
-        @media (max-width: 968px) {
+        /* 平板设备优化 (768px及以下) */
+        @media (max-width: 768px) {
             .game-grid {
                 grid-template-columns: 1fr;
             }
+
+            .mission-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .stat-box {
+                padding: 10px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+        }
+
+        /* 手机设备优化 (480px及以下) */
+        @media (max-width: 480px) {
+            /* 基础设置 */
+            body {
+                font-size: 14px;
+                padding-bottom: 20px;
+            }
+
+            /* 任务头部优化 */
+            .mission-header {
+                padding: 15px;
+                position: relative; /* 避免sticky在移动端的问题 */
+            }
+
+            .mission-title {
+                font-size: 1.3em;
+                letter-spacing: 1px;
+                margin-bottom: 12px;
+            }
+
+            .mission-objective {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .objective-text {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+
+            .objective-details {
+                font-size: 0.85em;
+                line-height: 1.5;
+            }
+
+            /* 统计数据单列显示 */
             .mission-stats {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-box {
+                padding: 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .stat-label {
+                font-size: 0.9em;
+                text-align: left;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+                text-align: right;
+            }
+
+            /* 主内容区 */
+            .game-content {
+                padding: 15px;
+            }
+
+            .game-grid {
+                gap: 15px;
+            }
+
+            /* 场景卡片 */
+            .scene-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .scene-time {
+                font-size: 1em;
+                margin-bottom: 12px;
+            }
+
+            .scene-text {
+                font-size: 0.95em;
+                line-height: 1.7;
+            }
+
+            /* 行动卡片 */
+            .action-card {
+                padding: 15px;
+            }
+
+            .action-title {
+                font-size: 1.1em;
+                margin-bottom: 15px;
+            }
+
+            /* 行动按钮 - 确保触摸区域足够大 */
+            .action-btn {
+                padding: 16px;
+                min-height: 88px; /* 确保触摸目标 */
+                margin-bottom: 10px;
+            }
+
+            .action-name {
+                font-size: 1em;
+                margin-bottom: 6px;
+            }
+
+            .action-desc {
+                font-size: 0.85em;
+                margin-bottom: 8px;
+                line-height: 1.4;
+            }
+
+            .action-cost {
+                font-size: 0.8em;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            /* 侧边栏 */
+            .sidebar {
+                gap: 12px;
+            }
+
+            .sidebar-card {
+                padding: 15px;
+            }
+
+            .sidebar-title {
+                font-size: 1em;
+                margin-bottom: 12px;
+            }
+
+            /* 情报列表 */
+            .info-item {
+                padding: 10px;
+                margin-bottom: 8px;
+                font-size: 0.9em;
+            }
+
+            .consequence-item {
+                padding: 10px;
+                margin-bottom: 8px;
+                font-size: 0.85em;
+            }
+
+            /* 资源面板 */
+            .resource-panel {
+                padding: 15px;
+                margin-bottom: 12px;
+            }
+
+            .resource-title {
+                font-size: 1em;
+                margin-bottom: 12px;
+            }
+
+            .resource-item {
+                padding: 8px;
+            }
+
+            .resource-label {
+                font-size: 0.85em;
+            }
+
+            .resource-value {
+                font-size: 0.9em;
+            }
+
+            /* 弹窗优化 */
+            .result-box {
+                padding: 25px;
+                margin: 15px;
+                max-width: calc(100% - 30px);
+            }
+
+            .result-icon {
+                font-size: 3.5em;
+                margin-bottom: 15px;
+            }
+
+            .result-title {
+                font-size: 2em;
+                margin-bottom: 15px;
+                letter-spacing: 2px;
+            }
+
+            .result-text {
+                font-size: 1em;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+
+            /* 按钮优化 - 确保足够大 */
+            .result-btn {
+                padding: 14px 28px;
+                font-size: 1em;
+                margin: 5px;
+                min-width: 120px;
+                min-height: 44px; /* iOS推荐最小触摸目标 */
+                display: inline-block;
+            }
+
+            .feedback-close {
+                padding: 14px 24px;
+                font-size: 1em;
+                min-height: 44px;
+            }
+
+            /* 反馈弹窗 */
+            .feedback-card {
+                padding: 20px;
+                margin: 15px;
+                max-width: calc(100% - 30px);
+            }
+
+            .feedback-header {
+                gap: 10px;
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+
+            .feedback-icon-small {
+                font-size: 1.5em;
+            }
+
+            .feedback-title-small {
+                font-size: 1.1em;
+            }
+
+            .feedback-content {
+                font-size: 0.95em;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            .feedback-time {
+                padding: 8px;
+                margin-bottom: 15px;
+                font-size: 0.85em;
+            }
+
+            /* 对话系统 */
+            .dialogue-header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+
+            .dialogue-question {
+                padding: 15px;
+                margin-bottom: 20px;
+                font-size: 1em;
+                line-height: 1.6;
+            }
+
+            .dialogue-option {
+                padding: 14px;
+                margin-bottom: 10px;
+                min-height: 60px;
+            }
+
+            .option-label {
+                font-size: 1em;
+            }
+
+            .option-text {
+                font-size: 0.9em;
+            }
+
+            .option-feedback {
+                font-size: 0.85em;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+
+            /* 事件弹窗 */
+            .event-modal {
+                width: 95%;
+                max-width: 95%;
+            }
+
+            .event-header {
+                padding: 20px;
+            }
+
+            .event-icon {
+                font-size: 3em;
+                margin-bottom: 12px;
+            }
+
+            .event-type-badge {
+                font-size: 0.8em;
+                padding: 4px 12px;
+            }
+
+            .event-title {
+                font-size: 1.4em;
+            }
+
+            .event-body {
+                padding: 20px;
+            }
+
+            .event-description {
+                font-size: 1em;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            .event-context {
+                padding: 12px;
+                margin-bottom: 20px;
+                font-size: 0.9em;
+            }
+
+            .event-choice {
+                padding: 14px;
+                margin-bottom: 10px;
+            }
+
+            .choice-label {
+                font-size: 1em;
+            }
+
+            .choice-text {
+                font-size: 0.9em;
+            }
+
+            .choice-cost,
+            .choice-success-rate {
+                font-size: 0.8em;
+            }
+
+            /* 结果输出 */
+            .event-outcome {
+                padding: 25px;
+            }
+
+            .outcome-icon {
+                font-size: 3.5em;
+                margin-bottom: 15px;
+            }
+
+            .outcome-title {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+
+            .outcome-text {
+                font-size: 1em;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+
+            .outcome-close {
+                padding: 12px 30px;
+                font-size: 1em;
+                min-height: 44px;
+            }
+
+            /* 确保准备好按钮足够大 */
+            #ready-btn {
+                min-height: 50px;
+                font-size: 1.1em;
+                padding: 15px 30px;
+            }
+
+            /* 修复小屏幕下的滚动问题 */
+            .actions-grid {
+                margin-bottom: 15px;
+            }
+        }
+
+        /* 超小屏幕优化 (360px及以下 - Android常见尺寸) */
+        @media (max-width: 360px) {
+            body {
+                font-size: 13px;
+            }
+
+            .mission-title {
+                font-size: 1.1em;
+            }
+
+            .result-title {
+                font-size: 1.6em;
+            }
+
+            .result-icon {
+                font-size: 3em;
+            }
+
+            .action-btn {
+                padding: 14px;
+                min-height: 80px;
+            }
+
+            .result-btn {
+                font-size: 0.95em;
+                padding: 12px 20px;
+                min-width: 100px;
+            }
+        }
+
+        /* 横屏优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .mission-header {
+                position: relative; /* 避免占用过多垂直空间 */
+            }
+
+            .mission-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stat-box {
+                padding: 8px;
+            }
+
+            .stat-value {
+                font-size: 1.3em;
+            }
+
+            .result-box,
+            .feedback-card,
+            .event-modal {
+                max-height: 85vh;
+                overflow-y: auto;
             }
         }
     </style>

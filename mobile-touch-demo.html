@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>移动端触摸交互优化演示 | Mobile Touch Demo</title>
+
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="mobile-touch-optimized.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .demo-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .demo-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+
+        .demo-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            min-height: 48px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #F44336 0%, #E53935 100%);
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+        }
+
+        .option-card:active {
+            transform: scale(0.98);
+            border-color: #667eea;
+        }
+
+        .option-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .option-desc {
+            font-size: 16px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            min-height: 48px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .toast-triggers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .swipe-demo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-demo {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 16px;
+            background: #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .feature-list {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 4px;
+        }
+
+        .long-press-hint {
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>📱 移动端触摸交互演示</h1>
+            <p>Mobile Touch Interaction Demo</p>
+        </div>
+
+        <!-- 主内容 -->
+        <div class="content">
+            <!-- 1. 触摸友好按钮 -->
+            <section class="section">
+                <h2 class="section-title">1️⃣ 触摸友好按钮</h2>
+                <div class="demo-item">
+                    <div class="demo-label">最小 44x44px 点击区域，涟漪反馈效果</div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="handleButtonClick('primary')">
+                            主要按钮 Primary Button
+                        </button>
+                        <button class="btn btn-secondary" onclick="handleButtonClick('secondary')">
+                            次要按钮 Secondary Button
+                        </button>
+                        <button class="btn btn-success" onclick="handleButtonClick('success')">
+                            ✓ 成功按钮 Success
+                        </button>
+                        <button class="btn btn-warning" onclick="handleButtonClick('warning')">
+                            ⚠️ 警告按钮 Warning
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 选项卡片 -->
+            <section class="section">
+                <h2 class="section-title">2️⃣ 可点击选项卡片</h2>
+                <div class="demo-item">
+                    <div class="demo-label">增大点击区域，触摸时缩放反馈</div>
+                    <div class="demo-grid">
+                        <div class="option-card swipeable" onclick="handleOptionClick('A')">
+                            <div class="option-title">选项 A - 内容营销</div>
+                            <div class="option-desc">低成本、高效果、长期收益</div>
+                        </div>
+                        <div class="option-card swipeable" onclick="handleOptionClick('B')">
+                            <div class="option-title">选项 B - 社交媒体</div>
+                            <div class="option-desc">快速获客、广泛传播、互动性强</div>
+                        </div>
+                        <div class="option-card swipeable" onclick="handleOptionClick('C')">
+                            <div class="option-title">选项 C - 产品优化</div>
+                            <div class="option-desc">提升留存、用户满意度、口碑传播</div>
+                        </div>
+                    </div>
+                    <div class="swipeable::after" style="text-align: center; margin-top: 12px; font-size: 14px; color: #6c757d;">
+                        💡 提示：左右滑动卡片查看更多
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Toast 通知 -->
+            <section class="section">
+                <h2 class="section-title">3️⃣ Toast 通知提示</h2>
+                <div class="demo-item">
+                    <div class="demo-label">带振动反馈的通知系统</div>
+                    <div class="toast-triggers">
+                        <button class="btn btn-success" onclick="showToast('操作成功！', 'success')">
+                            成功 ✓
+                        </button>
+                        <button class="btn btn-danger" onclick="showToast('操作失败！', 'error')">
+                            错误 ✗
+                        </button>
+                        <button class="btn btn-warning" onclick="showToast('请注意！', 'warning')">
+                            警告 ⚠️
+                        </button>
+                        <button class="btn btn-secondary" onclick="showToast('这是一条信息', 'info')">
+                            信息 ℹ️
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 滑动手势 -->
+            <section class="section">
+                <h2 class="section-title">4️⃣ 滑动手势支持</h2>
+                <div class="demo-item">
+                    <div class="demo-label">向左/右滑动触发操作</div>
+                    <div class="swipe-demo swipeable" id="swipe-area">
+                        👆 向左或向右滑动
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 表单输入 -->
+            <section class="section">
+                <h2 class="section-title">5️⃣ 触摸友好表单</h2>
+                <div class="demo-item">
+                    <div class="demo-label">16px 字体避免自动缩放，清晰焦点状态</div>
+                    <input type="text" placeholder="输入您的名字 (16px 字体)" style="margin-bottom: 12px;">
+                    <textarea placeholder="输入您的反馈（至少 48px 高度）" rows="3"></textarea>
+                </div>
+            </section>
+
+            <!-- 6. 进度条 -->
+            <section class="section">
+                <h2 class="section-title">6️⃣ 可交互进度条</h2>
+                <div class="demo-item">
+                    <div class="demo-label">点击进度条查看详情</div>
+                    <div class="progress-demo">
+                        <div class="progress-bar" onclick="handleProgressClick('budget')">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <div class="progress-bar" onclick="handleProgressClick('energy')">
+                            <div class="progress-fill" style="width: 50%;"></div>
+                        </div>
+                        <div class="progress-bar" onclick="handleProgressClick('trust')">
+                            <div class="progress-fill" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. 统计数据 -->
+            <section class="section">
+                <h2 class="section-title">7️⃣ 易读数据展示</h2>
+                <div class="demo-item">
+                    <div class="demo-label">大字体、高对比度、清晰层次</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">1,234</div>
+                            <div class="stat-label">用户数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">89%</div>
+                            <div class="stat-label">留存率</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">$50K</div>
+                            <div class="stat-label">收入</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">4.8⭐</div>
+                            <div class="stat-label">评分</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. 长按操作 -->
+            <section class="section">
+                <h2 class="section-title">8️⃣ 长按操作</h2>
+                <div class="demo-item">
+                    <div class="demo-label">长按按钮触发特殊操作（防误触）</div>
+                    <button class="btn btn-danger" id="long-press-btn">
+                        长按删除 (Hold to Delete)
+                    </button>
+                    <div class="long-press-hint">⏱️ 长按 1 秒以确认删除</div>
+                </div>
+            </section>
+
+            <!-- 9. 优化特性列表 -->
+            <section class="section">
+                <h2 class="section-title">✨ 优化特性清单</h2>
+                <div class="feature-list">
+                    <ul>
+                        <li>✅ 最小触摸目标 44x44px (Apple/Google 标准)</li>
+                        <li>✅ 按钮间距最少 8px</li>
+                        <li>✅ 正文字体 ≥16px (避免浏览器自动缩放)</li>
+                        <li>✅ 行高 ≥1.6 提升可读性</li>
+                        <li>✅ 触摸涟漪效果 (Material Design)</li>
+                        <li>✅ 振动反馈 (iOS & Android)</li>
+                        <li>✅ 滑动手势支持</li>
+                        <li>✅ Toast 通知系统</li>
+                        <li>✅ 防止双击缩放</li>
+                        <li>✅ 优化滚动性能</li>
+                        <li>✅ 长按防误触</li>
+                        <li>✅ 禁用文本选择（按钮）</li>
+                        <li>✅ 自定义 tap-highlight-color</li>
+                        <li>✅ iOS 平滑滚动 (-webkit-overflow-scrolling)</li>
+                        <li>✅ 安全区域适配 (iPhone X+)</li>
+                        <li>✅ 深色模式支持</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 10. 技术标签 -->
+            <section class="section">
+                <h2 class="section-title">🏷️ 技术栈</h2>
+                <div class="demo-item" style="text-align: center;">
+                    <span class="badge">HTML5</span>
+                    <span class="badge">CSS3</span>
+                    <span class="badge">JavaScript ES6+</span>
+                    <span class="badge">Touch Events API</span>
+                    <span class="badge">Vibration API</span>
+                    <span class="badge">Intersection Observer</span>
+                    <span class="badge">CSS Variables</span>
+                    <span class="badge">Flexbox & Grid</span>
+                    <span class="badge">Mobile First</span>
+                    <span class="badge">Progressive Enhancement</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            <p>📱 最佳体验：使用移动设备访问本页面</p>
+            <p>🔧 支持：iOS Safari、Chrome、Android Chrome</p>
+            <p style="margin-top: 12px; font-size: 12px; opacity: 0.7;">
+                参考标准：Apple Human Interface Guidelines、Material Design、WCAG 2.1
+            </p>
+        </div>
+    </div>
+
+    <!-- 引入脚本 -->
+    <script src="mobile-touch-handler.js"></script>
+    <script>
+        // 按钮点击处理
+        function handleButtonClick(type) {
+            showToast(`点击了 ${type} 按钮`, 'info', 2000);
+        }
+
+        // 选项点击处理
+        function handleOptionClick(option) {
+            showToast(`选择了选项 ${option}`, 'success', 2000);
+        }
+
+        // 进度条点击处理
+        function handleProgressClick(type) {
+            const messages = {
+                budget: '预算进度：75%',
+                energy: '精力进度：50%',
+                trust: '信任进度：90%'
+            };
+            showToast(messages[type] || '点击了进度条', 'info', 2000);
+        }
+
+        // 设置滑动事件
+        document.addEventListener('DOMContentLoaded', () => {
+            const swipeArea = document.getElementById('swipe-area');
+
+            swipeArea.addEventListener('swipeleft', () => {
+                swipeArea.textContent = '👈 向左滑动';
+                swipeArea.style.background = 'linear-gradient(135deg, #F44336 0%, #E53935 100%)';
+                showToast('向左滑动！', 'info', 1500);
+
+                setTimeout(() => {
+                    swipeArea.textContent = '👆 向左或向右滑动';
+                    swipeArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }, 1500);
+            });
+
+            swipeArea.addEventListener('swiperight', () => {
+                swipeArea.textContent = '👉 向右滑动';
+                swipeArea.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+                showToast('向右滑动！', 'info', 1500);
+
+                setTimeout(() => {
+                    swipeArea.textContent = '👆 向左或向右滑动';
+                    swipeArea.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }, 1500);
+            });
+
+            // 设置长按
+            const longPressBtn = document.getElementById('long-press-btn');
+            if (window.mobileTouchHandler) {
+                window.mobileTouchHandler.setupLongPress(longPressBtn, () => {
+                    showToast('长按操作触发！已删除', 'success', 2000);
+                    longPressBtn.textContent = '✓ 已删除';
+                    longPressBtn.disabled = true;
+
+                    setTimeout(() => {
+                        longPressBtn.textContent = '长按删除 (Hold to Delete)';
+                        longPressBtn.disabled = false;
+                    }, 2000);
+                }, 1000);
+            }
+        });
+
+        // 显示设备信息
+        console.log('📱 设备信息:');
+        console.log('- User Agent:', navigator.userAgent);
+        console.log('- Touch Support:', 'ontouchstart' in window);
+        console.log('- Max Touch Points:', navigator.maxTouchPoints);
+        console.log('- Screen Size:', window.screen.width + 'x' + window.screen.height);
+        console.log('- Device Pixel Ratio:', window.devicePixelRatio);
+        console.log('- Vibration API:', 'vibrate' in navigator);
+    </script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- 移动端优化的viewport设置 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- iOS Web App配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="增长黑客">
+
+    <!-- Android Chrome配置 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+
+    <!-- PWA Manifest -->
+    <!-- <link rel="manifest" href="manifest.json"> -->
+
+    <title>移动端测试演示 | Mobile Test Demo</title>
+
+    <!-- 引入基础样式 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .test-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+        }
+
+        .status.success {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+
+    <!-- 引入移动端优化CSS -->
+    <link rel="stylesheet" href="mobile-optimizations.css">
+</head>
+<body>
+    <!-- 加载屏幕 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📱 移动端测试演示</h1>
+            <p>Mobile Optimization Test Demo</p>
+        </div>
+
+        <div class="content">
+            <!-- 设备信息 -->
+            <div class="test-section">
+                <h3>📊 设备信息</h3>
+                <div id="deviceInfo" class="status">
+                    检测中...
+                </div>
+            </div>
+
+            <!-- 性能指标 -->
+            <div class="test-section">
+                <h3>⚡ 性能指标</h3>
+                <div class="metrics-grid" id="performanceMetrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="fpsValue">--</div>
+                        <div class="metric-label">FPS</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="memoryValue">--</div>
+                        <div class="metric-label">内存 (MB)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="loadValue">--</div>
+                        <div class="metric-label">加载 (ms)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 触摸测试 -->
+            <div class="test-section">
+                <h3>👆 触摸测试</h3>
+                <p>点击按钮测试触摸反馈和性能</p>
+                <button class="btn" onclick="testTouch(this)">测试按钮 1</button>
+                <button class="btn" onclick="testTouch(this)">测试按钮 2</button>
+                <button class="btn" onclick="testTouch(this)">测试按钮 3</button>
+                <div id="touchResult" class="status" style="display: none; margin-top: 15px;"></div>
+            </div>
+
+            <!-- 输入测试 -->
+            <div class="test-section">
+                <h3>⌨️ 输入框测试</h3>
+                <p>测试iOS自动缩放问题（应该不会放大）</p>
+                <input type="text" placeholder="输入文字..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; margin: 10px 0;">
+                <textarea placeholder="输入多行文字..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; min-height: 80px;"></textarea>
+            </div>
+
+            <!-- 滚动测试 -->
+            <div class="test-section">
+                <h3>📜 滚动测试</h3>
+                <div style="height: 200px; overflow-y: auto; border: 2px solid #ddd; border-radius: 8px; padding: 15px; -webkit-overflow-scrolling: touch;">
+                    <p>测试移动端平滑滚动</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <p>更多内容...</p>
+                    <p>More content...</p>
+                    <p>继续滚动...</p>
+                    <p>Keep scrolling...</p>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="test-section">
+                <h3>🔧 测试工具</h3>
+                <button class="btn" onclick="toggleDebugPanel()">切换调试面板</button>
+                <button class="btn" onclick="exportReport()">导出性能报告</button>
+                <button class="btn" onclick="toggleLowPerformance()">切换低性能模式</button>
+                <button class="btn" onclick="testNotification()">测试通知</button>
+            </div>
+
+            <!-- 测试结果 -->
+            <div class="test-section">
+                <h3>📋 测试结果</h3>
+                <div id="testResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入性能监控脚本 -->
+    <script src="performance-monitor.js"></script>
+
+    <script>
+        // 页面加载完成后隐藏loading
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 300);
+            }, 500);
+        });
+
+        // 显示设备信息
+        function displayDeviceInfo() {
+            const monitor = window.performanceMonitor;
+            if (!monitor) return;
+
+            const device = monitor.deviceCapabilities;
+            const info = `
+                <strong>设备类型:</strong> ${device.isMobile ? '移动设备 📱' : '桌面设备 💻'}<br>
+                <strong>性能等级:</strong> ${device.isLowEnd ? '低端设备 ⚠️' : '正常设备 ✅'}<br>
+                <strong>CPU核心:</strong> ${device.cpuCores}<br>
+                <strong>设备内存:</strong> ${device.deviceMemory} GB<br>
+                <strong>触摸点数:</strong> ${device.maxTouchPoints}<br>
+                <strong>网络类型:</strong> ${device.connection.effectiveType}<br>
+                <strong>下载速度:</strong> ${device.connection.downlink} Mbps
+            `;
+
+            document.getElementById('deviceInfo').innerHTML = info;
+            document.getElementById('deviceInfo').className = device.isLowEnd ? 'status warning' : 'status success';
+        }
+
+        // 更新性能指标
+        function updatePerformanceMetrics() {
+            const monitor = window.performanceMonitor;
+            if (!monitor) return;
+
+            document.getElementById('fpsValue').textContent = monitor.metrics.fps || '--';
+            document.getElementById('memoryValue').textContent = monitor.metrics.memory || '--';
+            document.getElementById('loadValue').textContent = monitor.metrics.loadTime || '--';
+
+            // FPS颜色
+            const fpsElement = document.getElementById('fpsValue');
+            const fps = monitor.metrics.fps;
+            fpsElement.style.color = fps >= 50 ? '#28a745' :
+                                     fps >= 30 ? '#ffc107' : '#dc3545';
+        }
+
+        // 触摸测试
+        function testTouch(button) {
+            const result = document.getElementById('touchResult');
+            result.style.display = 'block';
+            result.className = 'status success';
+            result.innerHTML = `✅ 按钮 "${button.textContent}" 点击成功！<br>时间: ${new Date().toLocaleTimeString()}`;
+
+            // 测试触摸反馈
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 100);
+        }
+
+        // 切换调试面板
+        function toggleDebugPanel() {
+            if (window.perfToggle) {
+                window.perfToggle();
+                showToast('调试面板已切换');
+            }
+        }
+
+        // 导出报告
+        function exportReport() {
+            if (window.perfReport) {
+                const report = window.perfReport();
+                addTestResult('性能报告已导出到控制台');
+                showToast('报告已复制到剪贴板 ✅', 'success');
+            }
+        }
+
+        // 切换低性能模式
+        function toggleLowPerformance() {
+            const monitor = window.performanceMonitor;
+            if (!monitor) return;
+
+            if (monitor.isLowPerformanceMode) {
+                monitor.isLowPerformanceMode = false;
+                document.body.classList.remove('low-performance-mode');
+                showToast('低性能模式已关闭', 'success');
+            } else {
+                monitor.enableLowPerformanceMode();
+                showToast('低性能模式已开启', 'warning');
+            }
+
+            addTestResult(`低性能模式: ${monitor.isLowPerformanceMode ? '开启' : '关闭'}`);
+        }
+
+        // 测试通知
+        function testNotification() {
+            showToast('这是一条测试通知！', 'info');
+            addTestResult('通知功能测试成功');
+        }
+
+        // 显示Toast通知
+        function showToast(message, type = 'info') {
+            // 移除已有的toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // 显示
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            // 3秒后隐藏
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // 添加测试结果
+        function addTestResult(message) {
+            const results = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            const result = document.createElement('div');
+            result.className = 'status';
+            result.innerHTML = `<strong>${timestamp}:</strong> ${message}`;
+            results.insertBefore(result, results.firstChild);
+
+            // 只保留最近5条
+            while (results.children.length > 5) {
+                results.removeChild(results.lastChild);
+            }
+        }
+
+        // 初始化
+        setTimeout(() => {
+            displayDeviceInfo();
+            updatePerformanceMetrics();
+
+            // 每秒更新性能指标
+            setInterval(updatePerformanceMetrics, 1000);
+
+            addTestResult('页面初始化完成 ✅');
+        }, 1000);
+
+        // 监听低性能模式事件
+        window.addEventListener('lowPerformanceMode', (e) => {
+            addTestResult(`⚠️ 自动启用低性能模式 (FPS过低)`);
+            showToast('性能优化已启用', 'warning');
+        });
+
+        // 添加一些有用的控制台命令
+        console.log('%c🎮 移动端测试演示', 'color: #667eea; font-size: 20px; font-weight: bold;');
+        console.log('%c可用命令:', 'color: #888; font-size: 14px;');
+        console.log('%cperfReport()', 'color: #0f0;', '- 导出性能报告');
+        console.log('%cperfToggle()', 'color: #0f0;', '- 切换调试面板');
+        console.log('%cwindow.performanceMonitor', 'color: #0f0;', '- 性能监控实例');
+    </script>
+
+    <!-- 跳过内容链接（无障碍） -->
+    <a href="#content" class="skip-to-content">跳到主内容</a>
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>移动端触摸优化测试清单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist-item:active {
+            transform: scale(0.98);
+        }
+
+        .checklist-item.checked {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .checklist-item.failed {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #6c757d;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .checklist-item.failed .checkbox {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 48px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .device-info {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .device-info-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #dee2e6;
+        }
+
+        .device-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-info-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #6c757d;
+            border-top: 2px solid #e9ecef;
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 移动端触摸优化测试</h1>
+            <p>Mobile Touch Optimization Test Checklist</p>
+        </div>
+
+        <div class="content">
+            <!-- 统计信息 -->
+            <div class="stats">
+                <h3>测试进度</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="passed-count">0</div>
+                        <div class="stat-label">已通过</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="failed-count">0</div>
+                        <div class="stat-label">未通过</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="progress">0%</div>
+                        <div class="stat-label">完成度</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设备信息 -->
+            <div class="device-info">
+                <h3 style="margin-bottom: 12px; color: #333;">📱 设备信息</h3>
+                <div class="device-info-item">
+                    <span class="device-info-label">屏幕尺寸:</span>
+                    <span id="screen-size">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">像素比:</span>
+                    <span id="pixel-ratio">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">触摸支持:</span>
+                    <span id="touch-support">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">触摸点数:</span>
+                    <span id="touch-points">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">振动API:</span>
+                    <span id="vibrate-support">-</span>
+                </div>
+                <div class="device-info-item">
+                    <span class="device-info-label">用户代理:</span>
+                    <span id="user-agent" style="font-size: 12px;">-</span>
+                </div>
+            </div>
+
+            <!-- 1. 触摸友好设计 -->
+            <section class="section">
+                <h2 class="section-title">1️⃣ 触摸友好设计</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">所有按钮最小尺寸 44x44px</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">按钮之间间距至少 8px</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">可点击区域明显，易于触摸</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 2. 文字可读性 -->
+            <section class="section">
+                <h2 class="section-title">2️⃣ 文字可读性</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">正文字体至少 16px</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">行高至少 1.5</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">重要信息加粗或放大</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">浏览器不会自动缩放</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 3. 触摸反馈 -->
+            <section class="section">
+                <h2 class="section-title">3️⃣ 触摸反馈效果</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">点击时有视觉反馈 (涟漪效果)</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">Active 状态有缩放效果</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">支持振动反馈 (如果设备支持)</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">按钮不可选择文本</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 4. 滚动性能 -->
+            <section class="section">
+                <h2 class="section-title">4️⃣ 滚动性能</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">滚动流畅无卡顿</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">iOS 平滑滚动正常</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">无意外的过度滚动</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 5. 手势支持 -->
+            <section class="section">
+                <h2 class="section-title">5️⃣ 手势支持</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">滑动手势正常工作</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">长按操作可触发</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">防止双击缩放</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">防止重复点击</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 6. Toast 通知 -->
+            <section class="section">
+                <h2 class="section-title">6️⃣ Toast 通知</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">Toast 正常显示</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">Toast 自动消失</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">Toast 可点击关闭</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 7. 响应式设计 -->
+            <section class="section">
+                <h2 class="section-title">7️⃣ 响应式设计</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">在不同设备上显示正常</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">横屏模式适配良好</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">安全区域适配 (iPhone X+)</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">无横向滚动条</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 8. 辅助功能 -->
+            <section class="section">
+                <h2 class="section-title">8️⃣ 辅助功能</h2>
+                <ul class="checklist">
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">焦点状态清晰可见</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">色彩对比度足够</div>
+                    </li>
+                    <li class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-text">支持深色模式 (如果启用)</div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 操作按钮 -->
+            <div class="action-buttons">
+                <button class="btn" onclick="resetAll()">🔄 重置测试</button>
+                <button class="btn btn-secondary" onclick="exportResults()">📋 导出结果</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💡 提示: 点击每一项标记为通过 ✓ 或失败 ✗</p>
+            <p style="margin-top: 8px;">再次点击可切换状态</p>
+        </div>
+    </div>
+
+    <script>
+        // 初始化设备信息
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('screen-size').textContent =
+                `${window.screen.width}x${window.screen.height}`;
+
+            document.getElementById('pixel-ratio').textContent =
+                window.devicePixelRatio || 1;
+
+            document.getElementById('touch-support').textContent =
+                'ontouchstart' in window ? '✅ 支持' : '❌ 不支持';
+
+            document.getElementById('touch-points').textContent =
+                navigator.maxTouchPoints || 0;
+
+            document.getElementById('vibrate-support').textContent =
+                'vibrate' in navigator ? '✅ 支持' : '❌ 不支持';
+
+            document.getElementById('user-agent').textContent =
+                navigator.userAgent;
+
+            updateStats();
+        });
+
+        // 切换检查状态
+        function toggleCheck(element) {
+            if (element.classList.contains('checked')) {
+                element.classList.remove('checked');
+                element.classList.add('failed');
+                element.querySelector('.checkbox').textContent = '✗';
+            } else if (element.classList.contains('failed')) {
+                element.classList.remove('failed');
+                element.querySelector('.checkbox').textContent = '';
+            } else {
+                element.classList.add('checked');
+                element.querySelector('.checkbox').textContent = '✓';
+            }
+
+            updateStats();
+
+            // 振动反馈
+            if (navigator.vibrate && element.classList.contains('checked')) {
+                navigator.vibrate(10);
+            }
+        }
+
+        // 更新统计
+        function updateStats() {
+            const total = document.querySelectorAll('.checklist-item').length;
+            const passed = document.querySelectorAll('.checklist-item.checked').length;
+            const failed = document.querySelectorAll('.checklist-item.failed').length;
+            const progress = Math.round(((passed + failed) / total) * 100);
+
+            document.getElementById('passed-count').textContent = passed;
+            document.getElementById('failed-count').textContent = failed;
+            document.getElementById('progress').textContent = progress + '%';
+        }
+
+        // 重置所有
+        function resetAll() {
+            const items = document.querySelectorAll('.checklist-item');
+            items.forEach(item => {
+                item.classList.remove('checked', 'failed');
+                item.querySelector('.checkbox').textContent = '';
+            });
+            updateStats();
+
+            if (navigator.vibrate) {
+                navigator.vibrate([10, 50, 10]);
+            }
+        }
+
+        // 导出结果
+        function exportResults() {
+            const total = document.querySelectorAll('.checklist-item').length;
+            const passed = document.querySelectorAll('.checklist-item.checked').length;
+            const failed = document.querySelectorAll('.checklist-item.failed').length;
+            const pending = total - passed - failed;
+
+            let report = '📋 移动端触摸优化测试报告\n';
+            report += '=' .repeat(40) + '\n\n';
+            report += `测试时间: ${new Date().toLocaleString('zh-CN')}\n`;
+            report += `设备信息: ${navigator.userAgent}\n`;
+            report += `屏幕尺寸: ${window.screen.width}x${window.screen.height}\n`;
+            report += `像素比: ${window.devicePixelRatio}\n\n`;
+            report += '测试结果:\n';
+            report += `✅ 通过: ${passed}/${total}\n`;
+            report += `✗ 失败: ${failed}/${total}\n`;
+            report += `⏸ 未测: ${pending}/${total}\n`;
+            report += `进度: ${Math.round(((passed + failed) / total) * 100)}%\n\n`;
+
+            // 详细结果
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const title = section.querySelector('.section-title').textContent;
+                report += `\n${title}\n`;
+                report += '-'.repeat(40) + '\n';
+
+                const items = section.querySelectorAll('.checklist-item');
+                items.forEach((item, index) => {
+                    const text = item.querySelector('.item-text').textContent;
+                    let status = '⏸ 未测';
+                    if (item.classList.contains('checked')) {
+                        status = '✅ 通过';
+                    } else if (item.classList.contains('failed')) {
+                        status = '✗ 失败';
+                    }
+                    report += `${index + 1}. ${status} - ${text}\n`;
+                });
+            });
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(report).then(() => {
+                alert('✅ 测试报告已复制到剪贴板！');
+            }).catch(() => {
+                // 降级方案：显示报告
+                alert(report);
+            });
+
+            if (navigator.vibrate) {
+                navigator.vibrate([10, 50, 10, 50, 10]);
+            }
+        }
+    </script>
+</body>
+</html>

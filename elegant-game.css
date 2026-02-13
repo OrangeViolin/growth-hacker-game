@@ -619,6 +619,45 @@ body {
 }
 
 /* ============================================
+   移动端触摸优化增强
+   ============================================ */
+
+/* 所有可交互元素的触摸优化 */
+.btn,
+button,
+.suggestion-btn,
+a {
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+/* 触摸反馈 */
+.btn:active,
+button:active,
+.suggestion-btn:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+}
+
+/* 输入框触摸优化 */
+#user-input,
+input,
+textarea {
+    font-size: 16px; /* 避免iOS自动缩放 */
+    min-height: 44px;
+}
+
+/* 滚动容器优化 */
+.conversation-history,
+.status-panel {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
+
+/* ============================================
    响应式设计
    ============================================ */
 
@@ -651,6 +690,29 @@ body {
     .message-content {
         max-width: 85%;
     }
+
+    /* 移动端触摸增强 */
+    .btn-primary {
+        min-height: 48px;
+        font-size: 17px;
+        padding: 14px 28px;
+    }
+
+    .suggestion-btn {
+        min-height: 48px;
+        padding: 12px 20px;
+        font-size: 16px;
+    }
+
+    #user-input {
+        font-size: 17px;
+        min-height: 52px;
+    }
+
+    .message-text {
+        font-size: 17px;
+        line-height: 1.7;
+    }
 }
 
 @media (max-width: 600px) {
@@ -679,7 +741,38 @@ body {
     }
 
     .quick-suggestions {
-        flex-direction: column;
+        overflow-x: auto;
+        gap: 10px;
+        padding: 8px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .suggestion-btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* 移动端按钮全宽 */
+    .btn-primary {
+        width: 100%;
+        min-height: 52px;
+        font-size: 18px;
+    }
+
+    /* 进度条触摸友好 */
+    .progress-bar {
+        min-height: 14px;
+        cursor: pointer;
+    }
+
+    .progress-bar:active {
+        transform: scaleY(1.2);
+    }
+
+    /* 技能项触摸优化 */
+    .skill-item {
+        min-height: 60px;
+        padding: 14px;
     }
 }
 

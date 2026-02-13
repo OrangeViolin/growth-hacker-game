@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动端修复验证工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0F172A;
+            color: #E2E8F0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #A855F7;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .info-box {
+            background: #1E293B;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #94A3B8;
+        }
+
+        .value {
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .value.fail {
+            color: #EF4444;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #06B6D4;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .test-item {
+            background: #1E293B;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #475569;
+        }
+
+        .test-item.pass {
+            border-left-color: #10B981;
+        }
+
+        .test-item.fail {
+            border-left-color: #EF4444;
+        }
+
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .test-result {
+            font-size: 0.9em;
+            color: #CBD5E1;
+        }
+
+        button {
+            background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+            color: #FFF;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+            min-height: 44px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 3px solid #A855F7;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .summary h3 {
+            color: #A855F7;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #10B981;
+            margin: 20px 0;
+        }
+
+        .score.fail {
+            color: #EF4444;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+            }
+
+            h2 {
+                font-size: 1.1em;
+            }
+
+            .info-box {
+                padding: 15px;
+            }
+
+            button {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 移动端修复验证工具</h1>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="label">屏幕宽度:</span>
+                <span class="value" id="screen-width">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">屏幕高度:</span>
+                <span class="value" id="screen-height">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">设备像素比:</span>
+                <span class="value" id="device-ratio">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">方向:</span>
+                <span class="value" id="orientation">-</span>
+            </div>
+            <div class="info-row">
+                <span class="label">User Agent:</span>
+                <span class="value" id="user-agent" style="font-size:0.8em;word-break:break-all;">-</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 媒体查询测试</h2>
+            <div id="media-query-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📏 触摸目标测试</h2>
+            <div id="touch-target-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔤 字体大小测试</h2>
+            <div id="font-size-tests"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 实际测试</h2>
+            <button onclick="window.location.href='crisis-mission.html'">打开游戏页面</button>
+            <button onclick="runTests()">重新测试</button>
+        </div>
+
+        <div class="summary" id="summary" style="display:none;">
+            <h3>测试结果</h3>
+            <div class="score" id="score">-</div>
+            <p id="summary-text">-</p>
+        </div>
+    </div>
+
+    <script>
+        // 更新设备信息
+        function updateDeviceInfo() {
+            document.getElementById('screen-width').textContent = window.innerWidth + 'px';
+            document.getElementById('screen-height').textContent = window.innerHeight + 'px';
+            document.getElementById('device-ratio').textContent = window.devicePixelRatio;
+
+            const orientation = window.innerWidth > window.innerHeight ? '横屏' : '竖屏';
+            document.getElementById('orientation').textContent = orientation;
+
+            document.getElementById('user-agent').textContent = navigator.userAgent;
+        }
+
+        // 媒体查询测试
+        function testMediaQueries() {
+            const queries = [
+                { query: '(max-width: 768px)', name: '平板断点 (≤768px)' },
+                { query: '(max-width: 480px)', name: '手机断点 (≤480px)' },
+                { query: '(max-width: 360px)', name: '小屏断点 (≤360px)' },
+                { query: '(max-width: 768px) and (orientation: landscape)', name: '横屏模式' }
+            ];
+
+            const container = document.getElementById('media-query-tests');
+            container.innerHTML = '';
+
+            queries.forEach(({ query, name }) => {
+                const matches = window.matchMedia(query).matches;
+                const item = document.createElement('div');
+                item.className = 'test-item ' + (matches ? 'pass' : '');
+                item.innerHTML = `
+                    <div class="test-name">${name}</div>
+                    <div class="test-result">${matches ? '✅ 匹配' : '❌ 不匹配'} - ${query}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 触摸目标测试
+        function testTouchTargets() {
+            const container = document.getElementById('touch-target-tests');
+            container.innerHTML = '';
+
+            // 创建测试按钮
+            const testButtons = [
+                { name: '标准按钮 (44px)', minHeight: 44 },
+                { name: '行动按钮 (88px)', minHeight: 88 },
+                { name: '准备按钮 (50px)', minHeight: 50 }
+            ];
+
+            let passCount = 0;
+
+            testButtons.forEach(({ name, minHeight }) => {
+                const btn = document.createElement('button');
+                btn.textContent = '测试按钮';
+                btn.style.minHeight = minHeight + 'px';
+                btn.style.display = 'none';
+                document.body.appendChild(btn);
+
+                const rect = btn.getBoundingClientRect();
+                const actualHeight = rect.height;
+                const pass = actualHeight >= minHeight;
+
+                if (pass) passCount++;
+
+                const item = document.createElement('div');
+                item.className = 'test-item ' + (pass ? 'pass' : 'fail');
+                item.innerHTML = `
+                    <div class="test-name">${name}</div>
+                    <div class="test-result">
+                        期望: ≥${minHeight}px | 实际: ${actualHeight.toFixed(1)}px
+                        ${pass ? '✅ 通过' : '❌ 失败'}
+                    </div>
+                `;
+                container.appendChild(item);
+
+                document.body.removeChild(btn);
+            });
+
+            return passCount;
+        }
+
+        // 字体大小测试
+        function testFontSizes() {
+            const container = document.getElementById('font-size-tests');
+            container.innerHTML = '';
+
+            const bodyFontSize = parseFloat(window.getComputedStyle(document.body).fontSize);
+            const minFontSize = 13;
+            const pass = bodyFontSize >= minFontSize;
+
+            const item = document.createElement('div');
+            item.className = 'test-item ' + (pass ? 'pass' : 'fail');
+            item.innerHTML = `
+                <div class="test-name">基础字体大小</div>
+                <div class="test-result">
+                    最小要求: ≥${minFontSize}px | 实际: ${bodyFontSize}px
+                    ${pass ? '✅ 通过' : '❌ 失败'}
+                </div>
+            `;
+            container.appendChild(item);
+
+            // 检查viewport是否正确
+            const viewport = document.querySelector('meta[name="viewport"]');
+            const viewportPass = viewport && viewport.content.includes('width=device-width');
+
+            const viewportItem = document.createElement('div');
+            viewportItem.className = 'test-item ' + (viewportPass ? 'pass' : 'fail');
+            viewportItem.innerHTML = `
+                <div class="test-name">Viewport设置</div>
+                <div class="test-result">
+                    ${viewportPass ? '✅ 正确设置' : '❌ 未设置'}: ${viewport ? viewport.content : '无'}
+                </div>
+            `;
+            container.appendChild(viewportItem);
+
+            return (pass ? 1 : 0) + (viewportPass ? 1 : 0);
+        }
+
+        // 运行所有测试
+        function runTests() {
+            updateDeviceInfo();
+            testMediaQueries();
+            const touchScore = testTouchTargets();
+            const fontScore = testFontSizes();
+
+            // 计算总分
+            const totalTests = 3 + 2; // 3个触摸目标 + 2个字体测试
+            const passedTests = touchScore + fontScore;
+            const percentage = Math.round((passedTests / totalTests) * 100);
+
+            // 显示总结
+            const summary = document.getElementById('summary');
+            const score = document.getElementById('score');
+            const summaryText = document.getElementById('summary-text');
+
+            summary.style.display = 'block';
+            score.textContent = percentage + '%';
+            score.className = 'score' + (percentage >= 80 ? '' : ' fail');
+
+            if (percentage === 100) {
+                summaryText.innerHTML = '✅ 完美！所有测试通过！<br>移动端优化完全正常。';
+            } else if (percentage >= 80) {
+                summaryText.innerHTML = '✅ 良好！大部分测试通过。<br>建议检查失败项目。';
+            } else if (percentage >= 60) {
+                summaryText.innerHTML = '⚠️ 一般。部分测试失败。<br>需要进一步优化。';
+            } else {
+                summaryText.innerHTML = '❌ 失败！多项测试未通过。<br>请检查移动端优化代码。';
+            }
+        }
+
+        // 页面加载时运行测试
+        window.addEventListener('DOMContentLoaded', runTests);
+
+        // 窗口大小改变时重新测试
+        window.addEventListener('resize', () => {
+            setTimeout(runTests, 100);
+        });
+
+        // 方向改变时重新测试
+        window.addEventListener('orientationchange', () => {
+            setTimeout(runTests, 300);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,713 @@
+/* ===================================
+   移动端优化样式表
+   Mobile Optimizations CSS
+
+   增长黑客游戏 - Growth Hacker Game
+   版本: 1.0
+   日期: 2026-02-13
+   =================================== */
+
+/* ===================================
+   1. 基础优化 | Base Optimizations
+   =================================== */
+
+/* 防止横向滚动 */
+html {
+    overflow-x: hidden;
+    height: -webkit-fill-available;  /* iOS Safari 修复 */
+}
+
+body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;  /* iOS 平滑滚动 */
+    -webkit-font-smoothing: antialiased;  /* 字体渲染优化 */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* 修复 iOS 100vh 问题 */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+/* 禁用文本选择 (可选) */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* ===================================
+   2. 触摸优化 | Touch Optimizations
+   =================================== */
+
+/* 禁用iOS自动缩放 - 防止输入框聚焦时页面放大 */
+input,
+textarea,
+select,
+button {
+    font-size: 16px !important;  /* iOS需要至少16px防止自动缩放 */
+}
+
+/* 触摸反馈和优化 */
+button,
+a,
+.btn,
+.option,
+.action-btn,
+.suggestion-btn,
+.clickable {
+    /* iOS点击高亮 */
+    -webkit-tap-highlight-color: rgba(201, 169, 97, 0.3);
+
+    /* 禁用双击缩放延迟 */
+    touch-action: manipulation;
+
+    /* 确保触摸目标足够大 - iOS人机界面指南建议44x44pt */
+    min-height: 44px;
+    min-width: 44px;
+
+    /* 触摸时的反馈动画 */
+    transition: transform 0.1s ease;
+}
+
+button:active,
+.btn:active,
+.option:active,
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+/* 移除链接的点击延迟 */
+a {
+    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+}
+
+/* ===================================
+   3. 性能优化 | Performance
+   =================================== */
+
+/* 硬件加速 - 将频繁动画的元素提升到独立图层 */
+.animated-element,
+.message,
+.option,
+.metric-card,
+.progress-fill {
+    will-change: transform, opacity;
+    transform: translateZ(0);  /* 触发硬件加速 */
+    backface-visibility: hidden;  /* 优化3D变换 */
+}
+
+/* 滚动优化 */
+.conversation-history,
+.status-panel,
+.scrollable {
+    -webkit-overflow-scrolling: touch;  /* iOS 动量滚动 */
+    overscroll-behavior: contain;  /* 防止滚动传播 */
+}
+
+/* 在移动端禁用粒子系统以提升性能 */
+@media (max-width: 768px) {
+    #particle-canvas {
+        display: none !important;
+    }
+}
+
+/* 低性能模式 - 可通过JS动态添加此类 */
+.low-performance-mode .animated-element {
+    animation: none !important;
+    transition: none !important;
+}
+
+.low-performance-mode #particle-canvas {
+    display: none !important;
+}
+
+/* ===================================
+   4. 小屏幕优化 | Small Screen
+   =================================== */
+
+@media (max-width: 480px) {
+    /* 容器padding优化 */
+    .container {
+        padding: 10px !important;
+        margin: 10px !important;
+    }
+
+    .content {
+        padding: 20px !important;
+    }
+
+    /* 按钮尺寸优化 */
+    .btn {
+        padding: 14px 24px !important;
+        font-size: 15px !important;
+        min-height: 48px !important;
+    }
+
+    .option {
+        padding: 16px !important;
+        font-size: 15px !important;
+        min-height: 48px !important;
+    }
+
+    .action-btn {
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+        min-height: 44px !important;
+    }
+
+    /* 字体大小适配 */
+    body {
+        font-size: 14px;
+    }
+
+    h1,
+    .game-title {
+        font-size: 22px !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    h2 {
+        font-size: 18px !important;
+    }
+
+    .game-header h1 {
+        font-size: 24px !important;
+    }
+
+    .company-name {
+        font-size: 20px !important;
+    }
+
+    .question {
+        font-size: 18px !important;
+    }
+
+    /* 指标卡片优化 */
+    .metrics-dashboard {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        padding: 15px !important;
+    }
+
+    .metric-card {
+        padding: 12px !important;
+    }
+
+    .metric-value {
+        font-size: 1.5em !important;
+    }
+
+    .stat-value {
+        font-size: 1.5em !important;
+    }
+
+    /* 对话框优化 */
+    .message-bubble {
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+
+    .message-avatar {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 18px !important;
+    }
+
+    /* 输入框优化 */
+    #user-input {
+        font-size: 16px !important;
+        padding: 12px !important;
+        min-height: 50px !important;
+    }
+
+    /* 导航链接优化 */
+    .nav-links {
+        padding: 10px 15px !important;
+    }
+
+    .nav-links a {
+        font-size: 13px !important;
+        margin: 0 8px !important;
+        display: inline-block;
+        padding: 5px 0;
+    }
+
+    /* 信息卡片优化 */
+    .company-info {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .info-item {
+        padding: 8px !important;
+    }
+
+    /* 技能标签优化 */
+    .skill-tag {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+        margin: 3px !important;
+    }
+
+    /* 进度条优化 */
+    .progress-bar {
+        height: 8px !important;
+    }
+
+    /* 面板优化 */
+    .panel-section {
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .section-title {
+        font-size: 14px !important;
+    }
+}
+
+/* ===================================
+   5. 超小屏幕优化 | Extra Small
+   =================================== */
+
+@media (max-width: 375px) {
+    /* iPhone SE 及更小设备 */
+    .container {
+        border-radius: 10px !important;
+        margin: 5px !important;
+    }
+
+    body {
+        padding: 5px !important;
+    }
+
+    .game-header {
+        padding: 15px !important;
+    }
+
+    .game-header h1 {
+        font-size: 20px !important;
+    }
+
+    .metrics-dashboard {
+        padding: 10px !important;
+    }
+
+    .option-title {
+        font-size: 14px !important;
+    }
+
+    .option-desc {
+        font-size: 13px !important;
+    }
+}
+
+/* ===================================
+   6. 横屏优化 | Landscape Mode
+   =================================== */
+
+@media (orientation: landscape) and (max-height: 500px) {
+    /* 减少垂直padding */
+    .game-header {
+        padding: 10px 20px !important;
+    }
+
+    .game-header h1 {
+        font-size: 20px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .game-header .subtitle {
+        font-size: 14px !important;
+    }
+
+    /* 指标横向排列 */
+    .metrics-dashboard {
+        grid-template-columns: repeat(6, 1fr) !important;
+        padding: 10px 15px !important;
+    }
+
+    .stats {
+        padding: 10px !important;
+    }
+
+    /* 减少内容padding */
+    .content {
+        padding: 20px !important;
+    }
+
+    .conversation-history {
+        padding: 15px !important;
+    }
+
+    /* 优化按钮间距 */
+    .options {
+        gap: 10px !important;
+    }
+
+    /* 对话框紧凑模式 */
+    .message {
+        margin-bottom: 15px !important;
+    }
+
+    .message-bubble {
+        padding: 10px 12px !important;
+    }
+
+    /* 输入区紧凑 */
+    .conversation-input {
+        padding: 10px 15px !important;
+    }
+
+    #user-input {
+        min-height: 40px !important;
+        max-height: 60px !important;
+    }
+}
+
+/* ===================================
+   7. 平板优化 | Tablet
+   =================================== */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .container {
+        max-width: 95% !important;
+    }
+
+    .conversation-panel {
+        flex: 0 0 65% !important;
+    }
+
+    .status-panel {
+        flex: 0 0 35% !important;
+    }
+
+    .metrics-dashboard {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+/* iPad横屏 */
+@media (min-width: 1024px) and (orientation: landscape) {
+    .metrics-dashboard {
+        grid-template-columns: repeat(6, 1fr) !important;
+    }
+}
+
+/* ===================================
+   8. iOS 特定修复 | iOS Specific
+   =================================== */
+
+/* 修复iOS安全区域 */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(10px, env(safe-area-inset-left));
+        padding-right: max(10px, env(safe-area-inset-right));
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+
+    .game-header {
+        padding-top: max(20px, env(safe-area-inset-top));
+    }
+}
+
+/* 移除iOS默认样式 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 8px;
+}
+
+/* iOS日期/时间选择器 */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* 修复iOS按钮圆角 */
+button,
+input[type="submit"],
+input[type="button"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* 禁用iOS的文本大小调整 */
+body {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* ===================================
+   9. Android 特定优化 | Android
+   =================================== */
+
+/* Android字体渲染 */
+@media (max-width: 768px) {
+    body {
+        font-weight: 400;  /* Android上字体可能过细 */
+    }
+}
+
+/* ===================================
+   10. 加载优化 | Loading
+   =================================== */
+
+/* 加载屏幕 */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: -webkit-fill-available;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: white;
+    margin-top: 20px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* ===================================
+   11. 错误提示 | Error Toast
+   =================================== */
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    z-index: 10000;
+    transition: transform 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.error {
+    background: #dc3545;
+}
+
+.toast.success {
+    background: #28a745;
+}
+
+.toast.warning {
+    background: #ffc107;
+    color: #333;
+}
+
+/* ===================================
+   12. 可访问性 | Accessibility
+   =================================== */
+
+/* 焦点可见性 */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* 跳过导航链接 */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #667eea;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 100;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* 屏幕阅读器专用 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ===================================
+   13. 打印优化 | Print
+   =================================== */
+
+@media print {
+    /* 隐藏不必要的元素 */
+    .game-header,
+    .nav-links,
+    .btn,
+    #particle-canvas,
+    .conversation-input {
+        display: none !important;
+    }
+
+    /* 优化打印布局 */
+    body {
+        background: white;
+        color: black;
+    }
+
+    .container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+/* ===================================
+   14. 暗黑模式支持 | Dark Mode
+   =================================== */
+
+@media (prefers-color-scheme: dark) {
+    /* 可选：自动暗黑模式 */
+    /* 取消注释以启用 */
+
+    /*
+    body {
+        background: #1a1a2e;
+        color: #eee;
+    }
+
+    .container {
+        background: #16213e;
+    }
+
+    .message-bubble {
+        background: #0f3460;
+        color: #eee;
+    }
+
+    .option {
+        background: #0f3460;
+        border-color: #1a1a2e;
+        color: #eee;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    */
+}
+
+/* ===================================
+   15. 实用工具类 | Utilities
+   =================================== */
+
+/* 隐藏元素 - 仅在移动端 */
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* 隐藏元素 - 仅在桌面端 */
+@media (min-width: 769px) {
+    .hide-desktop {
+        display: none !important;
+    }
+}
+
+/* 仅显示在移动端 */
+@media (min-width: 769px) {
+    .show-mobile {
+        display: none !important;
+    }
+}
+
+/* 清除浮动 */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* 文本截断 */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 响应式图片 */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ===================================
+   16. 调试辅助 | Debug
+   =================================== */
+
+/* 开发环境中可启用 */
+/*
+.debug-outline * {
+    outline: 1px solid red;
+}
+
+.debug-grid {
+    background-image:
+        linear-gradient(rgba(255,0,0,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,0,0,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+*/
+
+/* ===================================
+   结束 | End of Mobile Optimizations
+   =================================== */
