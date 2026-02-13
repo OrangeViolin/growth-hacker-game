@@ -1,0 +1,756 @@
+/* ============================================
+   增长黑客游戏 - 优雅对话版样式表
+   文字冒险游戏美术风格
+   ============================================ */
+
+/* 核心配色方案 */
+:root {
+    /* 背景色 */
+    --bg-primary: #E8DCC4;
+    --bg-card: #F5F0E8;
+    --bg-card-dark: #EBE3D5;
+    --bg-user: #F9F4E8;
+    --bg-npc: #F5F0E8;
+    --bg-input: #FFFFFF;
+
+    /* 文字颜色 */
+    --text-primary: #8B7355;
+    --text-secondary: #A0937C;
+    --text-light: #B8A994;
+    --text-dark: #6B5744;
+
+    /* 强调色 */
+    --accent-gold: #C9A961;
+    --accent-gold-light: #D9BC7E;
+    --accent-gold-dark: #B89850;
+
+    /* 边框和阴影 */
+    --border: #D4C4AB;
+    --border-light: #E0D5C3;
+    --shadow: rgba(139, 115, 85, 0.15);
+    --shadow-medium: rgba(139, 115, 85, 0.25);
+    --shadow-strong: rgba(139, 115, 85, 0.35);
+
+    /* 进度条颜色 */
+    --progress-budget: #C9A961;
+    --progress-energy: #7FA65E;
+    --progress-timing: #D97E5E;
+    --progress-trust: #6B9BD1;
+    --progress-reputation: #B88CD9;
+    --progress-growth: #7FB8B8;
+    --progress-retention: #D99861;
+
+    /* 间距 */
+    --spacing-xs: 6px;
+    --spacing-sm: 12px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xl: 40px;
+}
+
+/* 全局重置和基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Georgia, 'Source Han Serif SC', '思源宋体', 'Noto Serif SC', serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+/* ============================================
+   主容器布局
+   ============================================ */
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+/* 顶部标题栏 */
+.game-header {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-dark) 100%);
+    border-bottom: 2px solid var(--border);
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: 0 4px 8px var(--shadow);
+    position: relative;
+    z-index: 10;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: 2px;
+}
+
+.game-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.stat-value {
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+/* 主内容区域 */
+.game-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ============================================
+   左侧对话区（70%）
+   ============================================ */
+
+.conversation-panel {
+    flex: 0 0 70%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-right: 2px solid var(--border);
+}
+
+/* 对话历史区 */
+.conversation-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+    scroll-behavior: smooth;
+}
+
+.conversation-history::-webkit-scrollbar {
+    width: 10px;
+}
+
+.conversation-history::-webkit-scrollbar-track {
+    background: var(--bg-card-dark);
+    border-radius: 5px;
+}
+
+.conversation-history::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 5px;
+}
+
+.conversation-history::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-gold-dark);
+}
+
+/* 对话消息 */
+.message {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    animation: fadeInUp 0.4s ease;
+}
+
+.message.user-message {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 3px 6px var(--shadow);
+}
+
+.message-content {
+    flex: 1;
+    max-width: 75%;
+}
+
+.message-bubble {
+    background: var(--bg-npc);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: var(--spacing-md) var(--spacing-md);
+    box-shadow: 0 3px 8px var(--shadow);
+    position: relative;
+}
+
+.user-message .message-bubble {
+    background: linear-gradient(135deg, var(--bg-user) 0%, #FFF9ED 100%);
+    border-color: var(--accent-gold-light);
+}
+
+.message-speaker {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-gold-dark);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.message-text {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+/* 打字机效果 */
+.typing-indicator {
+    display: inline-block;
+    animation: blink 1.2s infinite;
+}
+
+/* 对话输入区 */
+.conversation-input {
+    border-top: 2px solid var(--border);
+    background: var(--bg-card);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.input-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: flex-end;
+}
+
+#user-input {
+    flex: 1;
+    background: var(--bg-input);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: var(--spacing-md);
+    font-family: inherit;
+    font-size: 16px;
+    color: var(--text-primary);
+    resize: none;
+    min-height: 60px;
+    max-height: 120px;
+    transition: all 0.3s ease;
+}
+
+#user-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+}
+
+#user-input::placeholder {
+    color: var(--text-light);
+}
+
+.input-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px var(--shadow);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%);
+    color: white;
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px var(--shadow-medium);
+}
+
+.btn-secondary {
+    background: var(--bg-card-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-card);
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 快捷建议按钮 */
+.quick-suggestions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.suggestion-btn {
+    background: var(--bg-card-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.suggestion-btn:hover {
+    background: var(--accent-gold-light);
+    color: white;
+    border-color: var(--accent-gold);
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   右侧状态面板（30%）
+   ============================================ */
+
+.status-panel {
+    flex: 0 0 30%;
+    background: var(--bg-card-dark);
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+.status-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.status-panel::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.status-panel::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 4px;
+}
+
+.panel-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 3px 8px var(--shadow);
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+/* 当前场景 */
+.scene-info {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.8;
+}
+
+.scene-location {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 600;
+    color: var(--accent-gold-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* 资源进度条 */
+.resource-item {
+    margin-bottom: var(--spacing-md);
+}
+
+.resource-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+    font-size: 14px;
+}
+
+.resource-name {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.resource-value {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.progress-bar {
+    height: 12px;
+    background: var(--bg-primary);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-gold);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,0.3) 50%,
+        transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+/* 不同资源的颜色 */
+.progress-budget { background: var(--progress-budget); }
+.progress-energy { background: var(--progress-energy); }
+.progress-timing { background: var(--progress-timing); }
+.progress-trust { background: var(--progress-trust); }
+.progress-reputation { background: var(--progress-reputation); }
+.progress-growth { background: var(--progress-growth); }
+.progress-retention { background: var(--progress-retention); }
+
+/* 关系面板 */
+.relationship-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--bg-card-dark);
+    border-radius: 8px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.relationship-name {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.relationship-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-primary);
+    border-radius: 4px;
+    margin: 0 var(--spacing-sm);
+    overflow: hidden;
+}
+
+.relationship-fill {
+    height: 100%;
+    background: var(--accent-gold);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.relationship-value {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* 技能解锁 */
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--bg-card-dark);
+    border-radius: 8px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.skill-icon {
+    font-size: 20px;
+}
+
+.skill-info {
+    flex: 1;
+}
+
+.skill-name {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.skill-requirement {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.skill-locked {
+    opacity: 0.5;
+}
+
+/* 游戏日志 */
+.log-item {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px dashed var(--border-light);
+    line-height: 1.5;
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-time {
+    color: var(--text-light);
+    font-size: 11px;
+}
+
+/* ============================================
+   动画效果
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* 通知动画 */
+.notification {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: var(--bg-card);
+    border: 2px solid var(--accent-gold);
+    border-radius: 12px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    box-shadow: 0 6px 16px var(--shadow-strong);
+    animation: slideInRight 0.4s ease;
+    z-index: 1000;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   响应式设计
+   ============================================ */
+
+@media (max-width: 1200px) {
+    .conversation-panel {
+        flex: 0 0 65%;
+    }
+
+    .status-panel {
+        flex: 0 0 35%;
+    }
+}
+
+@media (max-width: 900px) {
+    .game-main {
+        flex-direction: column;
+    }
+
+    .conversation-panel {
+        flex: 1;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .status-panel {
+        flex: 0 0 auto;
+        max-height: 40vh;
+    }
+
+    .message-content {
+        max-width: 85%;
+    }
+}
+
+@media (max-width: 600px) {
+    .game-title {
+        font-size: 20px;
+    }
+
+    .game-stats {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        font-size: 14px;
+    }
+
+    .conversation-history {
+        padding: var(--spacing-md);
+    }
+
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .message-content {
+        max-width: 90%;
+    }
+
+    .quick-suggestions {
+        flex-direction: column;
+    }
+}
+
+/* ============================================
+   特殊效果
+   ============================================ */
+
+/* 悬浮提示 */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--text-dark);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+/* 加载指示器 */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent-gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 高亮效果 */
+.highlight {
+    background: var(--accent-gold-light);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* 徽章 */
+.badge {
+    display: inline-block;
+    background: var(--accent-gold);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success { background: var(--progress-energy); }
+.badge-warning { background: var(--progress-timing); }
+.badge-info { background: var(--progress-trust); }

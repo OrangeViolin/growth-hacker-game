@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新手引导测试 | Onboarding Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+            color: #E2E8F0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border-radius: 15px;
+            border: 2px solid #A855F7;
+        }
+
+        .test-title {
+            font-size: 2.5em;
+            color: #A855F7;
+            margin-bottom: 15px;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .test-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(201, 169, 97, 0.5);
+        }
+
+        .test-btn.danger {
+            background: linear-gradient(135deg, #FF4444 0%, #CC0000 100%);
+            color: #FFF;
+        }
+
+        .mock-game {
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border: 2px solid #C9A961;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .mock-title {
+            font-size: 1.8em;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mock-actions {
+            display: grid;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #8B7355;
+            color: #E8DCC4;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            border-color: #FFD700;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+
+        .action-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .action-desc {
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-title {
+            font-size: 1.3em;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .info-text {
+            line-height: 1.8;
+            color: #E8DCC4;
+        }
+
+        .status-box {
+            background: rgba(168, 85, 247, 0.1);
+            border: 2px solid #A855F7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .status-label {
+            font-size: 0.9em;
+            color: #C9A961;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #A855F7;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <div class="test-title">新手引导系统测试</div>
+            <p style="font-size: 1.1em; color: #C9A961; margin-top: 10px;">
+                测试互动式新手引导的各项功能
+            </p>
+
+            <div class="test-controls">
+                <button class="test-btn" onclick="startOnboarding()">启动新手引导</button>
+                <button class="test-btn danger" onclick="resetOnboarding()">重置引导状态</button>
+                <button class="test-btn" onclick="checkStatus()">检查状态</button>
+            </div>
+
+            <div class="status-box" id="status-box">
+                <div class="status-label">引导状态</div>
+                <div class="status-value" id="status-value">未知</div>
+            </div>
+        </div>
+
+        <div class="mock-game">
+            <div class="mock-title">模拟游戏界面</div>
+
+            <div class="info-box">
+                <div class="info-title">测试说明</div>
+                <div class="info-text">
+                    1. 点击"启动新手引导"开始体验<br>
+                    2. 按照引导提示操作<br>
+                    3. 可以随时点击"跳过引导"<br>
+                    4. 使用"重置引导状态"重新体验<br>
+                    5. 引导完成后会自动记录，再次打开不会显示
+                </div>
+            </div>
+
+            <div class="mock-actions" style="margin-top: 30px;">
+                <button class="action-btn" onclick="mockAction(1)">
+                    <div class="action-name">👥 深挖用户数据</div>
+                    <div class="action-desc">查看用户构成、流失明细、付费转化率</div>
+                </button>
+
+                <button class="action-btn" onclick="mockAction(2)">
+                    <div class="action-name">💰 分析财务报表</div>
+                    <div class="action-desc">收入结构、成本明细、现金流预测</div>
+                </button>
+
+                <button class="action-btn" onclick="mockAction(3)">
+                    <div class="action-name">🎯 调研竞品策略</div>
+                    <div class="action-desc">分析竞品的免费模式、用户反馈</div>
+                </button>
+
+                <button class="action-btn" onclick="mockAction(4)">
+                    <div class="action-name">📊 计算生存时间</div>
+                    <div class="action-desc">详细计算现金流、Unit Economics</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载新手引导系统 -->
+    <script src="onboarding.js"></script>
+
+    <script>
+        // 启动新手引导
+        function startOnboarding() {
+            console.log('Starting onboarding test...');
+            OnboardingSystem.init();
+            updateStatus();
+        }
+
+        // 重置引导状态
+        function resetOnboarding() {
+            OnboardingSystem.reset();
+            updateStatus();
+            alert('引导状态已重置！刷新页面或点击"启动新手引导"重新体验。');
+        }
+
+        // 检查状态
+        function checkStatus() {
+            updateStatus();
+            const completed = localStorage.getItem('onboarding_completed') === 'true';
+            alert(completed ? '✅ 已完成新手引导' : '⚠️ 尚未完成新手引导');
+        }
+
+        // 更新状态显示
+        function updateStatus() {
+            const completed = localStorage.getItem('onboarding_completed') === 'true';
+            const statusValue = document.getElementById('status-value');
+            statusValue.textContent = completed ? '已完成' : '未完成';
+            statusValue.style.color = completed ? '#4AFF4A' : '#FF8844';
+        }
+
+        // 模拟行动
+        function mockAction(id) {
+            console.log('Mock action clicked:', id);
+            alert(`你点击了行动 ${id}！\n在实际游戏中，这会触发相应的游戏逻辑。`);
+        }
+
+        // 引导完成回调
+        window.onOnboardingComplete = () => {
+            console.log('Onboarding completed!');
+            updateStatus();
+            alert('🎉 新手引导完成！\n\n现在你可以开始正式游戏了！');
+        };
+
+        // 页面加载时更新状态
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+
+            // 自动启动引导（仅用于测试）
+            const autoStart = new URLSearchParams(window.location.search).get('auto');
+            if (autoStart === 'true') {
+                setTimeout(startOnboarding, 500);
+            }
+        });
+    </script>
+</body>
+</html>

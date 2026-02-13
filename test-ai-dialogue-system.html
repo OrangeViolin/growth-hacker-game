@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI对话系统测试 - 增长黑客游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .api-key-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .api-key-section input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .api-key-section button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .api-key-section button:hover {
+            background: #5568d3;
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mode-real {
+            background: #48bb78;
+            color: white;
+        }
+
+        .mode-mock {
+            background: #ed8936;
+            color: white;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* 游戏状态面板 */
+        .game-state {
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* 对话面板 */
+        .dialogue-panel {
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .npc-emoji {
+            font-size: 24px;
+        }
+
+        .npc-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .emotion-badge {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .emotion-happy {
+            background: #48bb78;
+            color: white;
+        }
+
+        .emotion-neutral {
+            background: #718096;
+            color: white;
+        }
+
+        .emotion-concerned {
+            background: #ed8936;
+            color: white;
+        }
+
+        .emotion-angry {
+            background: #f56565;
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .suggestions {
+            margin-top: 8px;
+            padding: 8px;
+            background: #edf2f7;
+            border-radius: 5px;
+        }
+
+        .suggestions-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .suggestion-item {
+            font-size: 13px;
+            color: #4a5568;
+            padding: 4px 0;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .input-area button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .input-area button:hover {
+            background: #5568d3;
+        }
+
+        .input-area button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        /* NPC状态面板 */
+        .npc-status {
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .npc-card {
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .npc-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .npc-info {
+            flex: 1;
+        }
+
+        .npc-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .npc-role {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .satisfaction-bar {
+            margin-top: 8px;
+        }
+
+        .satisfaction-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        /* 场景面板 */
+        .scene-panel {
+            grid-column: 1 / -1;
+        }
+
+        .scene-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .scene-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .scene-description {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+
+        .scene-challenge {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 4px solid white;
+        }
+
+        .scene-hints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .hint-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        /* 控制面板 */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .controls button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+
+        /* 统计面板 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Loading状态 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>🤖 AI对话系统测试</h1>
+                    <p style="color: #666; font-size: 14px; margin-top: 5px;">
+                        测试AI对话引擎、NPC系统和场景生成器
+                        <span id="modeIndicator" class="mode-indicator mode-mock">Mock模式</span>
+                    </p>
+                </div>
+                <div class="stats-grid" style="width: 400px;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalMessages">0</div>
+                        <div class="stat-desc">总消息数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalScenes">0</div>
+                        <div class="stat-desc">总场景数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgSatisfaction">60</div>
+                        <div class="stat-desc">平均满意度</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Key配置 -->
+            <div class="api-key-section">
+                <input type="password" id="apiKeyInput" placeholder="输入Claude API Key (可选 - 留空使用Mock模式)">
+                <button onclick="setApiKey()">设置API Key</button>
+                <button class="btn-secondary" onclick="testMockMode()">测试Mock模式</button>
+            </div>
+
+            <!-- 控制按钮 -->
+            <div class="controls" style="margin-top: 15px;">
+                <button class="btn-primary" onclick="generateNewScene()">🎬 生成新场景</button>
+                <button class="btn-secondary" onclick="simulateAction()">⚡ 模拟用户行动</button>
+                <button class="btn-danger" onclick="resetAll()">🔄 重置所有</button>
+            </div>
+        </div>
+
+        <!-- 主网格 -->
+        <div class="main-grid">
+            <!-- 游戏状态 -->
+            <div class="panel game-state">
+                <h2>📊 游戏状态</h2>
+                <div id="gameStateContent"></div>
+            </div>
+
+            <!-- 对话面板 -->
+            <div class="panel dialogue-panel">
+                <h2>💬 AI对话</h2>
+                <div class="messages" id="messagesContainer"></div>
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="输入你的策略或问题..." onkeypress="handleKeyPress(event)">
+                    <button onclick="sendMessage()" id="sendBtn">发送</button>
+                </div>
+            </div>
+
+            <!-- NPC状态 -->
+            <div class="panel npc-status">
+                <h2>👥 NPC状态</h2>
+                <div id="npcStatusContent"></div>
+            </div>
+        </div>
+
+        <!-- 当前场景 -->
+        <div class="panel scene-panel">
+            <h2>🎬 当前场景</h2>
+            <div id="sceneContent"></div>
+        </div>
+    </div>
+
+    <!-- 引入系统文件 -->
+    <script src="ai-dialogue-engine.js"></script>
+    <script src="npc-system.js"></script>
+    <script src="scene-generator.js"></script>
+
+    <script>
+        // 全局变量
+        let dialogueEngine;
+        let npcManager;
+        let sceneGenerator;
+        let gameState = {
+            day: 1,
+            users: 0,
+            revenue: 0,
+            budget: 10000,
+            teamEnergy: 100,
+            marketTiming: 50,
+            userTrust: 70,
+            brandReputation: 60
+        };
+        let decisionHistory = [];
+
+        // 初始化
+        function init() {
+            // 创建系统实例（默认Mock模式）
+            dialogueEngine = new AIDialogueEngine();
+            npcManager = new NPCManager();
+            sceneGenerator = new SceneGenerator(dialogueEngine);
+
+            // 渲染初始界面
+            updateUI();
+
+            // 生成初始场景
+            generateNewScene();
+
+            console.log('✅ AI对话系统初始化完成');
+        }
+
+        // 设置API Key
+        function setApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+            if (apiKey) {
+                dialogueEngine = new AIDialogueEngine(apiKey);
+                sceneGenerator = new SceneGenerator(dialogueEngine);
+                document.getElementById('modeIndicator').textContent = 'Real API模式';
+                document.getElementById('modeIndicator').className = 'mode-indicator mode-real';
+                alert('✅ 已切换到Real API模式');
+            } else {
+                dialogueEngine = new AIDialogueEngine();
+                sceneGenerator = new SceneGenerator(dialogueEngine);
+                document.getElementById('modeIndicator').textContent = 'Mock模式';
+                document.getElementById('modeIndicator').className = 'mode-indicator mode-mock';
+                alert('✅ 已切换到Mock模式');
+            }
+        }
+
+        // 测试Mock模式
+        function testMockMode() {
+            dialogueEngine = new AIDialogueEngine();
+            sceneGenerator = new SceneGenerator(dialogueEngine);
+            document.getElementById('apiKeyInput').value = '';
+            document.getElementById('modeIndicator').textContent = 'Mock模式';
+            document.getElementById('modeIndicator').className = 'mode-indicator mode-mock';
+            alert('✅ 强制使用Mock模式进行测试');
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const userMessage = input.value.trim();
+
+            if (!userMessage) {
+                alert('请输入消息');
+                return;
+            }
+
+            // 清空输入框
+            input.value = '';
+
+            // 禁用发送按钮
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                // 显示用户消息
+                addUserMessage(userMessage);
+
+                // 调用AI引擎
+                const response = await dialogueEngine.sendMessage(userMessage, gameState);
+
+                // 显示AI响应
+                addAIMessage(response);
+
+                // 更新游戏状态
+                if (response.resourceImpact) {
+                    updateGameState(response.resourceImpact);
+                }
+
+                // 更新NPC状态
+                const currentNPC = response.role || dialogueEngine.currentRole;
+                npcManager.updateSatisfaction(currentNPC,
+                    response.emotion === 'happy' ? 5 :
+                    response.emotion === 'angry' ? -5 : 0
+                );
+
+                // 角色切换
+                if (response.nextRole) {
+                    dialogueEngine.switchRole(response.nextRole);
+                }
+
+                // 场景切换
+                if (response.sceneChange) {
+                    setTimeout(() => generateNewScene(), 2000);
+                }
+
+                // 更新UI
+                updateUI();
+
+            } catch (error) {
+                console.error('发送消息错误:', error);
+                alert('发送失败: ' + error.message);
+            } finally {
+                // 恢复发送按钮
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+            }
+        }
+
+        // 添加用户消息
+        function addUserMessage(text) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="npc-emoji">😊</div>
+                    <div class="npc-name">你</div>
+                </div>
+                <div class="message-content">${escapeHtml(text)}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 添加AI消息
+        function addAIMessage(response) {
+            const npc = npcManager.getNPC(response.role);
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+
+            let suggestionsHtml = '';
+            if (response.suggestions && response.suggestions.length > 0) {
+                suggestionsHtml = `
+                    <div class="suggestions">
+                        <div class="suggestions-title">💡 建议：</div>
+                        ${response.suggestions.map(s => `<div class="suggestion-item">• ${escapeHtml(s)}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="npc-emoji">${npc?.emoji || '🤖'}</div>
+                    <div class="npc-name">${npc?.name || 'AI'}</div>
+                    <span class="emotion-badge emotion-${response.emotion || 'neutral'}">
+                        ${getEmotionText(response.emotion)}
+                    </span>
+                </div>
+                <div class="message-content">${escapeHtml(response.text)}</div>
+                ${suggestionsHtml}
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 生成新场景
+        async function generateNewScene() {
+            try {
+                const scene = await sceneGenerator.generateScene(gameState, decisionHistory);
+                displayScene(scene);
+                updateUI();
+
+                // 如果有NPC对话，自动显示
+                if (scene.npcDialogues) {
+                    setTimeout(() => {
+                        Object.entries(scene.npcDialogues).forEach(([role, dialogue], index) => {
+                            setTimeout(() => {
+                                addAIMessage({
+                                    role: role,
+                                    text: dialogue,
+                                    emotion: 'neutral',
+                                    suggestions: []
+                                });
+                            }, index * 1000);
+                        });
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('生成场景错误:', error);
+                alert('场景生成失败: ' + error.message);
+            }
+        }
+
+        // 显示场景
+        function displayScene(scene) {
+            const container = document.getElementById('sceneContent');
+
+            let hintsHtml = '';
+            if (scene.hints && scene.hints.length > 0) {
+                hintsHtml = `
+                    <div class="scene-hints">
+                        ${scene.hints.map(hint => `<div class="hint-item">💡 ${escapeHtml(hint)}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="scene-content">
+                    <div class="scene-title">
+                        ${getTypeIcon(scene.type)} ${escapeHtml(scene.title)}
+                        <span style="float: right; font-size: 14px; opacity: 0.8;">
+                            难度: ${getDifficultyText(scene.difficulty)} | 时限: ${scene.timeLimit}天
+                        </span>
+                    </div>
+                    <div class="scene-description">${escapeHtml(scene.description)}</div>
+                    <div class="scene-challenge">
+                        <strong>🎯 挑战：</strong> ${escapeHtml(scene.challenge)}
+                    </div>
+                    ${hintsHtml}
+                </div>
+            `;
+        }
+
+        // 模拟用户行动
+        function simulateAction() {
+            const actions = [
+                { type: 'marketing', users: 100, cost: 1000, growthRate: 15, speed: 'fast' },
+                { type: 'product', users: 50, cost: 500, quality: 'high', userExperience: 85 },
+                { type: 'optimization', users: 30, cost: 200, sustainable: true, techDebt: 'low' }
+            ];
+
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const npcs = ['ceo', 'investor', 'cto', 'user'];
+            const npc = npcs[Math.floor(Math.random() * npcs.length)];
+
+            const reaction = npcManager.getReaction(npc, action, gameState);
+
+            // 更新游戏状态
+            gameState.users += action.users || 0;
+            gameState.budget -= action.cost || 0;
+            gameState.revenue += Math.floor((action.users || 0) * 2);
+
+            // 显示反应
+            addAIMessage(reaction);
+
+            // 记录决策
+            decisionHistory.push({
+                action: action.type,
+                result: `+${action.users}用户, -$${action.cost}`,
+                timestamp: Date.now()
+            });
+
+            updateUI();
+        }
+
+        // 更新游戏状态
+        function updateGameState(impact) {
+            if (impact.teamEnergy) {
+                gameState.teamEnergy = Math.max(0, Math.min(100, gameState.teamEnergy + impact.teamEnergy));
+            }
+            if (impact.userTrust) {
+                gameState.userTrust = Math.max(0, Math.min(100, gameState.userTrust + impact.userTrust));
+            }
+            if (impact.brandReputation) {
+                gameState.brandReputation = Math.max(0, Math.min(100, gameState.brandReputation + impact.brandReputation));
+            }
+        }
+
+        // 更新UI
+        function updateUI() {
+            updateGameStateUI();
+            updateNPCStatusUI();
+            updateStatsUI();
+        }
+
+        // 更新游戏状态UI
+        function updateGameStateUI() {
+            const container = document.getElementById('gameStateContent');
+            container.innerHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">📅 天数</span>
+                    <span class="stat-value">Day ${gameState.day}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">👥 用户数</span>
+                    <span class="stat-value">${gameState.users.toLocaleString()}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">💰 收入</span>
+                    <span class="stat-value">$${gameState.revenue.toLocaleString()}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">💵 预算</span>
+                    <span class="stat-value">$${gameState.budget.toLocaleString()}</span>
+                </div>
+                <div class="stat-item">
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span class="stat-label">⚡ 团队精力</span>
+                            <span class="stat-value">${gameState.teamEnergy}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.teamEnergy}%; background: ${getProgressColor(gameState.teamEnergy)}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span class="stat-label">🤝 用户信任</span>
+                            <span class="stat-value">${gameState.userTrust}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.userTrust}%; background: ${getProgressColor(gameState.userTrust)}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span class="stat-label">⭐ 品牌声誉</span>
+                            <span class="stat-value">${gameState.brandReputation}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.brandReputation}%; background: ${getProgressColor(gameState.brandReputation)}"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新NPC状态UI
+        function updateNPCStatusUI() {
+            const container = document.getElementById('npcStatusContent');
+            const npcs = npcManager.getAllNPCs();
+
+            container.innerHTML = Object.values(npcs).map(npc => `
+                <div class="npc-card">
+                    <div class="npc-header">
+                        <div class="npc-emoji">${npc.emoji}</div>
+                        <div class="npc-info">
+                            <div class="npc-title">${npc.name}</div>
+                            <div class="npc-role">${getRoleName(npc.id)}</div>
+                        </div>
+                    </div>
+                    <div class="satisfaction-bar">
+                        <div class="satisfaction-label">满意度: ${npc.satisfaction}%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${npc.satisfaction}%; background: ${getProgressColor(npc.satisfaction)}"></div>
+                        </div>
+                    </div>
+                    <div class="satisfaction-bar" style="margin-top: 8px;">
+                        <div class="satisfaction-label">信任度: ${npc.trustLevel}%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${npc.trustLevel}%; background: ${getProgressColor(npc.trustLevel)}"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 更新统计UI
+        function updateStatsUI() {
+            const dialogueStats = dialogueEngine.getStats();
+            const sceneStats = sceneGenerator.getStats();
+            const npcStats = npcManager.getStats();
+
+            document.getElementById('totalMessages').textContent = dialogueStats.totalMessages;
+            document.getElementById('totalScenes').textContent = sceneStats.totalScenes;
+            document.getElementById('avgSatisfaction').textContent = npcStats.averageSatisfaction;
+        }
+
+        // 重置所有
+        function resetAll() {
+            if (!confirm('确定要重置所有数据吗？')) return;
+
+            // 重置游戏状态
+            gameState = {
+                day: 1,
+                users: 0,
+                revenue: 0,
+                budget: 10000,
+                teamEnergy: 100,
+                marketTiming: 50,
+                userTrust: 70,
+                brandReputation: 60
+            };
+
+            // 重置系统
+            dialogueEngine.clearHistory();
+            npcManager.reset();
+            sceneGenerator.resetUsedScenes();
+            decisionHistory = [];
+
+            // 清空消息
+            document.getElementById('messagesContainer').innerHTML = '';
+
+            // 更新UI
+            updateUI();
+
+            // 生成新场景
+            generateNewScene();
+
+            alert('✅ 已重置所有数据');
+        }
+
+        // 辅助函数
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getEmotionText(emotion) {
+            const map = {
+                'happy': '😊 开心',
+                'neutral': '😐 中立',
+                'concerned': '😟 担忧',
+                'angry': '😠 愤怒'
+            };
+            return map[emotion] || '😐 中立';
+        }
+
+        function getTypeIcon(type) {
+            const map = {
+                'challenge': '🎯',
+                'event': '📰',
+                'milestone': '🏆',
+                'crisis': '⚠️'
+            };
+            return map[type] || '📌';
+        }
+
+        function getDifficultyText(difficulty) {
+            const map = {
+                'easy': '⭐ 简单',
+                'medium': '⭐⭐ 中等',
+                'hard': '⭐⭐⭐ 困难'
+            };
+            return map[difficulty] || '⭐⭐ 中等';
+        }
+
+        function getRoleName(id) {
+            const map = {
+                'ceo': 'CEO - 激进派',
+                'investor': '投资人 - 保守派',
+                'cto': 'CTO - 完美主义',
+                'user': '用户代表 - 挑剔派',
+                'advisor': 'AI顾问 - 客观派'
+            };
+            return map[id] || id;
+        }
+
+        function getProgressColor(value) {
+            if (value >= 70) return 'linear-gradient(90deg, #48bb78, #38a169)';
+            if (value >= 40) return 'linear-gradient(90deg, #ed8936, #dd6b20)';
+            return 'linear-gradient(90deg, #f56565, #e53e3e)';
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

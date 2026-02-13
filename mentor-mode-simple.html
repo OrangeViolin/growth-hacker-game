@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长黑客导师模式 | Growth Hacker Mentor Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Source Han Serif SC', 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #E8DCC4 0%, #D4C4AB 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #8B7355;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #C9A961 0%, #A0937C 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .challenge-section {
+            background: #F5F0E8;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #D4C4AB;
+        }
+
+        .challenge-title {
+            font-size: 1.8em;
+            color: #C9A961;
+        }
+
+        .challenge-difficulty {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .difficulty-easy { background: #E8F5E9; color: #2E7D32; }
+        .difficulty-medium { background: #FFF3E0; color: #E65100; }
+        .difficulty-hard { background: #FFEBEE; color: #C62828; }
+
+        .challenge-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #C9A961;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .answer-section textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #D4C4AB;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #C9A961 0%, #A0937C 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 169, 97, 0.4);
+        }
+
+        .feedback {
+            background: #FFF9F0;
+            border-left: 4px solid #C9A961;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .sidebar {
+            background: #F5F0E8;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #E8DCC4;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #C9A961 0%, #D4AF37 100%);
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .challenge-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .challenge-item {
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .challenge-item:hover {
+            background: #FFF9F0;
+        }
+
+        .challenge-item.current {
+            background: #C9A961;
+            color: white;
+        }
+
+        .challenge-item.completed {
+            opacity: 0.6;
+        }
+
+        .hint-btn {
+            background: #E8DCC4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 增长黑客导师模式</h1>
+            <p class="subtitle">Growth Hacker Mentor Mode - 严格闯关，真正掌握</p>
+        </div>
+
+        <div class="game-area">
+            <div class="challenge-section">
+                <div class="challenge-header">
+                    <h2 class="challenge-title" id="challenge-title">第1关：LTV基础计算</h2>
+                    <span class="challenge-difficulty difficulty-medium" id="challenge-difficulty">中等 Medium</span>
+                </div>
+
+                <div class="challenge-content" id="challenge-scenario">
+正在加载挑战...
+                </div>
+
+                <div class="answer-section">
+                    <h3 style="margin-bottom: 15px; color: #C9A961;">📝 你的答案：</h3>
+                    <textarea id="user-answer" placeholder="请输入你的答案，包括：
+1. 完整的计算过程
+2. 每个变量的解释
+3. 最终答案和结论"></textarea>
+
+                    <button class="submit-btn" onclick="submitAnswer()">提交答案</button>
+                    <button class="hint-btn" onclick="getHint()">💡 获取提示 (<span id="hints-remaining">3</span>次)</button>
+                </div>
+
+                <div id="feedback-area"></div>
+            </div>
+
+            <div class="sidebar">
+                <h3 style="margin-bottom: 20px; color: #C9A961;">📊 学习进度</h3>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%">0 / 10</div>
+                </div>
+
+                <h3 style="margin: 20px 0 15px; color: #C9A961;">📈 答题统计</h3>
+                <div class="stat-item">
+                    <span>当前关卡</span>
+                    <strong id="current-level">1</strong>
+                </div>
+                <div class="stat-item">
+                    <span>已完成</span>
+                    <strong id="completed-count">0</strong>
+                </div>
+                <div class="stat-item">
+                    <span>平均分数</span>
+                    <strong id="average-score">--</strong>
+                </div>
+                <div class="stat-item">
+                    <span>当前等级</span>
+                    <strong id="current-grade">初学者</strong>
+                </div>
+
+                <h3 style="margin: 20px 0 15px; color: #C9A961;">📋 关卡列表</h3>
+                <div class="challenge-list" id="challenge-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 挑战数据
+        const challenges = [
+            {
+                id: 1,
+                title: '第1关：LTV基础计算',
+                difficulty: 'medium',
+                scenario: `你的SaaS产品数据：
+- 月费：$99
+- 平均留存月数：8个月
+- Gross Margin：75%
+
+问题：
+1. 计算Gross LTV（总生命周期价值）
+2. 计算Net LTV（净生命周期价值）
+3. 解释两者的区别及应用场景
+
+要求：显示完整计算步骤`,
+                answer: {
+                    grossLTV: 792,
+                    netLTV: 594
+                },
+                hints: [
+                    'Gross LTV = 月费 × 平均留存月数',
+                    'Net LTV = Gross LTV × Gross Margin',
+                    'Gross LTV不考虑成本，Net LTV考虑了毛利率'
+                ]
+            },
+            {
+                id: 2,
+                title: '第2关：CAC Payback Period',
+                difficulty: 'hard',
+                scenario: `你的SaaS公司：
+- 月费：$49
+- Gross Margin：70%
+- 平均CAC（客户获取成本）：$490
+- 月流失率：5%
+
+问题：
+1. 计算CAC Payback Period（月）
+2. 如果要在6个月内回本，月费应该是多少？
+3. 这个指标为什么对早期创业公司很重要？`,
+                answer: {
+                    paybackPeriod: 14.3,
+                    targetPrice: 116.67
+                },
+                hints: [
+                    'Monthly Profit = MRR × Gross Margin',
+                    'Payback Period = CAC / Monthly Profit',
+                    '6个月回本意味着：CAC / (新价格 × 0.7) = 6'
+                ]
+            },
+            {
+                id: 3,
+                title: '第3关：病毒系数K值',
+                difficulty: 'hard',
+                scenario: `Dropbox的推荐系统：
+- 平均每个用户发送2.5个邀请
+- 邀请转化率：26%
+
+问题：
+1. 计算病毒系数K值
+2. 如果K=1.2，100个初始用户能带来多少用户？（3轮增长）
+3. 要达到K>1，至少需要多少转化率？（假设邀请数保持2.5）`,
+                answer: {
+                    kValue: 0.65,
+                    totalUsers: 464,
+                    minConversion: 40
+                },
+                hints: [
+                    'K = i（邀请数）× c（转化率）',
+                    '每轮增长：新用户 = 当前用户 × K',
+                    'K > 1 表示自然增长，K < 1 表示需要持续投入'
+                ]
+            },
+            {
+                id: 4,
+                title: '第4关：留存曲线分析',
+                difficulty: 'expert',
+                scenario: `你的App数据：
+- Day 1 留存率：40%
+- Day 7 留存率：20%
+- Day 30 留存率：8%
+- Day 90 留存率：5%
+
+问题：
+1. 这个留存曲线健康吗？为什么？
+2. 如果要提升至优秀水平（D1: 50%, D7: 30%, D30: 15%），应该优先优化哪个环节？
+3. 计算：1000个新用户中，90天后还有多少活跃用户？`,
+                answer: {
+                    day90Users: 50,
+                    priority: 'Day 1 to Day 7'
+                },
+                hints: [
+                    'D1->D7的衰减最快，说明新用户体验有问题',
+                    '优秀产品的D1应该>40%，D7应该>25%',
+                    '留存曲线应该趋于平缓，而不是一直陡降'
+                ]
+            },
+            {
+                id: 5,
+                title: '第5关：A/B测试显著性',
+                difficulty: 'expert',
+                scenario: `你在测试两个落地页：
+版本A（对照组）：
+- 访问量：1000
+- 转化数：50
+- 转化率：5%
+
+版本B（实验组）：
+- 访问量：1000
+- 转化数：65
+- 转化率：6.5%
+
+问题：
+1. 计算提升幅度
+2. 这个提升是否显著？（使用Z-test，α=0.05，Z临界值=1.96）
+3. 如果要检测出1%的提升（从5%到6%），需要多大样本量？`,
+                answer: {
+                    improvement: 30,
+                    zScore: 1.96,
+                    sampleSize: 3841
+                },
+                hints: [
+                    '提升幅度 = (6.5% - 5%) / 5% = 30%',
+                    'Z = (p1 - p2) / sqrt(p*(1-p)*(1/n1 + 1/n2))',
+                    '样本量公式：n = (Z*σ/δ)²'
+                ]
+            }
+        ];
+
+        // 游戏状态
+        let currentChallengeIndex = 0;
+        let completedChallenges = [];
+        let scores = [];
+        let hintsUsed = 0;
+
+        // 初始化游戏
+        function initGame() {
+            generateChallengeList();
+            loadChallenge(0);
+        }
+
+        // 生成关卡列表
+        function generateChallengeList() {
+            const listContainer = document.getElementById('challenge-list');
+            listContainer.innerHTML = challenges.map((challenge, index) => {
+                const isCompleted = completedChallenges.includes(index);
+                const isCurrent = index === currentChallengeIndex;
+                const isLocked = index > 0 && !completedChallenges.includes(index - 1);
+
+                return `
+                    <div class="challenge-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"
+                         onclick="${!isLocked ? `loadChallenge(${index})` : ''}">
+                        <div>
+                            <div style="font-weight: bold;">${challenge.title}</div>
+                            <div style="font-size: 0.85em; opacity: 0.8;">${challenge.difficulty}</div>
+                        </div>
+                        <div style="font-size: 1.5em;">
+                            ${isCompleted ? '✅' : isLocked ? '🔒' : '⭕'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 加载挑战
+        function loadChallenge(index) {
+            currentChallengeIndex = index;
+            const challenge = challenges[index];
+            hintsUsed = 0;
+
+            document.getElementById('challenge-title').textContent = challenge.title;
+            document.getElementById('challenge-difficulty').textContent = challenge.difficulty;
+            document.getElementById('challenge-difficulty').className = `challenge-difficulty difficulty-${challenge.difficulty}`;
+            document.getElementById('challenge-scenario').textContent = challenge.scenario;
+            document.getElementById('user-answer').value = '';
+            document.getElementById('feedback-area').innerHTML = '';
+            document.getElementById('hints-remaining').textContent = 3;
+
+            generateChallengeList();
+            updateStats();
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            const answer = document.getElementById('user-answer').value.trim();
+
+            if (!answer) {
+                alert('请输入你的答案！');
+                return;
+            }
+
+            const challenge = challenges[currentChallengeIndex];
+            const score = evaluateAnswer(answer, challenge);
+
+            scores.push(score);
+
+            if (score >= 70) {
+                if (!completedChallenges.includes(currentChallengeIndex)) {
+                    completedChallenges.push(currentChallengeIndex);
+                }
+                showFeedback(score, true);
+
+                setTimeout(() => {
+                    if (currentChallengeIndex < challenges.length - 1) {
+                        loadChallenge(currentChallengeIndex + 1);
+                    } else {
+                        alert('🎉 恭喜！你已完成所有挑战！');
+                    }
+                }, 3000);
+            } else {
+                showFeedback(score, false);
+            }
+
+            updateStats();
+        }
+
+        // 评估答案
+        function evaluateAnswer(answer, challenge) {
+            let score = 0;
+            const answerLower = answer.toLowerCase();
+
+            // 检查是否包含计算过程（30分）
+            if (answer.includes('×') || answer.includes('*') || answer.includes('=') || answer.match(/\d+\s*[×*]\s*\d+/)) {
+                score += 30;
+            }
+
+            // 检查是否有解释说明（20分）
+            if (answer.length > 100) {
+                score += 20;
+            }
+
+            // 检查关键数字（50分）
+            const numbers = answer.match(/\d+\.?\d*/g) || [];
+            if (challenge.answer.grossLTV && numbers.some(n => Math.abs(parseFloat(n) - challenge.answer.grossLTV) < 10)) {
+                score += 25;
+            }
+            if (challenge.answer.netLTV && numbers.some(n => Math.abs(parseFloat(n) - challenge.answer.netLTV) < 10)) {
+                score += 25;
+            }
+            if (challenge.answer.kValue && numbers.some(n => Math.abs(parseFloat(n) - challenge.answer.kValue) < 0.1)) {
+                score += 25;
+            }
+            if (challenge.answer.paybackPeriod && numbers.some(n => Math.abs(parseFloat(n) - challenge.answer.paybackPeriod) < 2)) {
+                score += 25;
+            }
+
+            return Math.min(score, 100);
+        }
+
+        // 显示反馈
+        function showFeedback(score, passed) {
+            const grade = score >= 95 ? 'A+' : score >= 85 ? 'A' : score >= 75 ? 'B' : score >= 70 ? 'C' : 'F';
+            const feedback = document.getElementById('feedback-area');
+
+            feedback.innerHTML = `
+                <div class="feedback">
+                    <h3 style="color: ${passed ? '#2E7D32' : '#C62828'}; margin-bottom: 15px;">
+                        ${passed ? '✅ 通过！' : '❌ 未通过'}
+                    </h3>
+                    <div style="margin-bottom: 10px;">
+                        <strong>得分：</strong>${score} 分 | <strong>等级：</strong>${grade}
+                    </div>
+                    <div style="margin-top: 15px; line-height: 1.8;">
+                        ${passed ?
+                            `太棒了！你展现了扎实的增长黑客知识。${score >= 95 ? '完美答案！' : '继续保持！'}` :
+                            `还需要加强。建议：<br>1. 显示完整计算过程<br>2. 解释每个变量的含义<br>3. 检查数字的准确性<br><br>重新组织一下答案再试试！`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // 获取提示
+        function getHint() {
+            const challenge = challenges[currentChallengeIndex];
+
+            if (hintsUsed >= 3) {
+                alert('提示次数已用完！');
+                return;
+            }
+
+            const hint = challenge.hints[hintsUsed];
+            alert(`💡 提示 ${hintsUsed + 1}/3：\n\n${hint}`);
+
+            hintsUsed++;
+            document.getElementById('hints-remaining').textContent = 3 - hintsUsed;
+        }
+
+        // 更新统计
+        function updateStats() {
+            const avgScore = scores.length > 0
+                ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+                : '--';
+
+            document.getElementById('current-level').textContent = currentChallengeIndex + 1;
+            document.getElementById('completed-count').textContent = completedChallenges.length;
+            document.getElementById('average-score').textContent = avgScore;
+
+            const progress = (completedChallenges.length / challenges.length * 100).toFixed(0);
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = `${completedChallenges.length} / ${challenges.length}`;
+
+            let grade = '初学者';
+            if (avgScore >= 90) grade = '大师';
+            else if (avgScore >= 80) grade = '专家';
+            else if (avgScore >= 70) grade = '熟练';
+            document.getElementById('current-grade').textContent = grade;
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

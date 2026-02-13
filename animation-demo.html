@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation System Demo | 动画系统演示</title>
+    <link rel="stylesheet" href="ui-effects.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .demo-header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 2em;
+            border-bottom: 3px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .demo-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            margin: 20px auto;
+            max-width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: visible;
+        }
+
+        .demo-card:hover {
+            border-color: #667eea;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .office-scene-wrapper {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #6c757d;
+        }
+
+        code {
+            background: #f1f3f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎨 动画系统演示</h1>
+            <p>Animation System Demo</p>
+        </div>
+
+        <!-- 1. 数字计数动画 -->
+        <div class="demo-section">
+            <h2>1. 数字计数动画 CountUp Animation</h2>
+            <div class="description">
+                <strong>功能：</strong>数字从旧值平滑过渡到新值，使用 <code>requestAnimationFrame</code> 和缓动函数实现流畅动画。
+            </div>
+
+            <div class="demo-grid">
+                <div class="metric-card" data-metric="users">
+                    <div class="metric-label">用户数</div>
+                    <div class="metric-value" id="demo-users">5000</div>
+                </div>
+                <div class="metric-card" data-metric="revenue">
+                    <div class="metric-label">月收入</div>
+                    <div class="metric-value" id="demo-revenue">$10,000</div>
+                </div>
+                <div class="metric-card" data-metric="retention">
+                    <div class="metric-label">留存率</div>
+                    <div class="metric-value" id="demo-retention">25%</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoCountUp()">🚀 模拟增长</button>
+                <button class="btn" onclick="demoReset()">🔄 重置</button>
+            </div>
+        </div>
+
+        <!-- 2. 里程碑粒子效果 -->
+        <div class="demo-section">
+            <h2>2. 里程碑粒子效果 Milestone Celebration</h2>
+            <div class="description">
+                <strong>功能：</strong>当达到重要里程碑时触发彩带动画和屏幕震动效果。
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoMilestone()">🎉 触发里程碑 (10,000用户)</button>
+                <button class="btn" onclick="demoConfetti()">🎊 仅彩带效果</button>
+                <button class="btn" onclick="demoShake()">📳 仅屏幕震动</button>
+            </div>
+        </div>
+
+        <!-- 3. 指标脉冲警告 -->
+        <div class="demo-section">
+            <h2>3. 指标脉冲动画 Metric Pulse</h2>
+            <div class="description">
+                <strong>功能：</strong>当指标处于警戒状态时（如预算不足、留存率低），显示脉冲动画提醒用户。
+            </div>
+
+            <div class="demo-grid">
+                <div class="metric-card">
+                    <div class="metric-label">团队精力</div>
+                    <div class="metric-value">15%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">预算余额</div>
+                    <div class="metric-value">$800</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">客户满意度</div>
+                    <div class="metric-value">45%</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoPulseDanger()">⚠️ 危险脉冲 (红色)</button>
+                <button class="btn" onclick="demoPulseWarning()">⚡ 警告脉冲 (黄色)</button>
+                <button class="btn" onclick="demoPulseSuccess()">✅ 成功脉冲 (绿色)</button>
+            </div>
+        </div>
+
+        <!-- 4. 卡片动画 -->
+        <div class="demo-section">
+            <h2>4. 决策卡片动画 Card Animations</h2>
+            <div class="description">
+                <strong>功能：</strong>卡片翻转、选中高亮、滑动交互等效果。
+            </div>
+
+            <div class="demo-card" id="demo-card">
+                <div style="font-size: 3em; margin-bottom: 15px;">📝</div>
+                <h3>内容营销策略</h3>
+                <p style="margin-top: 10px; color: #6c757d;">点击翻转，拖动滑动</p>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoFlip()">🔄 卡片翻转</button>
+                <button class="btn" onclick="demoHighlight()">✨ 选中高亮</button>
+                <button class="btn" onclick="demoUnhighlight()">❌ 取消选中</button>
+            </div>
+        </div>
+
+        <!-- 5. 成就系统 -->
+        <div class="demo-section">
+            <h2>5. 成就解锁动画 Achievement System</h2>
+            <div class="description">
+                <strong>功能：</strong>成就解锁时的震撼效果，包括光芒、粒子、旋转等多重动画。
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoAchievementCommon()">🥉 普通成就</button>
+                <button class="btn" onclick="demoAchievementRare()">🥈 稀有成就</button>
+                <button class="btn" onclick="demoAchievementEpic()">🥇 史诗成就</button>
+                <button class="btn" onclick="demoAchievementLegendary()">👑 传奇成就</button>
+            </div>
+        </div>
+
+        <!-- 6. 办公室场景 -->
+        <div class="demo-section">
+            <h2>6. 公司成长可视化 Office Scene</h2>
+            <div class="description">
+                <strong>功能：</strong>根据用户数自动升级办公室场景，从车库到创业总部。
+            </div>
+
+            <div class="office-scene-wrapper" id="demo-office-container">
+                <!-- 将由JavaScript填充 -->
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoOffice('garage')">🚗 车库办公 (0-5K)</button>
+                <button class="btn" onclick="demoOffice('small-office')">🏢 小办公室 (5K-20K)</button>
+                <button class="btn" onclick="demoOffice('medium-office')">🏬 中型办公室 (20K-100K)</button>
+                <button class="btn" onclick="demoOffice('startup-hq')">🏙️ 创业总部 (100K+)</button>
+            </div>
+        </div>
+
+        <!-- 7. 提示消息 -->
+        <div class="demo-section">
+            <h2>7. 提示消息 Toast Notifications</h2>
+            <div class="description">
+                <strong>功能：</strong>轻量级的消息提示，支持多种类型和自动消失。
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoToast('success')">✅ 成功消息</button>
+                <button class="btn" onclick="demoToast('warning')">⚠️ 警告消息</button>
+                <button class="btn" onclick="demoToast('error')">❌ 错误消息</button>
+                <button class="btn" onclick="demoToast('info')">ℹ️ 信息提示</button>
+            </div>
+        </div>
+
+        <!-- 8. 进度条动画 -->
+        <div class="demo-section">
+            <h2>8. 进度条动画 Progress Bar</h2>
+            <div class="description">
+                <strong>功能：</strong>平滑的进度条动画，带光泽效果。
+            </div>
+
+            <div style="background: #e9ecef; height: 40px; border-radius: 20px; overflow: hidden; margin: 20px 0;">
+                <div id="demo-progress" class="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);">
+                    0%
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="demoProgress(25)">25%</button>
+                <button class="btn" onclick="demoProgress(50)">50%</button>
+                <button class="btn" onclick="demoProgress(75)">75%</button>
+                <button class="btn" onclick="demoProgress(100)">100%</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="animations.js"></script>
+    <script>
+        // 演示脚本
+        let currentUsers = 5000;
+        let currentRevenue = 10000;
+        let currentRetention = 25;
+
+        // 1. 数字计数动画
+        function demoCountUp() {
+            const newUsers = currentUsers + Math.floor(Math.random() * 5000) + 3000;
+            const newRevenue = currentRevenue + Math.floor(Math.random() * 20000) + 10000;
+            const newRetention = Math.min(100, currentRetention + Math.floor(Math.random() * 20) + 10);
+
+            gameAnimations.countUp(
+                document.getElementById('demo-users'),
+                currentUsers,
+                newUsers,
+                1500
+            );
+
+            gameAnimations.countUp(
+                document.getElementById('demo-revenue'),
+                currentRevenue,
+                newRevenue,
+                1500,
+                (val) => '$' + Math.floor(val).toLocaleString()
+            );
+
+            gameAnimations.countUp(
+                document.getElementById('demo-retention'),
+                currentRetention,
+                newRetention,
+                1500,
+                (val) => Math.floor(val) + '%'
+            );
+
+            // 检查里程碑
+            gameAnimations.checkMilestone(currentUsers, newUsers, 'users');
+            gameAnimations.checkMilestone(currentRevenue, newRevenue, 'revenue');
+
+            // 指标卡片脉冲
+            document.querySelectorAll('.metric-card').forEach(card => {
+                card.classList.add('metric-updating');
+                setTimeout(() => card.classList.remove('metric-updating'), 600);
+            });
+
+            currentUsers = newUsers;
+            currentRevenue = newRevenue;
+            currentRetention = newRetention;
+        }
+
+        function demoReset() {
+            currentUsers = 5000;
+            currentRevenue = 10000;
+            currentRetention = 25;
+
+            document.getElementById('demo-users').textContent = currentUsers.toLocaleString();
+            document.getElementById('demo-revenue').textContent = '$' + currentRevenue.toLocaleString();
+            document.getElementById('demo-retention').textContent = currentRetention + '%';
+        }
+
+        // 2. 里程碑效果
+        function demoMilestone() {
+            gameAnimations.triggerMilestoneAnimation(10000, 'users');
+        }
+
+        function demoConfetti() {
+            gameAnimations.confettiExplosion();
+        }
+
+        function demoShake() {
+            gameAnimations.screenShake();
+        }
+
+        // 3. 指标脉冲
+        function demoPulseDanger() {
+            const cards = document.querySelectorAll('.demo-section:nth-child(4) .metric-card');
+            cards.forEach(card => {
+                gameAnimations.removeMetricPulse(card);
+                gameAnimations.addMetricPulse(card, 'danger');
+            });
+        }
+
+        function demoPulseWarning() {
+            const cards = document.querySelectorAll('.demo-section:nth-child(4) .metric-card');
+            cards.forEach(card => {
+                gameAnimations.removeMetricPulse(card);
+                gameAnimations.addMetricPulse(card, 'warning');
+            });
+        }
+
+        function demoPulseSuccess() {
+            const cards = document.querySelectorAll('.demo-section:nth-child(4) .metric-card');
+            cards.forEach(card => {
+                gameAnimations.removeMetricPulse(card);
+                gameAnimations.addMetricPulse(card, 'success');
+            });
+        }
+
+        // 4. 卡片动画
+        function demoFlip() {
+            const card = document.getElementById('demo-card');
+            gameAnimations.flipCard(card);
+        }
+
+        function demoHighlight() {
+            const card = document.getElementById('demo-card');
+            gameAnimations.highlightCard(card);
+        }
+
+        function demoUnhighlight() {
+            const card = document.getElementById('demo-card');
+            gameAnimations.unhighlightCard(card);
+        }
+
+        // 5. 成就系统
+        function demoAchievementCommon() {
+            gameAnimations.showAchievement({
+                title: '初出茅庐',
+                description: '完成第一个增长策略',
+                icon: '🎯',
+                rarity: 'common'
+            });
+        }
+
+        function demoAchievementRare() {
+            gameAnimations.showAchievement({
+                title: '用户破万',
+                description: '成功获得10,000名用户',
+                icon: '🚀',
+                rarity: 'rare'
+            });
+        }
+
+        function demoAchievementEpic() {
+            gameAnimations.showAchievement({
+                title: '增长黑客大师',
+                description: '连续3个月保持40%增长率',
+                icon: '💎',
+                rarity: 'epic'
+            });
+        }
+
+        function demoAchievementLegendary() {
+            gameAnimations.showAchievement({
+                title: '独角兽诞生',
+                description: '公司估值达到10亿美元',
+                icon: '🦄',
+                rarity: 'legendary'
+            });
+        }
+
+        // 6. 办公室场景
+        function demoOffice(level) {
+            const container = document.getElementById('demo-office-container');
+            const scene = container.querySelector('.office-scene') || gameAnimations.initOfficeScene();
+
+            if (!container.querySelector('.office-scene')) {
+                container.appendChild(scene);
+            }
+
+            const levels = {
+                'garage': { threshold: 0, class: 'garage', label: '车库办公 Garage' },
+                'small-office': { threshold: 5000, class: 'small-office', label: '小办公室 Small Office' },
+                'medium-office': { threshold: 20000, class: 'medium-office', label: '中型办公室 Medium Office' },
+                'startup-hq': { threshold: 100000, class: 'startup-hq', label: '创业总部 Startup HQ' }
+            };
+
+            gameAnimations.transitionOffice(scene, levels[level]);
+        }
+
+        // 7. 提示消息
+        function demoToast(type) {
+            const messages = {
+                success: '策略执行成功！用户增长 15%',
+                warning: '注意：预算即将耗尽',
+                error: '执行失败：团队精力不足',
+                info: '提示：可以尝试内容营销策略'
+            };
+
+            gameAnimations.showToast(messages[type], type);
+        }
+
+        // 8. 进度条
+        function demoProgress(percent) {
+            const bar = document.getElementById('demo-progress');
+            bar.style.width = percent + '%';
+            bar.textContent = percent + '%';
+        }
+
+        // 初始化办公室场景
+        document.addEventListener('DOMContentLoaded', () => {
+            demoOffice('garage');
+
+            // 为演示卡片添加点击效果
+            const demoCard = document.getElementById('demo-card');
+            demoCard.addEventListener('click', demoFlip);
+        });
+    </script>
+</body>
+</html>

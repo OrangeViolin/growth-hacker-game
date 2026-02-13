@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爽点动画系统演示 | Effects Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+            color: #E2E8F0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .demo-section {
+            background: rgba(44, 24, 16, 0.6);
+            border: 2px solid #C9A961;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .demo-section h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .demo-section p {
+            color: #CBD5E1;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #8B7355;
+            color: #E8DCC4;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .demo-btn:hover {
+            border-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 15px;
+            border: 2px solid #10B981;
+        }
+
+        .score-label {
+            font-size: 1.2em;
+            color: #94A3B8;
+            margin-bottom: 10px;
+        }
+
+        .score-value {
+            font-size: 4em;
+            font-weight: bold;
+            color: #10B981;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .score-value.score-update {
+            animation: scorePopup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scorePopup {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Combo卡片样式 */
+        .combo-card {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(44, 24, 16, 0.95) 0%, rgba(26, 15, 10, 0.95) 100%);
+            border: 3px solid #FFA500;
+            border-radius: 15px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 165, 0, 0.3);
+            z-index: 10000;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: top right;
+        }
+
+        .combo-card.hidden {
+            opacity: 0;
+            transform: scale(0.5) translateX(20px);
+            pointer-events: none;
+        }
+
+        .combo-card.visible {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+        }
+
+        .combo-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .combo-icon {
+            font-size: 40px;
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .combo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .combo-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFD700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .combo-count {
+            font-size: 32px;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-shadow: 0 0 15px rgba(255, 165, 0, 0.8);
+            line-height: 1;
+        }
+
+        .combo-card.level-1 {
+            border-color: #FFA500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 165, 0, 0.4);
+        }
+
+        .combo-card.level-2 {
+            border-color: #FF4500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 69, 0, 0.6);
+            animation: fireGlow 1s ease-in-out infinite;
+        }
+
+        .combo-card.level-3 {
+            border-color: #FFD700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.8);
+            animation: legendaryGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes fireGlow {
+            0%, 100% {
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 69, 0, 0.6);
+            }
+            50% {
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 69, 0, 0.9);
+            }
+        }
+
+        @keyframes legendaryGlow {
+            0%, 100% {
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 215, 0, 0.8);
+            }
+            50% {
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 70px rgba(255, 215, 0, 1);
+            }
+        }
+
+        .combo-card.pulse {
+            animation: comboPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes comboPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .combo-card.combo-break {
+            animation: comboBreak 0.8s ease-out;
+            border-color: #FF4444;
+        }
+
+        @keyframes comboBreak {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            25% {
+                transform: rotate(-5deg) scale(0.95);
+            }
+            50% {
+                transform: rotate(5deg) scale(0.95);
+            }
+            75% {
+                transform: rotate(-3deg) scale(0.9);
+            }
+            100% {
+                transform: rotate(0deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% {
+                transform: translate3d(-2px, 0, 0);
+            }
+            20%, 80% {
+                transform: translate3d(4px, 0, 0);
+            }
+            30%, 50%, 70% {
+                transform: translate3d(-6px, 0, 0);
+            }
+            40%, 60% {
+                transform: translate3d(6px, 0, 0);
+            }
+        }
+
+        .instruction {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid #06B6D4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #CBD5E1;
+        }
+
+        .instruction strong {
+            color: #06B6D4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>爽点动画系统演示</h1>
+
+        <!-- 分数显示区域 -->
+        <div class="score-display">
+            <div class="score-label">当前分数</div>
+            <div class="score-value" id="score-value">0</div>
+        </div>
+
+        <!-- 1. 粒子爆炸系统 -->
+        <div class="demo-section">
+            <h2>1. 粒子爆炸系统</h2>
+            <p>答对时从按钮中心爆炸50个金色粒子，向四周发散。</p>
+            <div class="button-group">
+                <button class="demo-btn" onclick="demo.triggerParticleExplosion(this)">
+                    触发金色粒子爆炸
+                </button>
+                <button class="demo-btn" onclick="demo.triggerSuccessEffect(this)">
+                    成功反馈（光晕+粒子）
+                </button>
+                <button class="demo-btn" onclick="demo.triggerComboExplosion(this, 5)">
+                    Combo特效（更强烈）
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. Combo显示UI -->
+        <div class="demo-section">
+            <h2>2. Combo显示UI</h2>
+            <p>右上角悬浮卡片，显示连击数。颜色分级：橙色→红色→金色。</p>
+            <div class="instruction">
+                <strong>操作说明：</strong>连续点击"答对"增加Combo，点击"答错"断连震动消失。
+            </div>
+            <div class="button-group">
+                <button class="demo-btn" onclick="demo.answerCorrect(this)">
+                    答对（Combo +1）
+                </button>
+                <button class="demo-btn" onclick="demo.answerWrong(this)">
+                    答错（Combo断连）
+                </button>
+                <button class="demo-btn" onclick="demo.resetCombo()">
+                    重置Combo
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 数字滚动动画 -->
+        <div class="demo-section">
+            <h2>3. 数字滚动动画</h2>
+            <p>分数增加时数字滚动效果（使用requestAnimationFrame），同时放大缩小呼吸效果。</p>
+            <div class="button-group">
+                <button class="demo-btn" onclick="demo.addScore(10)">
+                    +10 分
+                </button>
+                <button class="demo-btn" onclick="demo.addScore(100)">
+                    +100 分
+                </button>
+                <button class="demo-btn" onclick="demo.addScore(500)">
+                    +500 分
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. 成功/失败反馈 -->
+        <div class="demo-section">
+            <h2>4. 成功/失败反馈优化</h2>
+            <p><strong>成功：</strong>绿色光晕 + 粒子爆炸<br>
+               <strong>失败：</strong>橙色边框 + 震动效果（不是红色）</p>
+            <div class="button-group">
+                <button class="demo-btn" onclick="demo.triggerSuccessEffect(this)">
+                    成功反馈
+                </button>
+                <button class="demo-btn" onclick="demo.triggerFailureEffect(this)">
+                    失败反馈
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. 综合演示 -->
+        <div class="demo-section">
+            <h2>5. 综合演示：答题场景</h2>
+            <p>模拟真实答题场景，集成所有特效。</p>
+            <div class="button-group">
+                <button class="demo-btn" onclick="demo.simulateCorrectAnswer(this)">
+                    模拟答对（完整特效）
+                </button>
+                <button class="demo-btn" onclick="demo.simulateWrongAnswer(this)">
+                    模拟答错（完整特效）
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载特效系统 -->
+    <script src="particle-system.js"></script>
+    <script src="combo-ui.js"></script>
+
+    <script>
+        // 演示控制器
+        const demo = {
+            score: 0,
+            combo: 0,
+            particleSystem: null,
+            comboUI: null,
+
+            init() {
+                // 初始化特效系统
+                this.particleSystem = new ParticleSystem();
+                this.comboUI = new ComboUI();
+
+                // 注入粒子系统样式
+                if (!document.getElementById('particle-styles')) {
+                    const styleEl = document.createElement('div');
+                    styleEl.id = 'particle-styles';
+                    styleEl.innerHTML = particleStyles;
+                    document.head.appendChild(styleEl);
+                }
+
+                console.log('特效系统初始化完成');
+            },
+
+            // 触发粒子爆炸
+            triggerParticleExplosion(button) {
+                this.particleSystem.explodeFromButton(button);
+                console.log('粒子爆炸触发');
+            },
+
+            // 触发成功效果
+            triggerSuccessEffect(button) {
+                this.particleSystem.createSuccessGlow(button);
+                this.particleSystem.explodeFromButton(button, {
+                    colors: ['#4AFF4A', '#00FF00', '#7FFF00', '#ADFF2F']
+                });
+                console.log('成功效果触发');
+            },
+
+            // 触发失败效果
+            triggerFailureEffect(button) {
+                this.particleSystem.createFailureShake(button);
+                console.log('失败效果触发');
+            },
+
+            // 触发Combo爆炸
+            triggerComboExplosion(button, level) {
+                this.particleSystem.createComboExplosion(button, level);
+                console.log(`Combo爆炸触发，等级: ${level}`);
+            },
+
+            // 答对
+            answerCorrect(button) {
+                this.combo++;
+                this.comboUI.update(this.combo, true);
+                this.particleSystem.explodeFromButton(button);
+                this.addScore(10 * this.combo);
+
+                // 根据combo等级显示不同效果
+                if (this.combo >= 5) {
+                    this.particleSystem.createComboExplosion(button, this.combo);
+                    const rect = button.getBoundingClientRect();
+                    this.particleSystem.createFloatingText('LEGENDARY!', rect.left + rect.width / 2, rect.top, {
+                        color: '#FFD700',
+                        fontSize: 32
+                    });
+                } else if (this.combo >= 3) {
+                    const rect = button.getBoundingClientRect();
+                    this.particleSystem.createFloatingText('ON FIRE!', rect.left + rect.width / 2, rect.top, {
+                        color: '#FF4500',
+                        fontSize: 28
+                    });
+                }
+
+                console.log(`答对！Combo: ${this.combo}`);
+            },
+
+            // 答错
+            answerWrong(button) {
+                this.comboUI.update(0, false);
+                this.particleSystem.createFailureShake(button);
+                this.combo = 0;
+                console.log('答错！Combo断连');
+            },
+
+            // 重置Combo
+            resetCombo() {
+                this.combo = 0;
+                this.comboUI.reset();
+                console.log('Combo已重置');
+            },
+
+            // 添加分数
+            addScore(points) {
+                const oldScore = this.score;
+                this.score += points;
+                const scoreEl = document.getElementById('score-value');
+
+                // 添加呼吸动画类
+                scoreEl.classList.remove('score-update');
+                void scoreEl.offsetWidth; // 强制重排
+                scoreEl.classList.add('score-update');
+
+                // 数字滚动动画
+                this.animateNumber(scoreEl, oldScore, this.score, 500);
+
+                // 显示飘浮文字
+                const rect = scoreEl.getBoundingClientRect();
+                this.particleSystem.createFloatingText(`+${points}`, rect.left + rect.width / 2, rect.top, {
+                    color: '#10B981',
+                    fontSize: 28
+                });
+
+                console.log(`分数增加: +${points} (总分: ${this.score})`);
+            },
+
+            // 数字滚动动画
+            animateNumber(element, start, end, duration) {
+                const startTime = performance.now();
+
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+
+                    // 使用easeOut缓动
+                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    const currentValue = Math.floor(start + (end - start) * easeProgress);
+
+                    element.textContent = currentValue;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            },
+
+            // 模拟答对（完整特效）
+            simulateCorrectAnswer(button) {
+                this.answerCorrect(button);
+                this.triggerSuccessEffect(button);
+            },
+
+            // 模拟答错（完整特效）
+            simulateWrongAnswer(button) {
+                this.answerWrong(button);
+            }
+        };
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            demo.init();
+        });
+    </script>
+</body>
+</html>

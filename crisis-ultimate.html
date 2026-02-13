@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长危机：极限生存 | Ultimate Growth Crisis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Source Han Serif SC', 'Noto Serif SC', serif;
+            background: #000;
+            color: #E8DCC4;
+            overflow-x: hidden;
+        }
+
+        /* 场景选择界面 */
+        .scenario-select {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            padding: 40px 20px;
+        }
+
+        .select-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .select-header h1 {
+            font-size: 3em;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 15px;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
+
+        .select-subtitle {
+            font-size: 1.2em;
+            color: #C9A961;
+        }
+
+        .scenarios-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #C9A961;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(201, 169, 97, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .scenario-card:hover::before {
+            left: 100%;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFD700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .scenario-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: #8B0000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .scenario-title {
+            font-size: 1.3em;
+            color: #FFD700;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .scenario-desc {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #E8DCC4;
+            margin-bottom: 15px;
+        }
+
+        .scenario-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: rgba(139, 0, 0, 0.3);
+            color: #FFD700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            border: 1px solid #8B0000;
+        }
+
+        .scenario-difficulty {
+            font-size: 0.9em;
+            color: #C9A961;
+        }
+
+        .difficulty-extreme { color: #FF0000; font-weight: bold; }
+        .difficulty-hard { color: #FF6600; }
+        .difficulty-medium { color: #FFD700; }
+
+        /* 游戏界面 */
+        .game-screen {
+            display: none;
+            min-height: 100vh;
+            background: #000;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        /* 紧急警报动画 */
+        .alert-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+            animation: flash 0.5s;
+            z-index: 1000;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* 顶部紧急状态栏 */
+        .crisis-bar {
+            background: linear-gradient(135deg, #8B0000 0%, #4A0000 100%);
+            border-bottom: 3px solid #FF0000;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crisis-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.3), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .crisis-bar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .crisis-title {
+            font-size: 2em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+
+        .urgent-timer {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            color: #FF0000;
+            font-weight: bold;
+            border: 2px solid #FF0000;
+            animation: timerBlink 1s infinite;
+        }
+
+        @keyframes timerBlink {
+            0%, 100% { border-color: #FF0000; }
+            50% { border-color: #FFD700; }
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #C9A961;
+            position: relative;
+        }
+
+        .stat-item.critical {
+            border-left-color: #FF0000;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #C9A961;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .stat-change {
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .stat-change.negative {
+            color: #FF4444;
+        }
+
+        .stat-change.positive {
+            color: #44FF44;
+        }
+
+        /* 主游戏区域 */
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        /* 突发事件弹窗 */
+        .breaking-news {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #8B0000 0%, #4A0000 100%);
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            z-index: 2000;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            animation: popIn 0.5s forwards;
+        }
+
+        @keyframes popIn {
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .breaking-title {
+            font-size: 1.8em;
+            color: #FF0000;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .breaking-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .breaking-close {
+            background: #FFD700;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            border: 2px solid #C9A961;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .scenario-box {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            padding: 25px;
+            border-bottom: 2px solid #C9A961;
+        }
+
+        .scenario-text {
+            line-height: 2;
+            white-space: pre-wrap;
+            font-size: 1.05em;
+        }
+
+        .highlight {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .urgent {
+            color: #FF4444;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        /* 问题区域 */
+        .question-box {
+            padding: 25px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #C9A961;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #C9A961;
+        }
+
+        .time-pressure {
+            font-size: 1.1em;
+            color: #FF4444;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            color: #FFD700;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #C9A961;
+            color: #E8DCC4;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(201, 169, 97, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .choice-btn:hover::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        .choice-btn:hover {
+            border-color: #FFD700;
+            transform: translateX(10px);
+            box-shadow: 0 5px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .choice-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .choice-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .choice-detail {
+            font-size: 0.95em;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .choice-risk {
+            margin-top: 10px;
+            font-size: 0.85em;
+            padding: 5px 10px;
+            background: rgba(139, 0, 0, 0.3);
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* 反馈区域 */
+        .feedback {
+            background: linear-gradient(135deg, #1A3A2A 0%, #0A2A1A 100%);
+            border-left: 4px solid #4A9A6A;
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .feedback.negative {
+            background: linear-gradient(135deg, #3A1A1A 0%, #2A0A0A 100%);
+            border-left-color: #FF4444;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-icon {
+            font-size: 2.5em;
+        }
+
+        .feedback-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .feedback-text {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .impact-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .impact-title {
+            color: #FFD700;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .impact-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(201, 169, 97, 0.5);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-box {
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            color: #FFD700;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #C9A961;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-indicator {
+            width: 10px;
+            height: 10px;
+            background: #FF0000;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        /* 实时通知 */
+        .notification {
+            background: rgba(139, 0, 0, 0.3);
+            border-left: 3px solid #FF4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            animation: slideIn 0.5s;
+        }
+
+        .notification-time {
+            font-size: 0.75em;
+            color: #C9A961;
+            margin-bottom: 5px;
+        }
+
+        .notification.critical {
+            animation: shake 0.5s;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(201, 169, 97, 0.2);
+            border: 2px solid #C9A961;
+            color: #FFD700;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        @media (max-width: 968px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 场景选择界面 -->
+    <div class="scenario-select" id="scenario-select">
+        <div class="select-header">
+            <h1>⚠️ 增长危机：极限生存</h1>
+            <p class="select-subtitle">选择你的危机挑战 - 20个真实场景等你破解</p>
+        </div>
+
+        <div class="scenarios-grid" id="scenarios-grid">
+            <!-- 场景卡片将通过JS生成 -->
+        </div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="game-screen" id="game-screen">
+        <button class="back-btn" onclick="backToSelect()">← 返回选择</button>
+
+        <!-- 危机状态栏 -->
+        <div class="crisis-bar">
+            <div class="crisis-bar-content">
+                <div class="crisis-title" id="crisis-title">
+                    ⚠️ 紧急危机
+                </div>
+                <div>
+                    <span class="urgent-timer" id="countdown">⏰ 倒计时：14天00时00分</span>
+                </div>
+                <div class="stats-bar" id="stats-bar">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 主游戏区 -->
+        <div class="game-container">
+            <div class="main-content">
+                <div class="scenario-box">
+                    <div class="scenario-text" id="scenario-text"></div>
+                </div>
+
+                <div class="question-box">
+                    <div class="question-header">
+                        <div class="question-number" id="question-number">决策点 #1</div>
+                        <div class="time-pressure" id="time-pressure">⏱️ 限时决策：5分钟</div>
+                    </div>
+                    <div class="question-text" id="question-text"></div>
+                    <div class="choices" id="choices"></div>
+                    <div id="feedback-container"></div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-box">
+                    <div class="sidebar-title">
+                        <span class="live-indicator"></span>
+                        实时数据
+                    </div>
+                    <div id="live-stats"></div>
+                </div>
+
+                <div class="sidebar-box">
+                    <div class="sidebar-title">
+                        🔥 紧急通知
+                    </div>
+                    <div id="notifications"></div>
+                </div>
+
+                <div class="sidebar-box">
+                    <div class="sidebar-title">
+                        📊 决策记录
+                    </div>
+                    <div id="decision-log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 20个危机场景库
+        const scenariosDatabase = [
+            {
+                id: 1,
+                title: "用户暴跌：竞品免费攻击",
+                desc: "竞品突然宣布全部功能永久免费，你的用户24小时内流失50%，预算只剩$10,000，投资人给你2周时间证明价值。",
+                tags: ["竞争", "留存", "定位"],
+                difficulty: "extreme",
+                icon: "📉",
+                initialState: {
+                    days: 14,
+                    budget: 10000,
+                    users: 5000,
+                    retention: 35,
+                    morale: 60
+                }
+            },
+            {
+                id: 2,
+                title: "预算耗尽：融资失败倒计时",
+                desc: "账上只剩$30,000，团队15人月工资$45,000，最后一轮融资被拒，你有21天找到生存方式或关门大吉。",
+                tags: ["现金流", "Unit Economics", "盈利"],
+                difficulty: "extreme",
+                icon: "💰"
+            },
+            {
+                id: 3,
+                title: "黑天鹅：核心功能崩溃",
+                desc: "凌晨3点被电话吵醒：支付系统崩了8小时，1000+用户投诉，媒体开始报道，竞品趁机挖墙脚。",
+                tags: ["危机公关", "用户信任", "止损"],
+                difficulty: "extreme",
+                icon: "🔥"
+            },
+            {
+                id: 4,
+                title: "病毒式崩盘：增长太快撑不住",
+                desc: "你的产品突然爆红，24小时新增10万用户，服务器崩溃，客服爆炸，团队只有8人，怎么办？",
+                tags: ["扩容", "运营", "质量控制"],
+                difficulty: "hard",
+                icon: "🚀"
+            },
+            {
+                id: 5,
+                title: "团队叛变：CTO带走核心团队",
+                desc: "周五晚上，CTO和3个核心工程师集体辞职，下周一加入竞品，代码库只有你一个人懂。",
+                tags: ["团队管理", "知识产权", "应急"],
+                difficulty: "extreme",
+                icon: "👥"
+            },
+            {
+                id: 6,
+                title: "监管铁拳：新政策封杀核心功能",
+                desc: "新政策出台，你的核心功能涉嫌违规，必须在30天内整改或下架，但整改意味着砍掉80%收入。",
+                tags: ["合规", "转型", "政策"],
+                difficulty: "extreme",
+                icon: "⚖️"
+            },
+            {
+                id: 7,
+                title: "大客户出走：ARR暴跌40%",
+                desc: "你最大的企业客户突然宣布不续约，占ARR的40%，其他客户开始观望，销售团队士气崩溃。",
+                tags: ["企业销售", "客户成功", "留存"],
+                difficulty: "hard",
+                icon: "🏢"
+            },
+            {
+                id: 8,
+                title: "病毒营销失控：PR灾难",
+                desc: "你策划的营销活动被曲解，社交媒体暴怒，#抵制你的品牌 登上热搜，品牌形象一夜崩塌。",
+                tags: ["危机公关", "品牌修复", "舆情"],
+                difficulty: "extreme",
+                icon: "📱"
+            },
+            {
+                id: 9,
+                title: "数据泄露：安全事件",
+                desc: "被黑客攻击，50万用户数据泄露，媒体已报道，用户疯狂卸载，监管部门介入调查。",
+                tags: ["安全", "信任重建", "合规"],
+                difficulty: "extreme",
+                icon: "🔒"
+            },
+            {
+                id: 10,
+                title: "市场崩盘：疫情/经济危机",
+                desc: "突发疫情，你的线下健身业务全部关闭，必须48小时内转型线上，否则月底发不出工资。",
+                tags: ["转型", "应急", "商业模式"],
+                difficulty: "extreme",
+                icon: "🌍"
+            },
+            {
+                id: 11,
+                title: "产品同质化：差异化消失",
+                desc: "3个竞品在同一周抄袭了你的所有核心功能，你的增长优势瞬间归零，CAC翻倍。",
+                tags: ["差异化", "创新", "定位"],
+                difficulty: "hard",
+                icon: "🎯"
+            },
+            {
+                id: 12,
+                title: "创始人冲突：CEO和CTO决裂",
+                desc: "CEO和CTO对产品方向产生严重分歧，董事会要求你（COO）48小时内拿出解决方案。",
+                tags: ["组织管理", "战略", "决策"],
+                difficulty: "hard",
+                icon: "⚔️"
+            },
+            {
+                id: 13,
+                title: "渠道失效：主要获客渠道被封",
+                desc: "Facebook突然更新算法，你的广告账户被限制，70%的获客渠道失效，CAC从$20涨到$150。",
+                tags: ["获客", "渠道", "多元化"],
+                difficulty: "extreme",
+                icon: "🚫"
+            },
+            {
+                id: 14,
+                title: "负面缠身：1星差评轰炸",
+                desc: "App Store突然出现500+个1星差评（疑似竞品攻击），下载量暴跌80%，申诉需要2周。",
+                tags: ["口碑管理", "危机处理", "增长"],
+                difficulty: "hard",
+                icon: "⭐"
+            },
+            {
+                id: 15,
+                title: "融资断裂：投资人反悔",
+                desc: "签约前一天，lead investor突然退出，其他投资人观望，你已经按融资到账做了扩张计划。",
+                tags: ["融资", "现金流", "应急"],
+                difficulty: "extreme",
+                icon: "💔"
+            },
+            {
+                id: 16,
+                title: "增长停滞：进入平台期",
+                desc: "连续3个月用户增长为0，投资人质疑天花板，团队焦虑，必须找到第二增长曲线。",
+                tags: ["增长", "创新", "战略"],
+                difficulty: "hard",
+                icon: "📊"
+            },
+            {
+                id: 17,
+                title: "供应链断裂：硬件创业噩梦",
+                desc: "工厂突然停产，5000台已预售的设备无法交付，客户要求退款，账上现金不够退。",
+                tags: ["供应链", "现金流", "危机"],
+                difficulty: "extreme",
+                icon: "📦"
+            },
+            {
+                id: 18,
+                title: "平台依赖：微信封号",
+                desc: "你的小程序被微信封禁（疑似违规），100万DAU瞬间归零，申诉渠道不明，投资人要求紧急会议。",
+                tags: ["平台风险", "应急", "多渠道"],
+                difficulty: "extreme",
+                icon: "📵"
+            },
+            {
+                id: 19,
+                title: "病毒系数坍塌：K值从1.2跌到0.3",
+                desc: "你的推荐系统一直运转良好，突然上周开始K值暴跌，增长引擎熄火，找不到原因。",
+                tags: ["病毒增长", "数据分析", "优化"],
+                difficulty: "hard",
+                icon: "📉"
+            },
+            {
+                id: 20,
+                title: "巨头进场：腾讯/字节推出竞品",
+                desc: "巨头官宣进入你的赛道，产品和你80%相似，免费+巨额补贴，你的估值一夜腰斩。",
+                tags: ["竞争", "战略", "差异化"],
+                difficulty: "extreme",
+                icon: "🦖"
+            }
+        ];
+
+        // 当前游戏状态
+        let currentScenario = null;
+        let gameState = {};
+        let countdownTimer = null;
+        let liveDataTimer = null;
+        let notificationTimer = null;
+
+        // 初始化场景选择界面
+        function initScenarioSelect() {
+            const grid = document.getElementById('scenarios-grid');
+            grid.innerHTML = scenariosDatabase.map(scenario => `
+                <div class="scenario-card" onclick="startScenario(${scenario.id})">
+                    <div class="scenario-number">${scenario.id}</div>
+                    <div class="scenario-title">${scenario.icon} ${scenario.title}</div>
+                    <div class="scenario-desc">${scenario.desc}</div>
+                    <div class="scenario-tags">
+                        ${scenario.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="scenario-difficulty difficulty-${scenario.difficulty}">
+                        难度：${scenario.difficulty === 'extreme' ? '⚠️ 极限' : '🔥 困难'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 开始场景
+        function startScenario(id) {
+            currentScenario = scenariosDatabase.find(s => s.id === id);
+            if (!currentScenario) return;
+
+            // 隐藏选择界面，显示游戏界面
+            document.getElementById('scenario-select').style.display = 'none';
+            document.getElementById('game-screen').classList.add('active');
+
+            // 初始化游戏状态
+            if (currentScenario.initialState) {
+                gameState = { ...currentScenario.initialState };
+            }
+
+            // 开始游戏流程
+            startGame();
+        }
+
+        // 返回场景选择
+        function backToSelect() {
+            if (confirm('确定要放弃当前挑战吗？')) {
+                // 清理定时器
+                if (countdownTimer) clearInterval(countdownTimer);
+                if (liveDataTimer) clearInterval(liveDataTimer);
+                if (notificationTimer) clearInterval(notificationTimer);
+
+                document.getElementById('game-screen').classList.remove('active');
+                document.getElementById('scenario-select').style.display = 'block';
+            }
+        }
+
+        // 开始游戏
+        function startGame() {
+            // 显示危机标题
+            document.getElementById('crisis-title').innerHTML =
+                `⚠️ ${currentScenario.icon} ${currentScenario.title}`;
+
+            // 初始化状态栏
+            updateStatsBar();
+
+            // 开始倒计时
+            startCountdown();
+
+            // 开始实时数据变化
+            startLiveData();
+
+            // 开始紧急通知
+            startNotifications();
+
+            // 加载第一个决策点（这里简化版，实际需要根据scenario ID加载对应的flow）
+            loadDecisionPoint(1);
+
+            // 触发警报效果
+            showAlert();
+        }
+
+        // 更新状态栏
+        function updateStatsBar() {
+            const statsBar = document.getElementById('stats-bar');
+            statsBar.innerHTML = `
+                <div class="stat-item ${gameState.budget < 5000 ? 'critical' : ''}">
+                    <div class="stat-label">💰 剩余预算</div>
+                    <div class="stat-value">$${gameState.budget?.toLocaleString() || '0'}</div>
+                </div>
+                <div class="stat-item ${gameState.users < 3000 ? 'critical' : ''}">
+                    <div class="stat-label">👥 活跃用户</div>
+                    <div class="stat-value">${gameState.users?.toLocaleString() || '0'}</div>
+                </div>
+                <div class="stat-item ${gameState.retention < 30 ? 'critical' : ''}">
+                    <div class="stat-label">📊 留存率</div>
+                    <div class="stat-value">${gameState.retention || '0'}%</div>
+                </div>
+                <div class="stat-item ${gameState.morale < 40 ? 'critical' : ''}">
+                    <div class="stat-label">💪 团队士气</div>
+                    <div class="stat-value">${gameState.morale || '0'}%</div>
+                </div>
+            `;
+        }
+
+        // 倒计时
+        function startCountdown() {
+            let timeLeft = (gameState.days || 14) * 24 * 60 * 60; // 秒
+
+            countdownTimer = setInterval(() => {
+                timeLeft -= 1;
+
+                const days = Math.floor(timeLeft / 86400);
+                const hours = Math.floor((timeLeft % 86400) / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+
+                document.getElementById('countdown').innerHTML =
+                    `⏰ 倒计时：${days}天${hours.toString().padStart(2, '0')}时${minutes.toString().padStart(2, '0')}分`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    gameOver('时间耗尽');
+                }
+            }, 1000);
+        }
+
+        // 实时数据变化（模拟）
+        function startLiveData() {
+            liveDataTimer = setInterval(() => {
+                // 随机微小波动
+                if (Math.random() > 0.7) {
+                    const change = Math.floor(Math.random() * 50) - 25;
+                    gameState.users += change;
+                    updateStatsBar();
+
+                    // 更新侧边栏实时数据
+                    const liveStats = document.getElementById('live-stats');
+                    const changeText = change > 0 ? `+${change}` : change;
+                    liveStats.innerHTML = `
+                        <div class="notification">
+                            <div class="notification-time">刚刚</div>
+                            用户数变化：<span class="stat-change ${change > 0 ? 'positive' : 'negative'}">${changeText}</span>
+                        </div>
+                    ` + liveStats.innerHTML;
+
+                    // 最多保留3条
+                    while (liveStats.children.length > 3) {
+                        liveStats.removeChild(liveStats.lastChild);
+                    }
+                }
+            }, 5000);
+        }
+
+        // 紧急通知
+        function startNotifications() {
+            const messages = [
+                "📧 CEO发来消息：情况怎么样了？",
+                "💬 Slack：用户投诉数+50",
+                "📱 微信：竞品又降价了",
+                "⚠️ 系统：服务器负载85%",
+                "📊 数据团队：留存率又下降了2%",
+                "👥 HR：又有1人提离职",
+                "💰 财务提醒：账上只够发2个月工资了",
+                "📈 市场部：本周获客成本+30%",
+                "🔥 App Store：又收到20个1星差评",
+                "⏰ 投资人：明天下午3点董事会"
+            ];
+
+            let index = 0;
+            notificationTimer = setInterval(() => {
+                const notifications = document.getElementById('notifications');
+                const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+
+                const notification = document.createElement('div');
+                notification.className = 'notification' + (Math.random() > 0.7 ? ' critical' : '');
+                notification.innerHTML = `
+                    <div class="notification-time">${time}</div>
+                    ${messages[index % messages.length]}
+                `;
+
+                notifications.insertBefore(notification, notifications.firstChild);
+                index++;
+
+                // 最多保留5条
+                while (notifications.children.length > 5) {
+                    notifications.removeChild(notifications.lastChild);
+                }
+            }, 8000);
+        }
+
+        // 显示警报
+        function showAlert() {
+            const alert = document.createElement('div');
+            alert.className = 'alert-flash';
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 500);
+        }
+
+        // 加载决策点（简化版示例）
+        function loadDecisionPoint(pointNumber) {
+            document.getElementById('question-number').textContent = `决策点 #${pointNumber}`;
+            document.getElementById('time-pressure').innerHTML = `⏱️ 限时决策：${Math.floor(Math.random() * 10 + 5)}分钟`;
+
+            // 这里应该根据当前scenario加载对应的决策流程
+            // 简化版：显示通用的第一个决策点
+            const scenarioText = `**危机爆发！**
+
+${currentScenario.desc}
+
+此刻是${new Date().toLocaleString('zh-CN', {hour: '2-digit', minute: '2-digit'})}，你的手机疯狂震动：
+- CEO打来3个未接来电
+- Slack有87条未读消息
+- 用户投诉邮件500+
+
+你坐在办公室，窗外是深夜的城市灯光。
+
+团队在等你的决策...`;
+
+            document.getElementById('scenario-text').textContent = scenarioText;
+            document.getElementById('question-text').textContent = "第一步：现在最紧急要做的是什么？";
+
+            // 生成选项
+            const choices = document.getElementById('choices');
+            choices.innerHTML = `
+                <button class="choice-btn" onclick="makeChoice(1)">
+                    <div class="choice-content">
+                        <div class="choice-title">立即分析数据</div>
+                        <div class="choice-detail">打开数据看板，导出流失用户数据，分析具体原因</div>
+                        <div class="choice-risk">⏱️ 需要2小时 | 💰 成本：$0</div>
+                    </div>
+                </button>
+                <button class="choice-btn" onclick="makeChoice(2)">
+                    <div class="choice-content">
+                        <div class="choice-title">紧急召集团队</div>
+                        <div class="choice-detail">凌晨紧急会议，群策群力商讨对策</div>
+                        <div class="choice-risk">⏱️ 需要3小时 | 💪 士气影响</div>
+                    </div>
+                </button>
+                <button class="choice-btn" onclick="makeChoice(3)">
+                    <div class="choice-content">
+                        <div class="choice-title">先稳住投资人</div>
+                        <div class="choice-detail">立即准备汇报材料，明早第一时间找CEO对齐</div>
+                        <div class="choice-risk">⏱️ 需要4小时 | 🎯 关键决策</div>
+                    </div>
+                </button>
+            `;
+        }
+
+        // 做出选择
+        function makeChoice(choiceNumber) {
+            // 禁用所有按钮
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+
+            // 显示反馈
+            const feedbackContainer = document.getElementById('feedback-container');
+
+            const feedbacks = [
+                {
+                    icon: '✅',
+                    title: '理性决策',
+                    text: '数据优先！你迅速打开后台，导出了过去24小时的所有数据...\n\n分析发现：\n- 流失主要集中在免费用户（占85%）\n- 付费用户流失率只有8%\n- 流失高峰在竞品宣布后的6小时内\n\n这个发现很关键！说明付费用户其实很稳定。',
+                    positive: true,
+                    impacts: {
+                        '分析深度': '+30%',
+                        '决策信心': '+25%',
+                        '时间消耗': '-2小时'
+                    }
+                },
+                {
+                    icon: '⚠️',
+                    title: '次优选择',
+                    text: '你紧急拉了个会...\n\n凌晨3点，7个人睡眼惺忪地在zoom上：\n- 产品："要不降价？"\n- 市场："投广告？"\n- 工程："加功能？"\n\n讨论了2小时，没有数据支撑，都是瞎猜。\n\n团队士气-10%（大家本来就焦虑，凌晨开会更累了）',
+                    positive: false,
+                    impacts: {
+                        '团队士气': '-10%',
+                        '时间消耗': '-3小时',
+                        '实际进展': '0'
+                    }
+                },
+                {
+                    icon: '❌',
+                    title: '本末倒置',
+                    text: '你花了4小时做PPT，准备明天给CEO汇报...\n\n但是：\n- 你自己还没搞清楚状况\n- 没有数据支撑\n- 只有"我们会努力"之类的空话\n\n早上8点，CEO看完PPT，皱着眉：\n"所以...具体要怎么做？有数据吗？"\n\n你说不出来。',
+                    positive: false,
+                    impacts: {
+                        '投资人信心': '-20%',
+                        '时间消耗': '-4小时',
+                        '机会成本': '错失黄金24小时'
+                    }
+                }
+            ];
+
+            const feedback = feedbacks[choiceNumber - 1];
+
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `feedback ${!feedback.positive ? 'negative' : ''}`;
+            feedbackDiv.innerHTML = `
+                <div class="feedback-header">
+                    <div class="feedback-icon">${feedback.icon}</div>
+                    <div class="feedback-title">${feedback.title}</div>
+                </div>
+                <div class="feedback-text">${feedback.text.replace(/\n/g, '<br>')}</div>
+                <div class="impact-box">
+                    <div class="impact-title">📊 决策影响：</div>
+                    ${Object.entries(feedback.impacts).map(([key, value]) => `
+                        <div class="impact-item">
+                            <span>${key}</span>
+                            <span class="stat-change ${value.includes('-') ? 'negative' : 'positive'}">${value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="continue-btn" onclick="continueToNext()">继续下一步 →</button>
+            `;
+
+            feedbackContainer.appendChild(feedbackDiv);
+
+            // 触发警报效果
+            showAlert();
+
+            // 添加决策记录
+            const log = document.getElementById('decision-log');
+            const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            log.innerHTML = `
+                <div class="notification">
+                    <div class="notification-time">${time}</div>
+                    决策#1: ${['数据分析', '团队会议', '汇报准备'][choiceNumber - 1]}
+                </div>
+            ` + log.innerHTML;
+        }
+
+        // 继续下一步
+        function continueToNext() {
+            alert('完整游戏流程开发中...\n\n当前演示了：\n✅ 20个场景选择\n✅ 实时倒计时\n✅ 动态数据变化\n✅ 紧急通知系统\n✅ 决策反馈机制\n\n完整版将包含每个场景的6-8个完整决策点！');
+        }
+
+        // 游戏结束
+        function gameOver(reason) {
+            alert(`游戏结束：${reason}`);
+            backToSelect();
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', initScenarioSelect);
+    </script>
+</body>
+</html>

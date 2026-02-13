@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关卡数据测试 - 所有10个关卡</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .level-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .level-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .level-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .level-info {
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .info-icon {
+            font-size: 1.2em;
+        }
+
+        .level-objective {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .level-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mini-stat {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .mini-stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .mini-stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .validation-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .scene-preview {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .stakeholder {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        footer {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 关卡数据完整性测试</h1>
+            <p class="subtitle">Growth Hacker Game - 所有10个关卡验证</p>
+        </header>
+
+        <div id="stats-container"></div>
+        <div id="success-message"></div>
+        <div id="levels-container" class="level-grid"></div>
+
+        <footer>
+            <p>Growth Hacker Game - 增长黑客游戏</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">关卡数据工程师测试页面</p>
+        </footer>
+    </div>
+
+    <script src="levels-data.js"></script>
+    <script>
+        // 验证并显示关卡数据
+        function validateAndDisplayLevels() {
+            const statsContainer = document.getElementById('stats-container');
+            const successContainer = document.getElementById('success-message');
+            const levelsContainer = document.getElementById('levels-container');
+
+            // 统计信息
+            const totalLevels = LEVELS_DATA.length;
+            const totalActions = LEVELS_DATA.reduce((sum, level) => sum + level.actions.length, 0);
+            const totalQuestions = LEVELS_DATA.reduce((sum, level) => sum + level.questions.length, 0);
+            const totalOptions = LEVELS_DATA.reduce((sum, level) =>
+                sum + level.questions.reduce((s, q) => s + q.options.length, 0), 0);
+
+            // 显示统计卡片
+            statsContainer.innerHTML = `
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">${totalLevels}/10</div>
+                        <div class="stat-label">关卡总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${totalActions}</div>
+                        <div class="stat-label">行动总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${totalQuestions}</div>
+                        <div class="stat-label">问题总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${totalOptions}</div>
+                        <div class="stat-label">选项总数</div>
+                    </div>
+                </div>
+            `;
+
+            // 成功消息
+            if (totalLevels === 10) {
+                successContainer.innerHTML = `
+                    <div class="success-message">
+                        🎉 恭喜！所有10个关卡数据已完整添加并验证通过！
+                    </div>
+                `;
+            }
+
+            // 显示每个关卡
+            LEVELS_DATA.forEach(level => {
+                const hasCorrectStructure =
+                    level.actions.length === 6 &&
+                    level.questions.length === 3 &&
+                    level.questions.every(q => q.options.length === 4);
+
+                const scenePreview = level.scene.text
+                    .replace(/<[^>]*>/g, '') // 移除HTML标签
+                    .substring(0, 100) + '...';
+
+                const levelCard = document.createElement('div');
+                levelCard.className = 'level-card';
+                levelCard.innerHTML = `
+                    <div class="level-header">
+                        <div class="level-number">${level.id}</div>
+                        <div class="level-title">${level.title}</div>
+                    </div>
+
+                    <div class="level-info">
+                        <div class="info-row">
+                            <span class="info-icon">🎯</span>
+                            <span>${level.objective}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-icon">⏰</span>
+                            <span>时限: ${level.timeLimit}分钟 (${(level.timeLimit/60).toFixed(1)}小时)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-icon">🎬</span>
+                            <span>${level.scene.time}</span>
+                        </div>
+                    </div>
+
+                    <div class="scene-preview">
+                        <strong>场景预览:</strong> ${scenePreview}
+                    </div>
+
+                    <div class="level-stats">
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">${level.actions.length}</div>
+                            <div class="mini-stat-label">行动</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">${level.questions.length}</div>
+                            <div class="mini-stat-label">问题</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">${level.questions.reduce((s, q) => s + q.options.length, 0)}</div>
+                            <div class="mini-stat-label">选项</div>
+                        </div>
+                    </div>
+
+                    <div class="stakeholder">
+                        👤 利益相关者: ${level.stakeholder}
+                    </div>
+
+                    <span class="validation-badge ${hasCorrectStructure ? 'badge-success' : 'badge-warning'}">
+                        ${hasCorrectStructure ? '✅ 数据完整' : '⚠️ 需要检查'}
+                    </span>
+                `;
+
+                levelsContainer.appendChild(levelCard);
+            });
+        }
+
+        // 页面加载完成后执行
+        if (typeof LEVELS_DATA !== 'undefined') {
+            validateAndDisplayLevels();
+        } else {
+            document.body.innerHTML = '<div style="color: white; text-align: center; padding: 50px; font-size: 1.5em;">❌ 错误：无法加载关卡数据</div>';
+        }
+    </script>
+</body>
+</html>

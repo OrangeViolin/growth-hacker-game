@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Systems Test | 高级系统测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+        }
+
+        .test-section h2 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        .warning {
+            color: #FF9800;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .info {
+            color: #2196F3;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .metric-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .metric-card .change {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .change.positive {
+            color: #4CAF50;
+        }
+
+        .change.negative {
+            color: #f44336;
+        }
+
+        .combo-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Advanced Game Systems Test | 高级游戏系统测试</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">Overview | 概览</button>
+            <button class="tab" onclick="switchTab('resources')">Resources | 资源</button>
+            <button class="tab" onclick="switchTab('combo')">Combo | 组合技</button>
+            <button class="tab" onclick="switchTab('meta')">Meta-Progression | 元进程</button>
+            <button class="tab" onclick="switchTab('full')">Full Test | 完整测试</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="test-section">
+                <h2>System Status | 系统状态</h2>
+                <button onclick="checkSystemStatus()">Check System Status | 检查系统状态</button>
+                <div id="status-output" class="output"></div>
+            </div>
+
+            <div class="test-section">
+                <h2>Current Metrics | 当前指标</h2>
+                <div id="metrics-display" class="metrics"></div>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources" class="tab-content">
+            <div class="test-section">
+                <h2>Multi-Resource Management | 多资源管理</h2>
+                <button onclick="testResourceManagement()">Test Resource System | 测试资源系统</button>
+                <button onclick="testResourceConstraints()">Test Constraints | 测试约束</button>
+                <button onclick="testRestAndRecover()">Test Rest & Recover | 测试休息恢复</button>
+                <div id="resource-output" class="output"></div>
+            </div>
+        </div>
+
+        <!-- Combo Tab -->
+        <div id="combo" class="tab-content">
+            <div class="test-section">
+                <h2>Combo System | 组合技系统</h2>
+                <button onclick="testComboSystem()">Test Combos | 测试组合技</button>
+                <button onclick="testStreakSystem()">Test Streak | 测试连击</button>
+                <button onclick="testHiddenCombos()">Discover Hidden Combos | 发现隐藏组合</button>
+                <div id="combo-display"></div>
+                <div id="combo-output" class="output"></div>
+            </div>
+        </div>
+
+        <!-- Meta-Progression Tab -->
+        <div id="meta" class="tab-content">
+            <div class="test-section">
+                <h2>Meta-Progression System | 元进程系统</h2>
+                <button onclick="testMetaProgression()">Test Skill Tree | 测试技能树</button>
+                <button onclick="testXPSystem()">Test XP System | 测试经验系统</button>
+                <button onclick="testSaveLoad()">Test Save/Load | 测试保存加载</button>
+                <button onclick="clearProgress()" style="background: #f44336;">Clear Progress | 清除进度</button>
+
+                <h3>Skill Tree Progress | 技能树进度</h3>
+                <div id="skill-progress"></div>
+
+                <div id="meta-output" class="output"></div>
+            </div>
+        </div>
+
+        <!-- Full Test Tab -->
+        <div id="full" class="tab-content">
+            <div class="test-section">
+                <h2>Full Game Playthrough | 完整游戏流程</h2>
+                <button onclick="runFullTest()">Run Full Test | 运行完整测试</button>
+                <button onclick="runMultipleGames()">Run Multiple Games | 运行多场游戏</button>
+                <div id="full-output" class="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include all required scripts -->
+    <script src="game-engine-v2.js"></script>
+    <script src="combo-system.js"></script>
+    <script src="meta-progression.js"></script>
+    <script src="advanced-systems-demo.js"></script>
+
+    <script>
+        let game = null;
+        let metaProgression = null;
+        let comboSystem = null;
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            checkSystemStatus();
+            updateMetricsDisplay();
+        });
+
+        function initializeGame() {
+            game = new GrowthGameEngineV2({
+                mode: 'real',
+                difficulty: 'medium',
+                company: 'TestStartup',
+                industry: 'saas'
+            });
+
+            const systems = game.initializeAdvancedSystems();
+            comboSystem = game.comboSystem;
+            metaProgression = game.metaProgression;
+
+            log('status-output', '✓ Game initialized with all advanced systems', 'success');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function checkSystemStatus() {
+            const output = [];
+            output.push('=== System Status Check ===\n');
+            output.push(`✓ Game Engine: ${game ? 'Loaded' : 'Not Loaded'}`);
+            output.push(`✓ Combo System: ${comboSystem ? 'Loaded' : 'Not Loaded'}`);
+            output.push(`✓ Meta-Progression: ${metaProgression ? 'Loaded' : 'Not Loaded'}`);
+            output.push(`\nGame State:`);
+            output.push(`  Difficulty: ${game.difficulty}`);
+            output.push(`  Current Level: ${game.currentLevel + 1}`);
+            output.push(`  Weeks Remaining: ${game.weeksRemaining}`);
+            output.push(`\nMeta-Progression State:`);
+            output.push(`  Player Level: ${metaProgression.playerProfile.level}`);
+            output.push(`  Total XP: ${metaProgression.playerProfile.totalXP}`);
+            output.push(`  Games Played: ${metaProgression.playerProfile.gamesPlayed}`);
+
+            log('status-output', output.join('\n'), 'info');
+            updateMetricsDisplay();
+        }
+
+        function updateMetricsDisplay() {
+            const metrics = game.getMetrics();
+            const container = document.getElementById('metrics-display');
+            container.innerHTML = metrics.map(m => `
+                <div class="metric-card">
+                    <div class="label">${m.icon || ''} ${m.label}</div>
+                    <div class="value">${m.value}</div>
+                    ${m.change !== 0 ? `<div class="change ${m.change > 0 ? 'positive' : 'negative'}">${m.change > 0 ? '+' : ''}${m.change}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function testResourceManagement() {
+            const output = [];
+            output.push('=== Testing Resource Management ===\n');
+            output.push('Initial Resources:');
+            output.push(`  Budget: $${game.metrics.budget}`);
+            output.push(`  Team Energy: ${game.metrics.teamEnergy}%`);
+            output.push(`  Market Timing: ${game.metrics.marketTiming}%`);
+            output.push(`  User Trust: ${game.metrics.userTrust}%`);
+            output.push(`  Brand Reputation: ${game.metrics.brandReputation}%`);
+
+            output.push('\nApplying resource changes...');
+            game.updateResources({
+                budget: -1000,
+                teamEnergy: -20,
+                userTrust: 10,
+                brandReputation: 15,
+                weeks: 2
+            });
+
+            output.push('\nUpdated Resources:');
+            output.push(`  Budget: $${game.metrics.budget} (-$1000)`);
+            output.push(`  Team Energy: ${game.metrics.teamEnergy}% (-20%)`);
+            output.push(`  Market Timing: ${game.metrics.marketTiming}% (-4% for 2 weeks)`);
+            output.push(`  User Trust: ${game.metrics.userTrust}% (+10%)`);
+            output.push(`  Brand Reputation: ${game.metrics.brandReputation}% (+15%)`);
+
+            log('resource-output', output.join('\n'), 'success');
+            updateMetricsDisplay();
+        }
+
+        function testResourceConstraints() {
+            const output = [];
+            output.push('=== Testing Resource Constraints ===\n');
+
+            const check1 = game.checkResourceConstraints({
+                budget: 1000,
+                teamEnergy: 20
+            });
+
+            output.push('Test 1: Can afford $1000 with 20% energy required');
+            output.push(`  Result: ${check1.canProceed ? '✓ Can proceed' : '✗ Cannot proceed'}`);
+
+            const check2 = game.checkResourceConstraints({
+                budget: 10000,
+                teamEnergy: 50
+            });
+
+            output.push('\nTest 2: Can afford $10000 with 50% energy required');
+            output.push(`  Result: ${check2.canProceed ? '✓ Can proceed' : '✗ Cannot proceed'}`);
+
+            if (!check2.canProceed) {
+                output.push('  Constraints:');
+                check2.constraints.forEach(c => output.push(`    - ${c.message}`));
+            }
+
+            log('resource-output', output.join('\n'), 'info');
+        }
+
+        function testRestAndRecover() {
+            const output = [];
+            output.push('=== Testing Rest and Recovery ===\n');
+            output.push(`Team Energy Before: ${game.metrics.teamEnergy}%`);
+
+            const result = game.restAndRecover(1);
+
+            output.push(`\n${result.message}`);
+            output.push(`Team Energy After: ${result.teamEnergy}%`);
+            output.push(`Weeks Used: ${result.weeksUsed}`);
+
+            log('resource-output', output.join('\n'), 'success');
+            updateMetricsDisplay();
+        }
+
+        function testComboSystem() {
+            const output = [];
+            output.push('=== Testing Combo System ===\n');
+
+            // Simulate using related skills
+            game.skillsUsed.push(
+                { skill: '内容营销+SEO', aarrr: 'Acquisition' },
+                { skill: 'Product Hunt发布', aarrr: 'Acquisition' },
+                { skill: 'SEO内容矩阵', aarrr: 'Acquisition' }
+            );
+
+            const synergies = comboSystem.checkSynergies(game.skillsUsed);
+
+            output.push(`Found ${synergies.length} active synergies:\n`);
+            synergies.forEach(s => {
+                output.push(`${s.icon} ${s.name}`);
+                output.push(`  ${s.description}`);
+                output.push(`  Multiplier: ${s.multiplier}x`);
+                output.push('');
+            });
+
+            log('combo-output', output.join('\n'), 'success');
+            updateComboDisplay();
+        }
+
+        function testStreakSystem() {
+            const output = [];
+            output.push('=== Testing Streak System ===\n');
+
+            // Simulate excellent decisions
+            for (let i = 0; i < 5; i++) {
+                comboSystem.updateComboState('excellent');
+                const display = comboSystem.getComboDisplay();
+                if (display) {
+                    output.push(`Decision ${i + 1}: ${display.message}`);
+                }
+            }
+
+            const onFire = comboSystem.getOnFireBonus();
+            if (onFire) {
+                output.push(`\n${onFire.icon} ${onFire.name}`);
+                output.push(`  ${onFire.description}`);
+            }
+
+            log('combo-output', output.join('\n'), 'success');
+            updateComboDisplay();
+        }
+
+        function testHiddenCombos() {
+            const output = [];
+            output.push('=== Testing Hidden Combos ===\n');
+
+            // Simulate combo for "Triple-A Strategy"
+            game.skillsUsed = [
+                { skill: 'AB测试优化', aarrr: 'Activation' },
+                { skill: '优化注册流程', aarrr: 'Activation' },
+                { skill: '个性化推荐系统', aarrr: 'Activation' }
+            ];
+
+            const synergies = comboSystem.checkSynergies(game.skillsUsed);
+            const discovered = comboSystem.getDiscoveredCombos();
+
+            output.push(`Discovered ${discovered.length} hidden combo(s):\n`);
+            discovered.forEach(combo => {
+                output.push(`${combo.icon} ${combo.name}`);
+                output.push(`  ${combo.description}`);
+                output.push(`  Multiplier: ${combo.multiplier}x`);
+                output.push('');
+            });
+
+            const hints = comboSystem.getComboHints();
+            if (hints.length > 0) {
+                output.push('Hints for other combos:');
+                hints.forEach(h => output.push(`  ${h.progress} - ${h.hint}`));
+            }
+
+            log('combo-output', output.join('\n'), 'success');
+        }
+
+        function updateComboDisplay() {
+            const display = comboSystem.getComboDisplay();
+            const container = document.getElementById('combo-display');
+
+            if (display) {
+                container.innerHTML = `<div class="combo-display" style="background: linear-gradient(135deg, ${display.color} 0%, #764ba2 100%);">${display.icon} ${display.message}</div>`;
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
+        function testMetaProgression() {
+            const output = [];
+            output.push('=== Testing Meta-Progression ===\n');
+
+            const progress = metaProgression.getSkillTreeProgress();
+            output.push(`Skill Tree Progress:`);
+            output.push(`  Unlocked Skills: ${progress.unlockedSkills}/${progress.totalSkills} (${progress.unlockedPercentage}%)`);
+            output.push(`  Total Levels: ${progress.currentLevels}/${progress.totalLevels} (${progress.levelPercentage}%)`);
+
+            output.push('\nAttempting to unlock skills...');
+
+            const unlock1 = metaProgression.unlockSkill('kol-collab', 'acquisition');
+            output.push(`  ${unlock1.success ? '✓' : '✗'} ${unlock1.message}`);
+
+            const unlock2 = metaProgression.unlockSkill('onboarding', 'activation');
+            output.push(`  ${unlock2.success ? '✓' : '✗'} ${unlock2.message}`);
+
+            log('meta-output', output.join('\n'), 'info');
+            updateSkillProgress();
+        }
+
+        function testXPSystem() {
+            const output = [];
+            output.push('=== Testing XP System ===\n');
+
+            const before = metaProgression.playerProfile.totalXP;
+            const levelBefore = metaProgression.playerProfile.level;
+
+            output.push(`Before: Level ${levelBefore}, ${before} XP`);
+
+            const xpResult = metaProgression.addXP(1500, 'Test reward');
+
+            output.push(`\nAdded 1500 XP`);
+            output.push(`After: Level ${metaProgression.playerProfile.level}, ${metaProgression.playerProfile.totalXP} XP`);
+
+            if (xpResult.levelUps.length > 0) {
+                output.push('\n🎊 LEVEL UP!');
+                xpResult.levelUps.forEach(lu => {
+                    output.push(`  New Level: ${lu.newLevel}`);
+                    output.push(`  Rewards: ${JSON.stringify(lu.reward)}`);
+                });
+            }
+
+            log('meta-output', output.join('\n'), 'success');
+            updateSkillProgress();
+        }
+
+        function testSaveLoad() {
+            const output = [];
+            output.push('=== Testing Save/Load System ===\n');
+
+            // Export
+            const saveData = metaProgression.exportProgress();
+            output.push('✓ Progress exported');
+            output.push(`  Data size: ${JSON.stringify(saveData).length} bytes`);
+
+            // Import
+            const importResult = metaProgression.importProgress(saveData);
+            output.push(`\n${importResult.success ? '✓' : '✗'} ${importResult.message}`);
+
+            log('meta-output', output.join('\n'), 'success');
+        }
+
+        function updateSkillProgress() {
+            const progress = metaProgression.getSkillTreeProgress();
+            const container = document.getElementById('skill-progress');
+
+            const percentage = progress.unlockedPercentage;
+            container.innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%">
+                        ${percentage}% Unlocked
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 10px;">
+                    ${progress.unlockedSkills} / ${progress.totalSkills} skills unlocked
+                </p>
+            `;
+        }
+
+        function clearProgress() {
+            if (confirm('Are you sure you want to clear all progress? This cannot be undone!')) {
+                metaProgression.clearAllProgress();
+                log('meta-output', '✓ Progress cleared', 'warning');
+                updateSkillProgress();
+            }
+        }
+
+        function runFullTest() {
+            const output = [];
+            output.push('=== Running Full Game Test ===\n');
+
+            try {
+                const result = AdvancedSystemsDemo.fullGamePlaythrough();
+                output.push('✓ Full test completed successfully!');
+                output.push(`\nFinal Results:`);
+                output.push(`  Users: ${result.game.metrics.users.toLocaleString()}`);
+                output.push(`  Revenue: $${result.game.metrics.revenue.toLocaleString()}`);
+                output.push(`  Max Combo: ${result.game.comboState.maxCombo}`);
+                output.push(`  XP Awarded: ${result.summary.metaProgression.xpAwarded}`);
+            } catch (error) {
+                output.push('✗ Test failed:');
+                output.push(error.message);
+                console.error(error);
+            }
+
+            log('full-output', output.join('\n'), 'success');
+        }
+
+        function runMultipleGames() {
+            const output = [];
+            output.push('=== Running Multiple Games ===\n');
+
+            const gameCount = 3;
+            const results = [];
+
+            for (let i = 0; i < gameCount; i++) {
+                const testGame = new GrowthGameEngineV2({
+                    mode: 'ai',
+                    difficulty: 'medium'
+                });
+
+                testGame.initializeAdvancedSystems();
+
+                // Simulate game
+                const summary = testGame.getGameSummary();
+                results.push(summary);
+
+                output.push(`Game ${i + 1}: ${summary.won ? 'WON' : 'LOST'}`);
+                output.push(`  Users: ${summary.finalUsers.toLocaleString()}`);
+                output.push(`  Revenue: $${summary.finalRevenue.toLocaleString()}`);
+                output.push('');
+            }
+
+            const avgUsers = Math.floor(results.reduce((sum, r) => sum + r.finalUsers, 0) / gameCount);
+            output.push(`Average Users: ${avgUsers.toLocaleString()}`);
+
+            log('full-output', output.join('\n'), 'info');
+        }
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const className = type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'info';
+            element.innerHTML = `<div class="${className}">${escapeHtml(message)}</div>`;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[<>]/g, (char) => char === '<' ? '&lt;' : '&gt;');
+        }
+    </script>
+</body>
+</html>

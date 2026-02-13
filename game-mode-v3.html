@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长黑客模拟器 - AI对话版</title>
+    <link rel="stylesheet" href="elegant-game.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 顶部标题栏 -->
+        <header class="game-header">
+            <div class="header-content">
+                <h1 class="game-title">增长黑客模拟器 - AI对话版</h1>
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <span>📅 Day</span>
+                        <span class="stat-value" id="current-day">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>💰 预算</span>
+                        <span class="stat-value" id="current-budget">$10,000</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🎯 目标用户</span>
+                        <span class="stat-value" id="target-users">10,000</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="game-main">
+            <!-- 左侧对话区 -->
+            <section class="conversation-panel">
+                <!-- 对话历史 -->
+                <div class="conversation-history" id="conversation-history">
+                    <!-- 初始消息 -->
+                    <div class="message npc-message">
+                        <div class="message-avatar">🧑‍💼</div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <div class="message-speaker">CEO</div>
+                                <div class="message-text">欢迎加入我们的创业团队！我是CEO张明。我们刚刚拿到了天使轮融资，现在急需快速增长用户。
+
+你作为增长负责人，有什么好的策略吗？我们的预算有限，需要在3个月内达到10,000个活跃用户。</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="message npc-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <div class="message-speaker">AI顾问</div>
+                                <div class="message-text">让我帮你分析一下当前情况：
+
+📊 当前状态：
+• 预算：$10,000
+• 团队精力：100%
+• 市场时机：良好（80%）
+• 用户信任：中等（50%）
+
+💡 建议方向：
+1. 内容营销 - 成本低，效果持久
+2. 社交媒体推广 - 快速获取流量
+3. 产品优化 - 提升留存率
+
+你想从哪个方向开始？</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 对话输入区 -->
+                <div class="conversation-input">
+                    <div class="input-wrapper">
+                        <!-- 快捷建议 -->
+                        <div class="quick-suggestions" id="quick-suggestions">
+                            <button class="suggestion-btn" onclick="insertSuggestion('我想先做内容营销，建立品牌影响力')">
+                                📝 内容营销策略
+                            </button>
+                            <button class="suggestion-btn" onclick="insertSuggestion('投放社交媒体广告，快速获取用户')">
+                                📱 社交媒体推广
+                            </button>
+                            <button class="suggestion-btn" onclick="insertSuggestion('优化产品体验，提升用户留存')">
+                                🎯 产品优化
+                            </button>
+                            <button class="suggestion-btn" onclick="insertSuggestion('需要更多建议')">
+                                💡 需要建议
+                            </button>
+                        </div>
+
+                        <!-- 输入框和按钮 -->
+                        <div class="input-container">
+                            <textarea
+                                id="user-input"
+                                placeholder="💭 输入你的增长策略..."
+                                rows="3"
+                                onkeydown="handleKeyDown(event)"
+                            ></textarea>
+                            <div class="input-actions">
+                                <button class="btn btn-secondary" onclick="requestHelp()">
+                                    💡 需要建议
+                                </button>
+                                <button class="btn btn-primary" onclick="sendMessage()" id="send-btn">
+                                    发送 📤
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧状态面板 -->
+            <aside class="status-panel">
+                <!-- 当前场景 -->
+                <div class="panel-section">
+                    <h3 class="section-title">📍 当前场景</h3>
+                    <div class="scene-info">
+                        <div class="scene-location">🏢 创业公司办公室 - 第1天</div>
+                        <p>你刚刚加入一家早期创业公司，担任增长负责人。CEO对你寄予厚望，希望能在有限的预算下实现快速增长。</p>
+                    </div>
+                </div>
+
+                <!-- 资源状态 -->
+                <div class="panel-section">
+                    <h3 class="section-title">📊 资源状态</h3>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">💰 预算</span>
+                            <span class="resource-value" id="budget-value">$10,000</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-budget" id="budget-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">⚡ 团队精力</span>
+                            <span class="resource-value" id="energy-value">100%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-energy" id="energy-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">⏰ 市场时机</span>
+                            <span class="resource-value" id="timing-value">80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-timing" id="timing-bar" style="width: 80%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">❤️ 用户信任</span>
+                            <span class="resource-value" id="trust-value">50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-trust" id="trust-bar" style="width: 50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">⭐ 品牌声誉</span>
+                            <span class="resource-value" id="reputation-value">50%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-reputation" id="reputation-bar" style="width: 50%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">📈 用户增长</span>
+                            <span class="resource-value" id="growth-value">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-growth" id="growth-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">
+                            <span class="resource-name">🔄 用户留存</span>
+                            <span class="resource-value" id="retention-value">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-retention" id="retention-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关系面板 -->
+                <div class="panel-section">
+                    <h3 class="section-title">👥 关系面板</h3>
+
+                    <div class="relationship-item">
+                        <span class="relationship-name">🧑‍💼 CEO满意度</span>
+                        <div class="relationship-bar">
+                            <div class="relationship-fill" id="ceo-relation" style="width: 80%"></div>
+                        </div>
+                        <span class="relationship-value">80%</span>
+                    </div>
+
+                    <div class="relationship-item">
+                        <span class="relationship-name">💰 投资人信心</span>
+                        <div class="relationship-bar">
+                            <div class="relationship-fill" id="investor-relation" style="width: 60%"></div>
+                        </div>
+                        <span class="relationship-value">60%</span>
+                    </div>
+
+                    <div class="relationship-item">
+                        <span class="relationship-name">👨‍💻 团队士气</span>
+                        <div class="relationship-bar">
+                            <div class="relationship-fill" id="team-relation" style="width: 70%"></div>
+                        </div>
+                        <span class="relationship-value">70%</span>
+                    </div>
+
+                    <div class="relationship-item">
+                        <span class="relationship-name">😊 用户满意度</span>
+                        <div class="relationship-bar">
+                            <div class="relationship-fill" id="user-relation" style="width: 50%"></div>
+                        </div>
+                        <span class="relationship-value">50%</span>
+                    </div>
+                </div>
+
+                <!-- 技能解锁 -->
+                <div class="panel-section">
+                    <h3 class="section-title">🎓 技能解锁</h3>
+
+                    <div class="skill-item">
+                        <span class="skill-icon">✅</span>
+                        <div class="skill-info">
+                            <div class="skill-name">内容营销 Lv.1</div>
+                            <div class="skill-requirement">已解锁</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item skill-locked">
+                        <span class="skill-icon">🔒</span>
+                        <div class="skill-info">
+                            <div class="skill-name">A/B测试</div>
+                            <div class="skill-requirement">需要 100 XP</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item skill-locked">
+                        <span class="skill-icon">🔒</span>
+                        <div class="skill-info">
+                            <div class="skill-name">病毒循环</div>
+                            <div class="skill-requirement">需要 500 XP</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item skill-locked">
+                        <span class="skill-icon">🔒</span>
+                        <div class="skill-info">
+                            <div class="skill-name">数据分析</div>
+                            <div class="skill-requirement">需要 300 XP</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item skill-locked">
+                        <span class="skill-icon">🔒</span>
+                        <div class="skill-info">
+                            <div class="skill-name">增长黑客</div>
+                            <div class="skill-requirement">需要 1000 XP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 游戏日志 -->
+                <div class="panel-section">
+                    <h3 class="section-title">📜 游戏日志</h3>
+                    <div id="game-log">
+                        <div class="log-item">
+                            <div class="log-time">Day 1 - 09:00</div>
+                            <div>🎮 游戏开始</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">Day 1 - 09:05</div>
+                            <div>🧑‍💼 CEO发起对话</div>
+                        </div>
+                        <div class="log-item">
+                            <div class="log-time">Day 1 - 09:10</div>
+                            <div>🤖 AI顾问提供建议</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // ============================================
+        // 游戏状态管理
+        // ============================================
+
+        const gameState = {
+            day: 1,
+            budget: 10000,
+            maxBudget: 10000,
+            energy: 100,
+            timing: 80,
+            trust: 50,
+            reputation: 50,
+            growth: 0,
+            retention: 0,
+            targetUsers: 10000,
+            currentUsers: 0,
+
+            // 关系值
+            relations: {
+                ceo: 80,
+                investor: 60,
+                team: 70,
+                user: 50
+            },
+
+            // 经验值
+            xp: 0,
+
+            // 已解锁技能
+            unlockedSkills: ['content-marketing-1']
+        };
+
+        // NPC角色定义
+        const NPCs = {
+            ceo: { name: 'CEO', emoji: '🧑‍💼', title: 'CEO' },
+            advisor: { name: 'AI顾问', emoji: '🤖', title: 'AI顾问' },
+            cto: { name: 'CTO', emoji: '👨‍💻', title: 'CTO' },
+            investor: { name: '投资人', emoji: '💰', title: '投资人' },
+            user: { name: '用户', emoji: '😊', title: '用户' }
+        };
+
+        // ============================================
+        // UI更新函数
+        // ============================================
+
+        function updateUI() {
+            // 更新顶部统计
+            document.getElementById('current-day').textContent = gameState.day;
+            document.getElementById('current-budget').textContent = `$${gameState.budget.toLocaleString()}`;
+            document.getElementById('target-users').textContent = gameState.targetUsers.toLocaleString();
+
+            // 更新资源条
+            updateResource('budget', gameState.budget, gameState.maxBudget, `$${gameState.budget.toLocaleString()}`);
+            updateResource('energy', gameState.energy, 100, `${gameState.energy}%`);
+            updateResource('timing', gameState.timing, 100, `${gameState.timing}%`);
+            updateResource('trust', gameState.trust, 100, `${gameState.trust}%`);
+            updateResource('reputation', gameState.reputation, 100, `${gameState.reputation}%`);
+            updateResource('growth', gameState.currentUsers, gameState.targetUsers, gameState.currentUsers);
+            updateResource('retention', gameState.retention, 100, `${gameState.retention}%`);
+
+            // 更新关系
+            updateRelation('ceo', gameState.relations.ceo);
+            updateRelation('investor', gameState.relations.investor);
+            updateRelation('team', gameState.relations.team);
+            updateRelation('user', gameState.relations.user);
+        }
+
+        function updateResource(name, value, max, displayText) {
+            const percentage = Math.min(100, Math.max(0, (value / max) * 100));
+            document.getElementById(`${name}-bar`).style.width = `${percentage}%`;
+            document.getElementById(`${name}-value`).textContent = displayText;
+        }
+
+        function updateRelation(name, value) {
+            const percentage = Math.min(100, Math.max(0, value));
+            document.getElementById(`${name}-relation`).style.width = `${percentage}%`;
+            document.getElementById(`${name}-relation`).parentElement.nextElementSibling.textContent = `${percentage}%`;
+        }
+
+        // ============================================
+        // 对话系统
+        // ============================================
+
+        function addMessage(speaker, text, isUser = false) {
+            const historyDiv = document.getElementById('conversation-history');
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'npc-message'}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : (NPCs[speaker]?.emoji || '🤖');
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            const speakerName = document.createElement('div');
+            speakerName.className = 'message-speaker';
+            speakerName.textContent = isUser ? '你' : (NPCs[speaker]?.title || speaker);
+
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+
+            bubble.appendChild(speakerName);
+            bubble.appendChild(messageText);
+            content.appendChild(bubble);
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+
+            historyDiv.appendChild(messageDiv);
+
+            // 打字机效果
+            if (!isUser) {
+                typeWriter(messageText, text, 30);
+            } else {
+                messageText.textContent = text;
+            }
+
+            // 滚动到底部
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.textContent = '';
+
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+
+                    // 自动滚动
+                    const historyDiv = document.getElementById('conversation-history');
+                    historyDiv.scrollTop = historyDiv.scrollHeight;
+                }
+            }
+
+            type();
+        }
+
+        // ============================================
+        // 消息发送
+        // ============================================
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            // 添加用户消息
+            addMessage('user', text, true);
+
+            // 清空输入框
+            input.value = '';
+
+            // 添加日志
+            addGameLog(`你: ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}`);
+
+            // 模拟AI回复
+            setTimeout(() => {
+                processUserMessage(text);
+            }, 1000);
+        }
+
+        function processUserMessage(text) {
+            const lowerText = text.toLowerCase();
+
+            // 简单的关键词识别
+            if (lowerText.includes('内容') || lowerText.includes('营销')) {
+                respondContentMarketing();
+            } else if (lowerText.includes('社交') || lowerText.includes('广告')) {
+                respondSocialMedia();
+            } else if (lowerText.includes('产品') || lowerText.includes('优化')) {
+                respondProductOptimization();
+            } else if (lowerText.includes('建议') || lowerText.includes('帮助')) {
+                requestHelp();
+            } else {
+                respondGeneric();
+            }
+        }
+
+        function respondContentMarketing() {
+            addMessage('advisor', `很好的选择！内容营销是成本效益最高的增长策略之一。
+
+📝 内容营销方案：
+• 成本：$2,000
+• 预计用户增长：500-800人
+• 时间周期：2周
+• 品牌声誉：+15%
+
+这个策略需要团队投入较多精力，但能建立长期的品牌影响力。确定要执行吗？`);
+
+            gameState.budget -= 2000;
+            gameState.energy -= 20;
+            gameState.reputation += 15;
+            gameState.currentUsers += 650;
+            gameState.relations.ceo += 5;
+            gameState.xp += 50;
+
+            updateUI();
+            addGameLog('📝 启动内容营销策略');
+
+            setTimeout(() => {
+                addMessage('ceo', '不错的开始！我看到数据在增长。继续保持！');
+            }, 3000);
+        }
+
+        function respondSocialMedia() {
+            addMessage('advisor', `社交媒体推广能快速带来流量！
+
+📱 社交媒体方案：
+• 成本：$3,000
+• 预计用户增长：1000-1500人
+• 时间周期：1周
+• 用户信任：可能降低5%（付费广告）
+
+这个策略见效快，但需要持续投入。你确定要投放广告吗？`);
+
+            gameState.budget -= 3000;
+            gameState.energy -= 15;
+            gameState.trust -= 5;
+            gameState.currentUsers += 1200;
+            gameState.relations.investor += 10;
+            gameState.xp += 40;
+
+            updateUI();
+            addGameLog('📱 启动社交媒体推广');
+
+            setTimeout(() => {
+                addMessage('investor', '💰 很高兴看到积极的行动！用户数据不错。');
+            }, 3000);
+        }
+
+        function respondProductOptimization() {
+            addMessage('cto', `👨‍💻 太好了！作为CTO，我一直认为产品体验最重要。
+
+🎯 产品优化方案：
+• 成本：$1,500
+• 用户增长：较慢（200-300人）
+• 用户留存：+20%
+• 用户满意度：+15%
+
+虽然短期增长慢，但能显著提升留存率。这是长期战略。`);
+
+            gameState.budget -= 1500;
+            gameState.energy -= 25;
+            gameState.retention += 20;
+            gameState.currentUsers += 250;
+            gameState.relations.team += 15;
+            gameState.relations.user += 15;
+            gameState.xp += 60;
+
+            updateUI();
+            addGameLog('🎯 启动产品优化项目');
+
+            setTimeout(() => {
+                addMessage('user', '😊 产品体验好多了！我会推荐给朋友。');
+            }, 3000);
+        }
+
+        function respondGeneric() {
+            const responses = [
+                {
+                    speaker: 'advisor',
+                    text: '🤖 我理解你的想法。让我分析一下当前情况...\n\n基于现有资源，我建议你优先考虑成本效益高的策略。你可以问我关于具体策略的问题。'
+                },
+                {
+                    speaker: 'ceo',
+                    text: '🧑‍💼 你的想法很有趣。不过我们需要看到具体的执行方案。能详细说说吗？'
+                },
+                {
+                    speaker: 'advisor',
+                    text: '💡 好的想法需要好的执行。我建议你先考虑：\n1. 目标用户是谁？\n2. 预算分配如何？\n3. 预期效果是什么？'
+                }
+            ];
+
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(response.speaker, response.text);
+        }
+
+        function requestHelp() {
+            addMessage('advisor', `🤖 让我为你提供一些建议：
+
+当前状态分析：
+• 预算剩余：$${gameState.budget.toLocaleString()}
+• 团队精力：${gameState.energy}%
+• 当前用户：${gameState.currentUsers}/${gameState.targetUsers}
+
+💡 推荐策略（按优先级）：
+
+1️⃣ 内容营销（推荐）
+   成本低，效果持久，提升品牌
+
+2️⃣ 产品优化
+   提升留存，长期价值高
+
+3️⃣ 社交媒体
+   快速获客，但成本较高
+
+你想了解哪个策略的详细信息？`);
+
+            addGameLog('💡 请求AI顾问建议');
+        }
+
+        // ============================================
+        // 辅助函数
+        // ============================================
+
+        function insertSuggestion(text) {
+            document.getElementById('user-input').value = text;
+            document.getElementById('user-input').focus();
+        }
+
+        function handleKeyDown(event) {
+            // Ctrl/Cmd + Enter 发送消息
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function addGameLog(text) {
+            const logDiv = document.getElementById('game-log');
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+
+            const time = document.createElement('div');
+            time.className = 'log-time';
+            time.textContent = `Day ${gameState.day} - ${new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}`;
+
+            const content = document.createElement('div');
+            content.textContent = text;
+
+            logItem.appendChild(time);
+            logItem.appendChild(content);
+
+            logDiv.appendChild(logItem);
+
+            // 限制日志条数
+            while (logDiv.children.length > 10) {
+                logDiv.removeChild(logDiv.firstChild);
+            }
+        }
+
+        function showNotification(text) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = text;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ============================================
+        // 初始化
+        // ============================================
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            console.log('🎮 增长黑客模拟器 - AI对话版已启动');
+
+            // 自动聚焦输入框
+            document.getElementById('user-input').focus();
+        });
+
+        // 定时事件（每分钟）
+        setInterval(() => {
+            // 恢复少量精力
+            if (gameState.energy < 100) {
+                gameState.energy = Math.min(100, gameState.energy + 2);
+                updateUI();
+            }
+        }, 60000);
+    </script>
+</body>
+</html>

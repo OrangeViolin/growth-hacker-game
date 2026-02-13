@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长危机：任务模式 | Mission Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+            color: #E2E8F0;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* 任务头部 */
+        .mission-header {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border-bottom: 3px solid #A855F7;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .mission-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .mission-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #A855F7;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .mission-objective {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #06B6D4;
+            margin-bottom: 15px;
+        }
+
+        .objective-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #06B6D4;
+            margin-bottom: 10px;
+        }
+
+        .objective-details {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #CBD5E1;
+        }
+
+        .mission-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #94A3B8;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #10B981;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .stat-value.critical {
+            color: #FF4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* 主游戏区 */
+        .game-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        /* 场景区 */
+        .scene-card {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 2px solid #475569;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .scene-time {
+            color: #06B6D4;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #475569;
+        }
+
+        .scene-text {
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        /* 行动选择 */
+        .action-card {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 2px solid #475569;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .action-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #A855F7;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .actions-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #334155 0%, #1E293B 100%);
+            border: 2px solid #475569;
+            color: #E2E8F0;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            border-color: #A855F7;
+            transform: scale(0.98);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .action-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #06B6D4;
+            margin-bottom: 8px;
+        }
+
+        .action-desc {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #CBD5E1;
+        }
+
+        .action-cost {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #94A3B8;
+        }
+
+        .cost-time {
+            color: #F59E0B;
+        }
+
+        /* 结果弹窗 */
+        .result-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 3px solid #A855F7;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            animation: zoomIn 0.5s;
+            box-shadow: 0 0 60px rgba(168, 85, 247, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .result-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .result-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .result-title.success {
+            color: #10B981;
+            text-shadow: 0 0 30px #10B981, 0 0 60px #10B981;
+            animation: successGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes successGlow {
+            0%, 100% {
+                text-shadow: 0 0 30px #10B981, 0 0 60px #10B981;
+            }
+            50% {
+                text-shadow: 0 0 40px #10B981, 0 0 80px #10B981, 0 0 100px #10B981;
+            }
+        }
+
+        .result-title.fail {
+            color: #EF4444;
+            text-shadow: 0 0 30px #EF4444, 0 0 60px #EF4444;
+        }
+
+        .result-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .result-btn {
+            background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+            color: #FFF;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .result-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+        }
+
+        .result-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 资源系统样式 */
+        .resource-panel {
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .resource-title {
+            color: #FFD700;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #C9A961;
+            text-align: center;
+        }
+
+        .resource-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .resource-item {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .resource-item.critical {
+            border: 2px solid #FF4444;
+            animation: warning-pulse 1s infinite;
+        }
+
+        .resource-item.empty {
+            border: 2px solid #8B0000;
+            opacity: 0.6;
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255,68,68,0.5); }
+            50% { box-shadow: 0 0 15px rgba(255,68,68,1); }
+        }
+
+        .resource-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .resource-label {
+            font-size: 0.9em;
+            color: #E8DCC4;
+        }
+
+        .resource-value {
+            font-size: 1em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .resource-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .resource-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease, background-color 0.3s;
+        }
+
+        .resource-bar.resource-change {
+            animation: bar-flash 0.3s;
+        }
+
+        @keyframes bar-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .resource-hint {
+            font-size: 0.75em;
+            color: #C9A961;
+            opacity: 0.7;
+            line-height: 1.3;
+        }
+
+        /* 事件系统样式 */
+        .event-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .event-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .event-modal {
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border: 3px solid #C9A961;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modal-appear 0.5s;
+        }
+
+        @keyframes modal-appear {
+            from {
+                transform: scale(0.8) translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .event-header {
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #C9A961;
+            position: relative;
+        }
+
+        .event-header.opportunity {
+            background: linear-gradient(135deg, rgba(74,255,74,0.1) 0%, transparent 100%);
+            border-bottom-color: #4AFF4A;
+        }
+
+        .event-header.crisis {
+            background: linear-gradient(135deg, rgba(255,68,68,0.1) 0%, transparent 100%);
+            border-bottom-color: #FF4444;
+        }
+
+        .event-header.milestone {
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, transparent 100%);
+            border-bottom-color: #FFD700;
+        }
+
+        .event-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            animation: icon-bounce 1s infinite;
+        }
+
+        @keyframes icon-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .event-type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(201,169,97,0.3);
+            border: 1px solid #C9A961;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            font-size: 1.8em;
+            color: #FFD700;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .event-body {
+            padding: 30px;
+        }
+
+        .event-description {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #E8DCC4;
+        }
+
+        .event-context {
+            background: rgba(201,169,97,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #C9A961;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .event-choices {
+            margin-top: 25px;
+        }
+
+        .choices-title {
+            font-size: 1.2em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .event-choice {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #8B7355;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .event-choice:hover {
+            border-color: #FFD700;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+
+        .choice-header {
+            margin-bottom: 10px;
+        }
+
+        .choice-label {
+            font-weight: bold;
+            color: #FFD700;
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+        .choice-text {
+            color: #E8DCC4;
+            font-size: 1em;
+        }
+
+        .choice-cost {
+            font-size: 0.85em;
+            color: #FF8844;
+            margin-bottom: 5px;
+        }
+
+        .choice-success-rate {
+            font-size: 0.85em;
+            color: #4AFF4A;
+        }
+
+        .event-outcome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            animation: outcome-appear 0.5s;
+        }
+
+        @keyframes outcome-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .event-outcome.success {
+            background: linear-gradient(135deg, rgba(74,255,74,0.1) 0%, #2C1810 100%);
+        }
+
+        .event-outcome.fail {
+            background: linear-gradient(135deg, rgba(255,68,68,0.1) 0%, #2C1810 100%);
+        }
+
+        .outcome-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .outcome-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .outcome-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #E8DCC4;
+        }
+
+        .outcome-close {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .outcome-close:hover {
+            transform: scale(1.05);
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-card {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1);
+        }
+
+        .sidebar-title {
+            color: #06B6D4;
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #475569;
+        }
+
+        .info-item {
+            background: rgba(71, 85, 105, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #475569;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+
+        .info-item.locked {
+            opacity: 0.3;
+        }
+
+        .info-item.unlocked {
+            cursor: pointer;
+        }
+
+        .info-item.unlocked:hover {
+            background: rgba(168, 85, 247, 0.2);
+            transform: translateX(3px);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            border-left-color: #A855F7;
+        }
+
+        .info-item.unlocked::after {
+            content: ' 👁️';
+            float: right;
+            opacity: 0.5;
+        }
+
+        .info-item.unlocked:hover::after {
+            opacity: 1;
+        }
+
+        .consequence-item {
+            background: rgba(239, 68, 68, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #EF4444;
+            font-size: 0.9em;
+        }
+
+        /* 行动反馈弹窗 */
+        .action-feedback {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-feedback.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .feedback-card {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            border: 3px solid #06B6D4;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(6, 182, 212, 0.5);
+            animation: slideDown 0.4s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #475569;
+        }
+
+        .feedback-icon-small {
+            font-size: 2em;
+        }
+
+        .feedback-title-small {
+            font-size: 1.3em;
+            color: #06B6D4;
+            font-weight: 700;
+        }
+
+        .feedback-content {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+
+        .feedback-time {
+            background: rgba(245, 158, 11, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid #F59E0B;
+            margin-bottom: 20px;
+        }
+
+        .feedback-close {
+            background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+            color: #FFF;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .feedback-close:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+        }
+
+        .feedback-close:active {
+            transform: scale(0.95);
+        }
+
+        /* 对话系统 */
+        .dialogue-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #475569;
+        }
+
+        .dialogue-content {
+            text-align: left;
+        }
+
+        .dialogue-question {
+            background: rgba(168, 85, 247, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #A855F7;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        .dialogue-option {
+            background: linear-gradient(135deg, #334155 0%, #1E293B 100%);
+            border: 2px solid #475569;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dialogue-option:hover {
+            border-color: #A855F7;
+            transform: scale(0.98);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+        }
+
+        .dialogue-option:active {
+            transform: scale(0.95);
+        }
+
+        .dialogue-option.selected {
+            background: linear-gradient(135deg, #065F46 0%, #064E3B 100%);
+            border-color: #10B981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+            animation: successPulse 1s ease-in-out;
+        }
+
+        @keyframes successPulse {
+            0% {
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(16, 185, 129, 0.9);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+            }
+        }
+
+        .dialogue-option.wrong {
+            background: linear-gradient(135deg, #7F1D1D 0%, #5B0F0F 100%);
+            border-color: #EF4444;
+        }
+
+        .option-label {
+            font-weight: 700;
+            color: #06B6D4;
+            margin-right: 10px;
+        }
+
+        .option-feedback {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .option-feedback.show {
+            display: block;
+        }
+
+        @media (max-width: 968px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            .mission-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 任务头部 -->
+    <div class="mission-header">
+        <div class="mission-container">
+            <div class="mission-title">⚠️ 关卡 #1：投资人生死劫</div>
+
+            <div class="mission-objective">
+                <div class="objective-text">🎯 任务目标：3小时内准备好数据，说服投资人继续支持</div>
+                <div class="objective-details">
+                    ⏰ 12:00 投资人Tom将来电，你必须给出有说服力的答案<br>
+                    ⚠️ 失败后果：融资终止，公司可能关门<br>
+                    ✅ 成功条件：基于数据给出正确判断，让Tom相信你有掌控力
+                </div>
+            </div>
+
+            <div class="mission-stats">
+                <div class="stat-box">
+                    <div class="stat-label">⏱️ 剩余时间</div>
+                    <div class="stat-value" id="time-left">3:00:00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">📊 已收集情报</div>
+                    <div class="stat-value" id="intel-count">0 / 6</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">🎲 决策机会</div>
+                    <div class="stat-value" id="decision-chances">1次</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主游戏区 -->
+    <div class="game-content">
+        <div class="game-grid">
+            <div class="main-panel">
+                <!-- 场景 -->
+                <div class="scene-card">
+                    <div class="scene-time">星期一，早上9:17</div>
+                    <div class="scene-text" id="scene-text">你的手机响了三次。是CEO Sarah。
+
+"会议室，现在。Tom（投资人）也在。"
+
+你快步走进去，白板上用红笔写着：
+昨晚8点：10,000人
+今早8点：5,000人（-50%）
+当前流失速度：15%/天
+
+Tom看起来很焦虑："FitnessPro昨晚宣布永久免费了。"
+
+Sarah补充："我们的健身App订阅是$20/月。"
+
+财务总监Lisa走进来，递给你一张纸：
+"账户余额：$10,000"
+"团队6人，月工资：$18,000"
+
+Tom站起来："我12点有电话会，到时候问你一个问题。"
+
+他走到门口，回头："你最好有数据支撑的答案。"
+
+<div style="color:#10B981;margin-top:15px;font-weight:600;">现在是9:20，你有2小时40分钟准备。</div></div>
+                </div>
+
+                <!-- 行动选择 -->
+                <div class="action-card">
+                    <div class="action-title">选择你的行动（每个行动消耗时间）</div>
+                    <div class="actions-grid" id="actions-grid">
+                        <button class="action-btn" data-action-id="users" onclick="takeAction('users')">
+                            <div class="action-name">👥 深挖用户数据</div>
+                            <div class="action-desc">查看用户构成、流失明细、付费转化率</div>
+                            <div class="action-cost">
+                                <span>价值：★★★★★</span>
+                                <span class="cost-time">⏱️ 耗时：40分钟</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" data-action-id="finance" onclick="takeAction('finance')">
+                            <div class="action-name">💰 分析财务报表</div>
+                            <div class="action-desc">收入结构、成本明细、现金流预测</div>
+                            <div class="action-cost">
+                                <span>价值：★★★★☆</span>
+                                <span class="cost-time">⏱️ 耗时：30分钟</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" data-action-id="competitor" onclick="takeAction('competitor')">
+                            <div class="action-name">🎯 调研竞品策略</div>
+                            <div class="action-desc">分析竞品的免费模式、用户反馈</div>
+                            <div class="action-cost">
+                                <span>价值：★★★☆☆</span>
+                                <span class="cost-time">⏱️ 耗时：50分钟</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" data-action-id="meeting" onclick="takeAction('meeting')">
+                            <div class="action-name">💬 召集团队会议</div>
+                            <div class="action-desc">讨论应对策略，稳定团队情绪</div>
+                            <div class="action-cost">
+                                <span>价值：★★☆☆☆</span>
+                                <span class="cost-time">⏱️ 耗时：90分钟</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" data-action-id="calc" onclick="takeAction('calc')">
+                            <div class="action-name">📊 计算生存时间</div>
+                            <div class="action-desc">详细计算现金流、Unit Economics</div>
+                            <div class="action-cost">
+                                <span>价值：★★★★★</span>
+                                <span class="cost-time">⏱️ 耗时：35分钟</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" data-action-id="ppt" onclick="takeAction('ppt')">
+                            <div class="action-name">📄 准备汇报PPT</div>
+                            <div class="action-desc">做一份漂亮的展示文档</div>
+                            <div class="action-cost">
+                                <span>价值：★☆☆☆☆</span>
+                                <span class="cost-time">⏱️ 耗时：60分钟</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div style="margin-top:20px;padding:15px;background:rgba(139,0,0,0.2);border-radius:10px;text-align:center;">
+                        <button class="result-btn" onclick="readyToAnswer()" id="ready-btn" disabled style="opacity:0.5;">
+                            我准备好回答了
+                        </button>
+                        <div style="font-size:0.85em;margin-top:10px;color:#C9A961;">
+                            至少完成2项调查才能尝试回答
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 资源面板 -->
+                <div id="resource-container"></div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">📋 已收集情报</div>
+                    <div id="intel-list">
+                        <div class="info-item locked" data-action="users">用户数据分析</div>
+                        <div class="info-item locked" data-action="finance">财务报表</div>
+                        <div class="info-item locked" data-action="competitor">竞品调研</div>
+                        <div class="info-item locked" data-action="meeting">团队意见</div>
+                        <div class="info-item locked" data-action="calc">生存计算</div>
+                        <div class="info-item locked" data-action="ppt">汇报材料</div>
+                    </div>
+                    <div style="font-size:0.8em;margin-top:10px;color:#C9A961;opacity:0.7;">
+                        💡 点击已解锁项目可重新查看
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">⚠️ 时间后果</div>
+                    <div class="consequence-item">
+                        超过3小时 → Tom来电时你还没准备好 → 立即FAIL
+                    </div>
+                    <div class="consequence-item">
+                        准备不足（<2项调查）→ 无法给出有说服力的答案 → FAIL
+                    </div>
+                    <div class="consequence-item">
+                        浪费时间在低价值行动上 → 错过关键信息 → FAIL
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">💡 生存提示</div>
+                    <div style="font-size:0.9em;line-height:1.6;">
+                        • 时间有限，选择最关键的调查<br>
+                        • 投资人要的是数据，不是PPT<br>
+                        • 开会不如自己分析数据<br>
+                        • 你只有一次回答机会
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 行动反馈弹窗 -->
+    <div class="action-feedback" id="action-feedback">
+        <div class="feedback-card">
+            <div class="feedback-header">
+                <div class="feedback-icon-small" id="feedback-icon">✅</div>
+                <div class="feedback-title-small" id="feedback-title">行动完成</div>
+            </div>
+            <div class="feedback-content" id="feedback-content">
+                内容加载中...
+            </div>
+            <div class="feedback-time" id="feedback-time">
+                ⏱️ 耗时：30分钟
+            </div>
+            <button class="feedback-close" onclick="closeFeedback()">明白了</button>
+        </div>
+    </div>
+
+    <!-- 对话弹窗 -->
+    <div class="result-overlay" id="dialogue-overlay">
+        <div class="result-box" style="max-width: 700px;">
+            <div class="dialogue-header">
+                <div style="font-size:3em;">☎️</div>
+                <div style="font-size:1.5em;color:#FFD700;margin-top:10px;">Tom来电</div>
+                <div style="font-size:0.9em;color:#C9A961;margin-top:5px;" id="dialogue-timer">12:00 PM</div>
+            </div>
+            <div class="dialogue-content">
+                <div class="dialogue-question" id="dialogue-question">
+                    Tom："我们能撑过这次危机吗？"
+                </div>
+                <div class="dialogue-options" id="dialogue-options">
+                    <!-- 选项会动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div class="result-overlay" id="result-overlay">
+        <div class="result-box">
+            <div class="result-icon" id="result-icon">🎉</div>
+            <div class="result-title" id="result-title">SUCCESS</div>
+            <div class="result-text" id="result-text">
+                恭喜通过第一关！
+            </div>
+            <button class="result-btn" onclick="nextLevel()">下一关</button>
+            <button class="result-btn" onclick="restart()">重新挑战</button>
+        </div>
+    </div>
+
+    <!-- 加载关卡数据 -->
+    <script src="levels-data.js"></script>
+
+    <!-- 加载新手引导系统 -->
+    <script src="onboarding.js"></script>
+
+    <!-- 加载资源系统 -->
+    <script src="resource-system.js"></script>
+
+    <!-- 加载事件系统 -->
+    <script src="event-system.js"></script>
+
+    <script>
+        // 确保数据加载完成
+        if (typeof LEVELS_DATA === 'undefined') {
+            alert('关卡数据加载失败，请刷新页面');
+            throw new Error('LEVELS_DATA not loaded');
+        }
+
+        // 关卡进度
+        let currentLevel = parseInt(localStorage.getItem('currentLevel') || '0');
+
+        // 确保关卡索引有效
+        if (currentLevel >= LEVELS_DATA.length) {
+            currentLevel = 0;
+            localStorage.setItem('currentLevel', '0');
+        }
+
+        let levelData = LEVELS_DATA[currentLevel];
+
+        // 游戏状态
+        let timeRemaining = levelData.timeLimit;
+        let intelCollected = 0;
+        let actionsCompleted = [];
+        let timerInterval;
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let totalQuestions = levelData.questions.length;
+        let shouldRestartAfterFeedback = false;
+
+        // 初始化资源系统和事件系统
+        let resourceSystem = null;
+        let resourceUI = null;
+        let eventSystem = null;
+        let eventUI = null;
+        let weekCount = 0; // 周计数
+
+
+        // 显示反馈弹窗
+        function showFeedback(icon, title, content, time) {
+            document.getElementById('feedback-icon').textContent = icon;
+            document.getElementById('feedback-title').textContent = title;
+            document.getElementById('feedback-content').textContent = content;
+            document.getElementById('feedback-time').innerHTML = time;
+            document.getElementById('action-feedback').classList.add('show');
+        }
+
+        // 关闭反馈弹窗
+        function closeFeedback() {
+            document.getElementById('action-feedback').classList.remove('show');
+
+            // 如果需要重启游戏
+            if (shouldRestartAfterFeedback) {
+                shouldRestartAfterFeedback = false;
+                setTimeout(() => restart(), 300);
+            }
+        }
+
+        // 行动数据（从关卡数据动态加载）
+        let actions = {};
+
+        // 初始化关卡
+        function initLevel() {
+            console.log('Initializing level:', currentLevel);
+            levelData = LEVELS_DATA[currentLevel];
+            console.log('Level data:', levelData);
+
+            timeRemaining = levelData.timeLimit;
+            totalQuestions = levelData.questions.length;
+
+            // 构建actions对象
+            actions = {};
+            levelData.actions.forEach(action => {
+                actions[action.id] = {
+                    time: action.time,
+                    value: action.value,
+                    name: action.name,
+                    critical: action.critical
+                };
+            });
+
+            console.log('Actions built:', actions);
+
+            // 初始化资源系统
+            initResourceSystem();
+
+            // 初始化事件系统
+            initEventSystem();
+
+            // 更新UI
+            updateLevelUI();
+
+            // 重置游戏状态
+            intelCollected = 0;
+            actionsCompleted = [];
+            currentQuestion = 0;
+            correctAnswers = 0;
+            weekCount = 0;
+
+            console.log('Level initialized successfully');
+        }
+
+        // 初始化资源系统
+        function initResourceSystem() {
+            if (typeof ResourceSystem === 'undefined') {
+                console.warn('ResourceSystem not loaded, skipping resource initialization');
+                return;
+            }
+
+            resourceSystem = new ResourceSystem();
+
+            // 设置初始资源值（基于关卡）
+            resourceSystem.set('cash', 10000, '关卡初始化');
+            resourceSystem.set('time', levelData.timeLimit, '关卡初始化');
+            resourceSystem.set('energy', 100, '关卡初始化');
+            resourceSystem.set('trust', 80, '关卡初始化');
+            resourceSystem.set('reputation', 60, '关卡初始化');
+
+            // 创建资源UI
+            resourceUI = new ResourceUI(resourceSystem, 'resource-container');
+
+            // 监听临界值事件
+            resourceSystem.on('onCritical', (data) => {
+                showFeedback('⚠️', `${data.resource.name}告急！`,
+                    `你的${data.resource.name}已降至临界值！\n当前：${data.value}${data.resource.unit}\n临界值：${data.critical}${data.resource.unit}\n\n请谨慎行动，避免资源耗尽！`,
+                    '');
+            });
+
+            // 监听资源耗尽事件
+            resourceSystem.on('onEmpty', (data) => {
+                if (data.type === 'cash') {
+                    // 现金耗尽 -> 游戏失败
+                    clearInterval(timerInterval);
+                    showResult(false, '💰 资金链断裂！\n\n公司账户余额为0，无法支付员工工资。\n团队宣布解散。\n\n游戏失败！');
+                } else if (data.type === 'trust') {
+                    // 信任耗尽 -> 游戏失败
+                    clearInterval(timerInterval);
+                    showResult(false, '💔 信任崩塌！\n\n团队和投资人对你完全失去信任。\n核心成员纷纷离职。\n\n游戏失败！');
+                } else if (data.type === 'energy') {
+                    // 精力耗尽 -> 强制休息
+                    showFeedback('😰', '精疲力竭',
+                        '你已经筋疲力尽，无法继续工作。\n\n强制休息30分钟...',
+                        '⏱️ 强制休息：30分钟');
+                    resourceSystem.consume('time', 30, '精力耗尽强制休息');
+                    resourceSystem.gain('energy', 50, '休息恢复');
+                }
+            });
+
+            console.log('Resource system initialized');
+        }
+
+        // 初始化事件系统
+        function initEventSystem() {
+            if (typeof EventSystem === 'undefined') {
+                console.warn('EventSystem not loaded, skipping event initialization');
+                return;
+            }
+
+            eventSystem = new EventSystem(resourceSystem);
+            eventUI = new EventUI(eventSystem, 'event-overlay-main');
+
+            console.log('Event system initialized');
+        }
+
+        // 尝试触发随机事件（每周30%概率）
+        function tryTriggerRandomEvent() {
+            if (!eventSystem) return;
+
+            weekCount++;
+
+            // 每个行动算作一周的工作
+            const event = eventSystem.tryTriggerEvent();
+            if (event) {
+                console.log('Random event triggered:', event.title);
+            }
+        }
+
+        // 更新关卡UI
+        function updateLevelUI() {
+            // 更新标题（添加进度显示）
+            document.querySelector('.mission-title').innerHTML = levelData.title + ` <span style="font-size:0.6em;opacity:0.7;">(${currentLevel + 1}/3)</span>`;
+            document.querySelector('.objective-text').innerHTML = levelData.objective;
+            document.querySelector('.objective-details').innerHTML = levelData.details;
+
+            // 更新场景
+            document.querySelector('.scene-time').textContent = levelData.scene.time;
+            document.getElementById('scene-text').innerHTML = levelData.scene.text;
+
+            // 更新行动按钮
+            const actionsGrid = document.getElementById('actions-grid');
+            actionsGrid.innerHTML = levelData.actions.map(action => `
+                <button class="action-btn" data-action-id="${action.id}" onclick="takeAction('${action.id}')">
+                    <div class="action-name">${action.name}</div>
+                    <div class="action-desc">${action.desc}</div>
+                    <div class="action-cost">
+                        <span>价值：${'★'.repeat(action.value)}${'☆'.repeat(5-action.value)}</span>
+                        <span class="cost-time">⏱️ 耗时：${action.time}分钟</span>
+                    </div>
+                </button>
+            `).join('');
+
+            // 更新情报列表
+            const intelList = document.getElementById('intel-list');
+            intelList.innerHTML = levelData.actions.map(action => `
+                <div class="info-item locked" data-action="${action.id}">${action.name.split(' ')[1] || action.name}</div>
+            `).join('');
+
+            // 更新时间显示
+            const hours = Math.floor(timeRemaining / 60);
+            const minutes = timeRemaining % 60;
+            document.getElementById('time-left').textContent = `${hours}:${minutes.toString().padStart(2, '0')}:00`;
+            document.getElementById('intel-count').textContent = `0 / ${levelData.actions.length}`;
+        }
+
+        // 启动计时器
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+
+                // 同步资源系统的时间
+                if (resourceSystem) {
+                    resourceSystem.set('time', timeRemaining, '时间流逝');
+                }
+
+                updateTimer();
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timeOut();
+                }
+
+                // 临界时间警告
+                if (timeRemaining === 30) {
+                    showFeedback('⏰', '时间警告', '只剩30分钟了！\n抓紧时间完成关键调查！', '');
+                }
+
+                // 每60秒（游戏内1小时）恢复少量精力
+                if (resourceSystem && timeRemaining % 60 === 0) {
+                    resourceSystem.gain('energy', 5, '时间恢复');
+                }
+            }, 1000); // 为了演示，1秒=1分钟
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            const hours = Math.floor(timeRemaining / 60);
+            const minutes = timeRemaining % 60;
+            const seconds = 0; // 简化显示
+            document.getElementById('time-left').textContent =
+                `${hours}:${minutes.toString().padStart(2, '0')}:00`;
+
+            // 时间紧张时变红
+            if (timeRemaining < 30) {
+                document.getElementById('time-left').classList.add('critical');
+            }
+        }
+
+        // 执行行动
+        function takeAction(actionId) {
+            console.log('takeAction called with:', actionId);
+            console.log('actions object:', actions);
+
+            if (actionsCompleted.includes(actionId)) {
+                showFeedback('⚠️', '重复操作', '你已经做过这个调查了', '');
+                return;
+            }
+
+            const action = actions[actionId];
+
+            if (!action) {
+                console.error('Action not found:', actionId);
+                showFeedback('❌', '错误', '找不到该操作数据，请刷新页面重试', '');
+                return;
+            }
+
+            // 检查时间
+            if (timeRemaining < action.time) {
+                showFeedback('⏰', '时间不足',
+                    `这个行动需要${action.time}分钟\n但你只剩${timeRemaining}分钟\n\n请选择更短的行动，或直接准备回答！`,
+                    '');
+                return;
+            }
+
+            // 使用资源系统消耗资源
+            if (resourceSystem) {
+                const resourceCost = {
+                    time: action.time,
+                    energy: Math.floor(action.time / 3) // 每3分钟消耗1点精力
+                };
+
+                const affordCheck = resourceSystem.canAfford(resourceCost);
+                if (!affordCheck.canAfford) {
+                    const insufficient = affordCheck.insufficient.map(item => {
+                        const res = resourceSystem.getResource(item.type);
+                        return `${res.name}不足（需要${item.required}，当前${item.current}）`;
+                    }).join('\n');
+                    showFeedback('⚠️', '资源不足', insufficient, '');
+                    return;
+                }
+
+                // 执行资源消耗
+                resourceSystem.consumeMultiple(resourceCost, `行动: ${action.name}`);
+            } else {
+                // 兼容模式：没有资源系统时直接消耗时间
+                timeRemaining -= action.time;
+            }
+
+            updateTimer();
+
+            // 标记完成
+            actionsCompleted.push(actionId);
+            intelCollected++;
+
+            // 更新UI
+            document.getElementById('intel-count').textContent = `${intelCollected} / ${levelData.actions.length}`;
+            const intelList = document.getElementById('intel-list').children;
+            const index = Object.keys(actions).indexOf(actionId);
+            intelList[index].classList.remove('locked');
+            intelList[index].classList.add('unlocked');
+            intelList[index].style.borderLeftColor = action.critical ? '#4AFF4A' : '#C9A961';
+
+            // 禁用按钮
+            const buttonElement = document.querySelector(`button[data-action-id="${actionId}"]`);
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.style.opacity = '0.5';
+            }
+
+            // 尝试触发随机事件
+            tryTriggerRandomEvent();
+
+            // 显示反馈
+            showActionFeedback(actionId);
+
+            // 检查是否可以回答
+            if (intelCollected >= 2) {
+                document.getElementById('ready-btn').disabled = false;
+                document.getElementById('ready-btn').style.opacity = '1';
+            }
+        }
+
+        // 显示行动反馈
+        function showActionFeedback(actionId) {
+            const action = levelData.actions.find(a => a.id === actionId);
+            const icon = action.critical ? '✅' : (action.value <= 2 ? '⚠️' : '✅');
+
+            showFeedback(
+                icon,
+                `${action.name}完成`,
+                action.feedback,
+                `⏱️ 耗时：${action.time}分钟 | 剩余：${timeRemaining}分钟`
+            );
+        }
+
+        // 准备好回答
+        function readyToAnswer() {
+            clearInterval(timerInterval);
+
+            // 检查最低要求
+            if (intelCollected < 2) {
+                showResult(false,
+                    `准备不足！\n\n你只收集了${intelCollected}项情报，连基本问题都无法回答！\n\nTom问了几个问题，你支支吾吾答不上来...\n\n结果：Tom决定停止投资。`
+                );
+                return;
+            }
+
+            // 开始对话
+            startDialogue();
+        }
+
+        // 开始对话
+        function startDialogue() {
+            currentQuestion = 0;
+            correctAnswers = 0;
+            document.getElementById('dialogue-overlay').classList.add('show');
+            showQuestion();
+        }
+
+        // 显示问题
+        function showQuestion() {
+            if (currentQuestion >= levelData.questions.length) {
+                // 所有问题回答完毕，显示结果
+                evaluatePerformance();
+                return;
+            }
+
+            const q = levelData.questions[currentQuestion];
+            document.getElementById('dialogue-question').innerHTML = q.question;
+
+            const optionsHtml = q.options.map((opt, index) => {
+                const letter = String.fromCharCode(65 + index); // A, B, C, D
+                return `
+                    <div class="dialogue-option" onclick="selectAnswer(${currentQuestion}, ${index})">
+                        <span class="option-label">${letter}.</span>
+                        <span class="option-text">${opt.text}</span>
+                        <div class="option-feedback" id="feedback-${currentQuestion}-${index}">
+                            ${opt.feedback}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('dialogue-options').innerHTML = optionsHtml;
+        }
+
+        // 选择答案
+        function selectAnswer(questionIndex, optionIndex) {
+            const q = levelData.questions[questionIndex];
+            const selectedOption = q.options[optionIndex];
+
+            // 禁用所有选项
+            const allOptions = document.querySelectorAll('.dialogue-option');
+            allOptions.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                opt.style.opacity = '0.6';
+            });
+
+            // 高亮选中的选项
+            const selectedElement = allOptions[optionIndex];
+            selectedElement.style.opacity = '1';
+            selectedElement.classList.add(selectedOption.correct ? 'selected' : 'wrong');
+
+            // 显示反馈
+            const feedbackElement = document.getElementById(`feedback-${questionIndex}-${optionIndex}`);
+            feedbackElement.classList.add('show');
+
+            // 记录分数
+            if (selectedOption.correct) {
+                correctAnswers++;
+            }
+
+            // 2秒后显示下一题
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 3500);
+        }
+
+        // 评估表现
+        function evaluatePerformance() {
+            document.getElementById('dialogue-overlay').classList.remove('show');
+
+            const score = correctAnswers / totalQuestions;
+            const timeUsed = 180 - timeRemaining;
+
+            if (score === 1) {
+                // 全对
+                showResult(true,
+                    `完美！你在${timeUsed}分钟内完成了关键调查！\n\n对话表现：${correctAnswers}/${totalQuestions}题全对\n\n你展现了：\n✓ 数据驱动的决策能力\n✓ 精准的财务分析\n✓ 清晰的战略判断\n\nTom满意地说："很好，你有掌控力。继续干，我会继续支持你！"\n\n💰 投资继续！`
+                );
+            } else if (score >= 0.66) {
+                // 2/3对
+                showResult(true,
+                    `通过！但有待提高。\n\n对话表现：${correctAnswers}/${totalQuestions}题正确\n\nTom略显犹豫："还行...但你需要更全面地收集信息。我会再给你一次机会。"\n\n⚠️ 勉强通过，下次要做得更好！`
+                );
+            } else {
+                // 失败
+                const wastedTime = actionsCompleted.includes('meeting') && actionsCompleted.includes('ppt');
+                let reason = '';
+                if (wastedTime) {
+                    reason = '\n\n你浪费了太多时间在开会和做PPT上，\n没有收集到关键数据！';
+                } else {
+                    reason = '\n\n你收集的情报不够关键，\n无法回答Tom的核心问题！';
+                }
+
+                showResult(false,
+                    `失败！\n\n对话表现：${correctAnswers}/${totalQuestions}题正确${reason}\n\nTom失望地说："你没有展现出增长负责人应有的数据能力。我需要重新考虑这笔投资。"\n\n💔 投资终止。`
+                );
+            }
+        }
+
+        // 时间到
+        function timeOut() {
+            showResult(false,
+                `⏰ 时间到！\n\n12:00，Tom的电话来了...\n但你还没准备好！\n\nTom："我需要你的判断。"\n你："呃，我还在整理..."\n\nTom挂断了电话。\n\n第二天，你收到邮件：\n"投资终止。"`
+            );
+        }
+
+        // 显示结果
+        function showResult(success, text) {
+            const overlay = document.getElementById('result-overlay');
+            const icon = document.getElementById('result-icon');
+            const title = document.getElementById('result-title');
+            const resultText = document.getElementById('result-text');
+
+            if (success) {
+                icon.textContent = '🎉';
+                title.textContent = 'SUCCESS';
+                title.className = 'result-title success';
+            } else {
+                icon.textContent = '💀';
+                title.textContent = 'FAIL';
+                title.className = 'result-title fail';
+            }
+
+            resultText.textContent = text;
+            overlay.classList.add('show');
+        }
+
+        // 下一关
+        function nextLevel() {
+            // 先关闭结果弹窗
+            document.getElementById('result-overlay').classList.remove('show');
+
+            // 检查是否还有下一关
+            if (currentLevel + 1 < LEVELS_DATA.length) {
+                // 进入下一关
+                currentLevel++;
+                localStorage.setItem('currentLevel', currentLevel);
+
+                setTimeout(() => {
+                    showFeedback('🎉', '关卡完成',
+                        `恭喜通过关卡${currentLevel}！\n\n准备进入下一关...\n\n点击"明白了"继续`,
+                        '');
+                    shouldRestartAfterFeedback = true;
+                }, 300);
+            } else {
+                // 所有关卡完成
+                setTimeout(() => {
+                    showFeedback('👑', '全部通关',
+                        '恭喜！你已通过所有10关挑战！\n\n你已经是真正的增长黑客大师！\n\n点击"明白了"重新开始第一关',
+                        '');
+                    shouldRestartAfterFeedback = true;
+                    currentLevel = 0;
+                    localStorage.setItem('currentLevel', '0');
+                }, 300);
+            }
+        }
+
+        // 重新开始
+        function restart() {
+            location.reload();
+        }
+
+        // 点击情报项目重新查看
+        function reviewIntel(actionId) {
+            showActionFeedback(actionId);
+        }
+
+        // 游戏开始标志
+        let gameStarted = false;
+
+        // 页面加载时启动
+        window.addEventListener('DOMContentLoaded', () => {
+            // 初始化关卡
+            initLevel();
+
+            // 检查是否需要新手引导
+            const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+
+            if (!hasCompletedOnboarding) {
+                // 首次进入，启动新手引导
+                console.log('First time user - starting onboarding');
+
+                // 延迟启动引导，让页面完全加载
+                setTimeout(() => {
+                    OnboardingSystem.init();
+                }, 500);
+
+                // 引导完成后启动游戏
+                window.onOnboardingComplete = () => {
+                    console.log('Onboarding complete - starting game');
+                    gameStarted = true;
+                    startTimer();
+                };
+            } else {
+                // 老玩家直接开始
+                console.log('Returning user - starting game directly');
+                gameStarted = true;
+                startTimer();
+            }
+
+            // 为情报列表添加点击事件
+            document.getElementById('intel-list').addEventListener('click', (e) => {
+                const item = e.target.closest('.info-item');
+                if (item && item.classList.contains('unlocked')) {
+                    const actionId = item.getAttribute('data-action');
+                    reviewIntel(actionId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

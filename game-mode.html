@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Growth Hacker Simulator | 增长黑客模拟器</title>
+    <link rel="stylesheet" href="ui-effects.css">
     <style>
         * {
             margin: 0;
@@ -486,6 +487,11 @@
             <!-- Metrics will be dynamically inserted -->
         </div>
 
+        <!-- Office Scene Visualization -->
+        <div id="office-scene-container" style="padding: 0 30px; display: none;">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
         <div class="content">
             <!-- Welcome Screen -->
             <div class="screen active" id="welcome-screen">
@@ -517,9 +523,48 @@
         </div>
     </div>
 
+    <!-- Core Systems -->
     <script src="growth-game-engine.js"></script>
+    <script src="game-engine-v2.js"></script>
+
+    <!-- Advanced Systems -->
+    <script src="combo-system.js"></script>
+    <script src="meta-progression.js"></script>
+    <script src="scenarios-library.js"></script>
+    <script src="achievements-data.js"></script>
+    <script src="decision-ui-addon.js"></script>
+
+    <!-- Animations -->
+    <script src="animations.js"></script>
     <script>
         let gameEngine;
+        let previousMetrics = {};
+        let decisionUI;
+        let comboSystem;
+        let metaProgression;
+        let advancedSystemsEnabled = true; // Toggle advanced features
+
+        // Initialize all systems on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize decision UI
+            if (typeof DecisionUI !== 'undefined') {
+                decisionUI = new DecisionUI('game-screen');
+            }
+
+            // Initialize meta-progression system
+            if (typeof MetaProgressionSystem !== 'undefined') {
+                metaProgression = new MetaProgressionSystem();
+                console.log('Meta-progression loaded. Level:', metaProgression.playerProfile.level);
+            }
+
+            // Add ripple effects to all interactive elements
+            document.addEventListener('click', (e) => {
+                const clickable = e.target.closest('.btn, .skill-card, .mode-card, .decision-option-card');
+                if (clickable && typeof gameAnimations !== 'undefined') {
+                    gameAnimations.createRipple(e, clickable);
+                }
+            });
+        });
 
         function startGame(mode) {
             if (mode === 'real') {
@@ -578,6 +623,18 @@
                                   style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px; min-height: 100px;"></textarea>
                     </div>
 
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold;">🎯 难度选择 Difficulty Level</label>
+                        <select id="difficulty" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px;">
+                            <option value="easy">简单 Easy - 更多资源，简单决策</option>
+                            <option value="medium" selected>中等 Medium - 平衡的挑战</option>
+                            <option value="hard">困难 Hard - 有限资源，高难度决策</option>
+                        </select>
+                        <p style="color: #6c757d; font-size: 0.85em; margin-top: 5px;">
+                            💡 难度影响：初始资源、决策复杂度、随机事件频率
+                        </p>
+                    </div>
+
                     <div style="text-align: center; margin-top: 30px;">
                         <button class="btn" onclick="initializeRealBusiness()">
                             🚀 开始游戏 Start Game
@@ -596,37 +653,115 @@
             const revenue = parseInt(document.getElementById('revenue').value) || 0;
             const budget = parseInt(document.getElementById('budget').value) || 5000;
             const challenge = document.getElementById('challenge').value;
+            const difficulty = document.getElementById('difficulty') ? document.getElementById('difficulty').value : 'medium';
 
             if (!company || !challenge) {
                 alert('请填写公司名称和核心挑战 Please fill in company name and core challenge');
                 return;
             }
 
-            gameEngine = new GrowthGameEngine({
-                mode: 'real',
-                company: company,
-                industry: industry,
-                initialUsers: users,
-                initialRevenue: revenue,
-                budget: budget,
-                challenge: challenge
-            });
+            // Use advanced engine if available
+            if (advancedSystemsEnabled && typeof GrowthGameEngineV2 !== 'undefined') {
+                gameEngine = new GrowthGameEngineV2({
+                    mode: 'real',
+                    company: company,
+                    industry: industry,
+                    initialUsers: users,
+                    initialRevenue: revenue,
+                    budget: budget,
+                    challenge: challenge,
+                    difficulty: difficulty
+                });
+
+                // Initialize advanced systems
+                const systems = gameEngine.initializeAdvancedSystems();
+                comboSystem = systems.comboSystem;
+                console.log('Advanced systems initialized:', systems);
+            } else {
+                // Fallback to basic engine
+                gameEngine = new GrowthGameEngine({
+                    mode: 'real',
+                    company: company,
+                    industry: industry,
+                    initialUsers: users,
+                    initialRevenue: revenue,
+                    budget: budget,
+                    challenge: challenge
+                });
+            }
 
             startLevel1();
         }
 
         function startAIChallenge() {
-            gameEngine = new GrowthGameEngine({
-                mode: 'ai'
-            });
+            // Show difficulty selection
+            const screen = document.getElementById('game-screen');
+            screen.innerHTML = `
+                <div style="max-width: 600px; margin: 0 auto; text-align: center;">
+                    <h2 style="margin-bottom: 30px;">🎮 选择难度 Select Difficulty</h2>
+
+                    <div style="background: #f8f9fa; padding: 30px; border-radius: 15px;">
+                        <div style="display: grid; gap: 15px;">
+                            <div class="mode-card" onclick="initializeAIChallenge('easy')" style="cursor: pointer;">
+                                <div class="icon">😊</div>
+                                <h3>简单 Easy</h3>
+                                <p>充足的资源，简单的决策，适合新手学习</p>
+                            </div>
+                            <div class="mode-card" onclick="initializeAIChallenge('medium')" style="cursor: pointer;">
+                                <div class="icon">🎯</div>
+                                <h3>中等 Medium</h3>
+                                <p>平衡的挑战，需要策略思考和资源管理</p>
+                            </div>
+                            <div class="mode-card" onclick="initializeAIChallenge('hard')" style="cursor: pointer;">
+                                <div class="icon">💪</div>
+                                <h3>困难 Hard</h3>
+                                <p>有限的资源，高难度决策，随机事件频繁</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            switchScreen('game-screen');
+        }
+
+        function initializeAIChallenge(difficulty) {
+            // Use advanced engine if available
+            if (advancedSystemsEnabled && typeof GrowthGameEngineV2 !== 'undefined') {
+                gameEngine = new GrowthGameEngineV2({
+                    mode: 'ai',
+                    difficulty: difficulty
+                });
+
+                // Initialize advanced systems
+                const systems = gameEngine.initializeAdvancedSystems();
+                comboSystem = systems.comboSystem;
+                console.log('Advanced systems initialized:', systems);
+            } else {
+                // Fallback to basic engine
+                gameEngine = new GrowthGameEngine({
+                    mode: 'ai'
+                });
+            }
 
             startLevel1();
         }
 
         function startLevel1() {
             updateMetrics();
+            initializeOfficeScene();
             const level = gameEngine.getCurrentLevel();
             displayLevel(level);
+        }
+
+        function initializeOfficeScene() {
+            const container = document.getElementById('office-scene-container');
+            const scene = gameAnimations.initOfficeScene();
+            container.innerHTML = '';
+            container.appendChild(scene);
+            container.style.display = 'block';
+
+            // 初始更新
+            gameAnimations.updateOfficeLevel(gameEngine.metrics.users);
         }
 
         function displayLevel(level) {
@@ -677,13 +812,17 @@
         let selectedSkillIndex = null;
 
         function selectSkill(index) {
+            const card = document.getElementById(`skill-${index}`);
+
             // Deselect all
-            document.querySelectorAll('.skill-card').forEach(card => {
-                card.classList.remove('selected');
+            document.querySelectorAll('.skill-card').forEach(c => {
+                gameAnimations.unhighlightCard(c);
+                c.classList.remove('selected');
             });
 
-            // Select this one
-            document.getElementById(`skill-${index}`).classList.add('selected');
+            // Select this one with animation
+            gameAnimations.highlightCard(card);
+            gameAnimations.flipCard(card);
             selectedSkillIndex = index;
 
             // Enable execute button
@@ -693,8 +832,22 @@
         function executeStrategy() {
             if (selectedSkillIndex === null) return;
 
-            const result = gameEngine.executeSkill(selectedSkillIndex);
-            displayResult(result);
+            // Use decision-based system if available
+            if (advancedSystemsEnabled && decisionUI && typeof gameEngine.getSkillDecisions === 'function') {
+                const skill = gameEngine.levels[gameEngine.currentLevel].skills[selectedSkillIndex];
+                const decisions = gameEngine.getSkillDecisions(selectedSkillIndex);
+
+                // Show decision sequence
+                decisionUI.showDecisionSequence(skill, decisions, (choices) => {
+                    // Execute skill with player choices
+                    const result = gameEngine.executeSkillWithAdvancedSystems(selectedSkillIndex, choices);
+                    displayResult(result);
+                });
+            } else {
+                // Fallback to simple execution
+                const result = gameEngine.executeSkill(selectedSkillIndex);
+                displayResult(result);
+            }
         }
 
         function displayResult(result) {
@@ -720,6 +873,25 @@
                         `).join('')}
                     </div>
 
+                    ${result.activeSynergies && result.activeSynergies.length > 0 ? `
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #ffc107;">
+                            <h4 style="color: #856404; margin-bottom: 10px;">⚡ 协同效果触发！ Synergy Activated!</h4>
+                            ${result.activeSynergies.map(syn => `
+                                <div style="margin-bottom: 10px;">
+                                    <strong>${syn.icon} ${syn.name}</strong> - ${syn.multiplier}x效果
+                                    <p style="color: #856404; font-size: 0.9em;">${syn.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${result.comboBonus ? `
+                        <div style="background: #f8d7da; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #dc3545;">
+                            <h4 style="color: #721c24; margin-bottom: 10px;">${result.comboBonus.icon} ${result.comboBonus.message}</h4>
+                            <p style="color: #721c24;">${result.comboBonus.description || '继续保持优秀决策!'}</p>
+                        </div>
+                    ` : ''}
+
                     ${result.achievement ? `
                         <div style="background: #d4edda; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #28a745;">
                             <h4 style="color: #155724; margin-bottom: 10px;">🏆 成就解锁！ Achievement Unlocked!</h4>
@@ -737,11 +909,19 @@
                 </div>
             `;
 
-            updateMetrics();
             switchScreen('result-screen');
 
+            // 先更新指标（带动画）
+            updateMetrics();
+
+            // 更新办公室场景
+            if (gameEngine.metrics.users) {
+                gameAnimations.updateOfficeLevel(gameEngine.metrics.users);
+            }
+
+            // 延迟显示成就以获得更好的体验
             if (result.achievement) {
-                setTimeout(() => showAchievement(result.achievement), 500);
+                setTimeout(() => showAchievement(result.achievement), 800);
             }
         }
 
@@ -752,6 +932,22 @@
         }
 
         function showFinalPlan() {
+            // Record game completion for meta-progression
+            if (metaProgression && gameEngine) {
+                const summary = {
+                    won: true,
+                    finalUsers: gameEngine.metrics.users || 0,
+                    finalRevenue: gameEngine.metrics.revenue || 0,
+                    totalDecisions: gameEngine.history.length,
+                    excellentDecisions: gameEngine.decisionHistory ?
+                        gameEngine.decisionHistory.filter(d => d.quality === 'excellent').length : 0,
+                    maxCombo: comboSystem ? comboSystem.comboState.maxCombo : 0
+                };
+
+                const result = metaProgression.recordGameCompletion(summary);
+                console.log('Meta-progression updated:', result);
+            }
+
             const plan = gameEngine.generateFinalPlan();
             const screen = document.getElementById('final-screen');
 
@@ -776,6 +972,35 @@
                             `).join('')}
                         </div>
                     </div>
+
+                    ${metaProgression ? `
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 15px; margin-bottom: 30px; color: white;">
+                            <h3 style="margin-bottom: 20px;">🎮 游戏进度 Meta-Progression</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 0.9em; opacity: 0.9;">等级 Level</div>
+                                    <div style="font-size: 2.5em; font-weight: bold;">${metaProgression.playerProfile.level}</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 0.9em; opacity: 0.9;">总XP Total XP</div>
+                                    <div style="font-size: 2.5em; font-weight: bold;">${metaProgression.playerProfile.totalXP}</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 0.9em; opacity: 0.9;">游戏次数 Games</div>
+                                    <div style="font-size: 2.5em; font-weight: bold;">${metaProgression.playerProfile.gamesPlayed}</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px;">
+                                <div style="font-size: 0.9em; margin-bottom: 5px;">距离下一级 To Next Level:</div>
+                                <div style="background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;">
+                                    <div style="background: white; height: 20px; width: ${(metaProgression.playerProfile.totalXP / metaProgression.playerProfile.xpToNextLevel) * 100}%; transition: width 0.5s;"></div>
+                                </div>
+                                <div style="font-size: 0.85em; margin-top: 5px; opacity: 0.9;">
+                                    ${metaProgression.playerProfile.totalXP} / ${metaProgression.playerProfile.xpToNextLevel} XP
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
 
                     <div class="plan-section">
                         <h3>📋 你的完整增长计划 Your Complete Growth Plan</h3>
@@ -855,10 +1080,10 @@
             const metrics = gameEngine.getMetrics();
             const dashboard = document.getElementById('metrics-dashboard');
 
-            dashboard.innerHTML = metrics.map(metric => `
-                <div class="metric-card">
+            dashboard.innerHTML = metrics.map((metric, index) => `
+                <div class="metric-card" data-metric="${metric.key || 'metric-' + index}">
                     <div class="metric-label">${metric.label}</div>
-                    <div class="metric-value">${metric.value}</div>
+                    <div class="metric-value" data-value="${metric.rawValue || metric.value}">${metric.value}</div>
                     ${metric.change ? `
                         <div class="metric-change ${metric.change > 0 ? 'positive' : 'negative'}">
                             ${metric.change > 0 ? '↑' : '↓'} ${Math.abs(metric.change)}${metric.unit || ''}
@@ -866,6 +1091,41 @@
                     ` : ''}
                 </div>
             `).join('');
+
+            // 动画更新指标
+            animateMetricChanges(metrics);
+
+            // 更新指标脉冲状态
+            if (gameEngine.metrics) {
+                gameAnimations.updateMetricPulses(gameEngine.metrics);
+            }
+        }
+
+        function animateMetricChanges(metrics) {
+            metrics.forEach((metric, index) => {
+                const key = metric.key || 'metric-' + index;
+                const element = document.querySelector(`[data-metric="${key}"] .metric-value`);
+
+                if (element && previousMetrics[key] !== undefined) {
+                    const oldValue = previousMetrics[key];
+                    const newValue = parseFloat(metric.rawValue || metric.value.toString().replace(/[^0-9.-]/g, ''));
+
+                    if (oldValue !== newValue) {
+                        // 数字计数动画
+                        gameAnimations.countUp(element, oldValue, newValue, 1000, (val) => {
+                            return metric.formatter ? metric.formatter(val) : Math.floor(val).toLocaleString();
+                        });
+
+                        // 检查里程碑
+                        if (metric.key === 'users' || metric.key === 'revenue') {
+                            gameAnimations.checkMilestone(oldValue, newValue, metric.key);
+                        }
+                    }
+                }
+
+                // 保存当前值
+                previousMetrics[key] = parseFloat(metric.rawValue || metric.value.toString().replace(/[^0-9.-]/g, ''));
+            });
         }
 
         function switchScreen(screenId) {
@@ -874,15 +1134,15 @@
         }
 
         function showAchievement(achievement) {
-            document.getElementById('achievement-title').textContent = achievement.title;
-            document.getElementById('achievement-desc').textContent = achievement.description;
-            document.getElementById('overlay').classList.add('show');
-            document.getElementById('achievement-popup').classList.add('show');
+            // 使用新的动画系统
+            gameAnimations.showAchievement({
+                ...achievement,
+                rarity: achievement.rarity || 'rare'
+            });
         }
 
         function closeAchievement() {
-            document.getElementById('overlay').classList.remove('show');
-            document.getElementById('achievement-popup').classList.remove('show');
+            gameAnimations.closeAchievement();
         }
     </script>
 </body>

@@ -822,40 +822,58 @@ class GrowthGameEngine {
     getMetrics() {
         return [
             {
+                key: 'users',
                 label: '用户数 Users',
                 value: this.metrics.users.toLocaleString(),
+                rawValue: this.metrics.users,
                 change: this.history.length > 1 ? this.metrics.users - this.history[this.history.length - 2].users : 0,
-                unit: ''
+                unit: '',
+                formatter: (v) => Math.floor(v).toLocaleString()
             },
             {
+                key: 'revenue',
                 label: '月收入 MRR',
                 value: '$' + this.metrics.revenue.toLocaleString(),
+                rawValue: this.metrics.revenue,
                 change: this.history.length > 1 ? this.metrics.revenue - this.history[this.history.length - 2].revenue : 0,
-                unit: '$'
+                unit: '$',
+                formatter: (v) => '$' + Math.floor(v).toLocaleString()
             },
             {
+                key: 'budget',
                 label: '预算 Budget',
                 value: '$' + this.metrics.budget.toLocaleString(),
+                rawValue: this.metrics.budget,
                 change: this.history.length > 1 ? this.metrics.budget - this.history[this.history.length - 2].budget : 0,
-                unit: '$'
+                unit: '$',
+                formatter: (v) => '$' + Math.floor(v).toLocaleString()
             },
             {
+                key: 'retention7d',
                 label: '7日留存 Retention',
                 value: this.metrics.retention7d + '%',
+                rawValue: this.metrics.retention7d,
                 change: this.history.length > 1 ? this.metrics.retention7d - this.history[this.history.length - 2].retention7d : 0,
-                unit: '%'
+                unit: '%',
+                formatter: (v) => Math.floor(v) + '%'
             },
             {
+                key: 'activation',
                 label: '激活率 Activation',
                 value: this.metrics.activation + '%',
+                rawValue: this.metrics.activation,
                 change: this.history.length > 1 ? this.metrics.activation - this.history[this.history.length - 2].activation : 0,
-                unit: '%'
+                unit: '%',
+                formatter: (v) => Math.floor(v) + '%'
             },
             {
+                key: 'nps',
                 label: 'NPS',
                 value: this.metrics.nps,
+                rawValue: this.metrics.nps,
                 change: this.history.length > 1 ? this.metrics.nps - this.history[this.history.length - 2].nps : 0,
-                unit: ''
+                unit: '',
+                formatter: (v) => Math.floor(v)
             }
         ];
     }

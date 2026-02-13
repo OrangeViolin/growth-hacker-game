@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="output"></div>
+
+    <script src="ai-mentor-system.js"></script>
+    <script src="knowledge-base.js"></script>
+    <script src="mentor-dialogue-templates.js"></script>
+    <script src="challenge-system.js"></script>
+    <script src="difficulty-engine.js"></script>
+    <script src="validation-rules.js"></script>
+    <script src="growth-hacking-curriculum.js"></script>
+    <script src="real-case-studies.js"></script>
+    <script src="common-mistakes-db.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg) {
+            console.log(msg);
+            output.innerHTML += msg + '<br>';
+        }
+
+        try {
+            log('Starting initialization...');
+
+            log('Creating AIMentorSystem...');
+            const mentorSystem = new AIMentorSystem();
+            log('✅ AIMentorSystem created');
+
+            log('Creating ChallengeSystem...');
+            const challengeSystem = new ChallengeSystem();
+            log('✅ ChallengeSystem created');
+
+            log('Creating DifficultyEngine...');
+            const difficultyEngine = new DifficultyEngine();
+            log('✅ DifficultyEngine created');
+
+            log('Getting all challenges...');
+            const challenges = challengeSystem.getAllChallenges();
+            log(`✅ Found ${challenges.length} challenges`);
+
+            if (challenges.length > 0) {
+                log('First challenge ID: ' + challenges[0].id);
+                log('First challenge title: ' + challenges[0].title);
+
+                log('Getting first challenge by ID...');
+                const challenge = challengeSystem.getChallenge('calc_001_ltv_basic');
+                if (challenge) {
+                    log('✅ Challenge found: ' + challenge.title);
+                    log('Scenario length: ' + (challenge.scenario ? challenge.scenario.length : 'undefined'));
+                } else {
+                    log('❌ Challenge not found!');
+                }
+            }
+
+            log('All tests passed!');
+
+        } catch (error) {
+            log('❌ ERROR: ' + error.message);
+            log('Stack: ' + error.stack);
+        }
+    </script>
+</body>
+</html>

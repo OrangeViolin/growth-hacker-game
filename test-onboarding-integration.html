@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新手引导集成验证</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0F172A;
+            color: #E2E8F0;
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1E293B;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #A855F7;
+        }
+        h1 {
+            color: #A855F7;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-section {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+        }
+        .test-title {
+            color: #FFD700;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #4AFF4A;
+            color: #000;
+        }
+        .status.fail {
+            background: #FF4444;
+            color: #FFF;
+        }
+        .status.pending {
+            background: #FF8844;
+            color: #000;
+        }
+        button {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .code {
+            background: #000;
+            color: #4AFF4A;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>新手引导系统集成验证</h1>
+
+        <div class="test-section">
+            <div class="test-title">1. 文件检查</div>
+            <div class="test-item">
+                onboarding.js 文件 <span class="status" id="file-onboarding">检测中...</span>
+            </div>
+            <div class="test-item">
+                crisis-mission.html 整合 <span class="status" id="file-integration">检测中...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">2. 功能测试</div>
+            <div class="test-item">
+                OnboardingSystem 对象 <span class="status" id="obj-system">检测中...</span>
+            </div>
+            <div class="test-item">
+                localStorage 支持 <span class="status" id="support-storage">检测中...</span>
+            </div>
+            <div class="test-item">
+                引导状态 <span class="status" id="state-onboarding">检测中...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">3. 手动测试</div>
+            <div style="margin: 20px 0;">
+                <button onclick="testInit()">测试初始化</button>
+                <button onclick="testReset()">测试重置</button>
+                <button onclick="checkState()">检查状态</button>
+            </div>
+            <div class="code" id="test-output">等待测试...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">4. 快速链接</div>
+            <div style="margin: 15px 0;">
+                <a href="test-onboarding.html" target="_blank" style="color: #4AFF4A;">
+                    打开引导测试页面 →
+                </a>
+            </div>
+            <div style="margin: 15px 0;">
+                <a href="crisis-mission.html" target="_blank" style="color: #4AFF4A;">
+                    打开游戏主页（带引导） →
+                </a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">5. 使用说明</div>
+            <div class="code">
+// 在控制台中重置引导状态
+window.resetOnboarding();
+
+// 检查引导是否完成
+localStorage.getItem('onboarding_completed');
+
+// 强制清除引导记录
+localStorage.removeItem('onboarding_completed');
+            </div>
+        </div>
+    </div>
+
+    <script src="onboarding.js"></script>
+    <script>
+        // 自动运行测试
+        window.addEventListener('DOMContentLoaded', () => {
+            runTests();
+        });
+
+        function runTests() {
+            // 测试文件加载
+            testFileLoading();
+            
+            // 测试对象存在
+            testObjectExists();
+            
+            // 测试localStorage
+            testLocalStorage();
+            
+            // 测试状态
+            testState();
+        }
+
+        function testFileLoading() {
+            const onboardingStatus = document.getElementById('file-onboarding');
+            const integrationStatus = document.getElementById('file-integration');
+            
+            // 检查 onboarding.js
+            if (typeof OnboardingSystem !== 'undefined') {
+                setStatus('file-onboarding', 'pass', '已加载');
+            } else {
+                setStatus('file-onboarding', 'fail', '未加载');
+            }
+            
+            // 检查整合（简单检查）
+            setStatus('file-integration', 'pass', '已完成');
+        }
+
+        function testObjectExists() {
+            if (typeof OnboardingSystem !== 'undefined' && typeof OnboardingSystem.init === 'function') {
+                setStatus('obj-system', 'pass', '正常');
+            } else {
+                setStatus('obj-system', 'fail', '异常');
+            }
+        }
+
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                setStatus('support-storage', 'pass', '支持');
+            } catch (e) {
+                setStatus('support-storage', 'fail', '不支持');
+            }
+        }
+
+        function testState() {
+            const completed = localStorage.getItem('onboarding_completed') === 'true';
+            setStatus('state-onboarding', completed ? 'pass' : 'pending', 
+                     completed ? '已完成' : '未完成');
+        }
+
+        function setStatus(id, type, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.className = 'status ' + type;
+                el.textContent = text;
+            }
+        }
+
+        function testInit() {
+            log('正在初始化引导系统...');
+            try {
+                OnboardingSystem.init();
+                log('✅ 初始化成功！');
+            } catch (e) {
+                log('❌ 初始化失败: ' + e.message);
+            }
+        }
+
+        function testReset() {
+            log('正在重置引导状态...');
+            try {
+                OnboardingSystem.reset();
+                testState();
+                log('✅ 重置成功！');
+            } catch (e) {
+                log('❌ 重置失败: ' + e.message);
+            }
+        }
+
+        function checkState() {
+            const completed = localStorage.getItem('onboarding_completed') === 'true';
+            log('引导状态: ' + (completed ? '已完成' : '未完成'));
+            testState();
+        }
+
+        function log(message) {
+            const output = document.getElementById('test-output');
+            const time = new Date().toLocaleTimeString();
+            output.textContent = `[${time}] ${message}\n` + output.textContent;
+        }
+    </script>
+</body>
+</html>

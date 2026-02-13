@@ -424,10 +424,8 @@
         </div>
 
         <div class="nav-links">
-            <a href="index.html">学习模式 Learning Mode</a> |
-            <a href="custom-scenario.html">实战模式 Real-World Mode (当前)</a> |
-            <a href="game-mode.html">🎮 游戏模式 Game Mode</a> |
-            <a href="mentor-mode.html" style="color: #C9A961; font-weight: bold;">🎓 导师模式 Mentor Mode ⭐NEW</a>
+            <a href="index.html">← 学习模式 Learning Mode</a> |
+            <a href="custom-scenario.html">实战模式 Real-World Mode (当前)</a>
         </div>
 
         <div class="content">
@@ -713,94 +711,368 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-
         function generateStrategies(company, industry, stage, model, users, revenue, challenge, metrics, goal) {
-            // Use the intelligent Strategy Engine
-            const engine = new StrategyEngine({
-                company, industry, stage, model, users, revenue, challenge, metrics, goal
-            });
+            const challengeLower = challenge.toLowerCase();
+            const goalLower = goal.toLowerCase();
+            const strategies = [];
 
-            const strategies = engine.generateStrategies();
-            const recommendation = engine.generateRecommendation();
+            // Parse user numbers for context
+            const userCount = parseInt(users.replace(/[^0-9]/g, '')) || 0;
+            const isEarlyStage = stage === 'idea' || stage === 'mvp' || stage === 'early';
+            const isGrowthStage = stage === 'growth' || stage === 'scale';
+            const isMature = stage === 'mature';
+
+            // Analyze the core problem from challenge description
+            const problemAnalysis = {
+                acquisition: challengeLower.match(/sign up|visitor|traffic|conversion|landing|获取|注册|流量|转化/),
+                activation: challengeLower.match(/onboarding|setup|first.*use|complete|profile|激活|入门|设置|完成/),
+                retention: challengeLower.match(/retention|return|come back|churn|留存|回来|流失|活跃/),
+                revenue: challengeLower.match(/revenue|monetization|paying|subscription|purchase|变现|付费|购买|订阅/),
+                referral: challengeLower.match(/referral|viral|share|invite|推荐|病毒|分享|邀请/)
+            };
+
+            // Find primary problem area
+            let primaryProblem = Object.keys(problemAnalysis).find(key => problemAnalysis[key]);
+            if (!primaryProblem) primaryProblem = 'general';
+
+            // Analyze which AARRR stage is the focus
+            if (challengeLower.includes('sign up') || challengeLower.includes('visitor') || challengeLower.includes('traffic') || challengeLower.includes('获取') || challengeLower.includes('注册')) {
+                strategies.push({
+                    title: '优化获取渠道 Optimize Acquisition Channels',
+                    framework: 'Acquisition',
+                    description: '专注于找到更有效的用户获取渠道，降低CAC，提高转化率。Focus on finding more effective user acquisition channels, lower CAC, improve conversion.',
+                    tactics: [
+                        '进行渠道测试，对比不同渠道的CAC和质量 Test multiple channels, compare CAC and quality',
+                        '优化着陆页，A/B测试标题和CTA Optimize landing pages, A/B test headlines and CTAs',
+                        '如果是B2B，考虑内容营销+SEO策略 For B2B, consider content marketing + SEO',
+                        '如果是C端，测试社交媒体+KOL合作 For consumer, test social media + influencer partnerships'
+                    ],
+                    pros: [
+                        '直接增加流量和潜在用户 Directly increases traffic and potential users',
+                        '可以快速测试和验证 Can test and validate quickly',
+                        'A/B测试提供数据驱动的决策 A/B testing provides data-driven decisions'
+                    ],
+                    cons: [
+                        '如果产品本身有问题，获取更多用户反而浪费钱 If product has issues, acquiring more users wastes money',
+                        '需要持续投入预算 Requires continuous budget',
+                        'CAC可能随竞争增加 CAC may increase with competition'
+                    ]
+                });
+
+                strategies.push({
+                    title: '程序化SEO Programmatic SEO',
+                    framework: 'Acquisition',
+                    description: '如果你的业务适合本地化或长尾关键词，创建大量针对性着陆页。If your business suits local or long-tail keywords, create many targeted landing pages.',
+                    tactics: [
+                        '识别长尾关键词机会 Identify long-tail keyword opportunities',
+                        '创建模板化的着陆页系统 Create templated landing page system',
+                        '针对不同城市/用例/细分市场生成页面 Generate pages for different cities/use cases/segments',
+                        '参考：Yelp, TripAdvisor, Zillow的策略 Reference: Yelp, TripAdvisor, Zillow strategies'
+                    ],
+                    pros: [
+                        '低成本，高扩展性 Low cost, high scalability',
+                        '长期有机流量 Long-term organic traffic',
+                        '适合本地服务、市场平台 Great for local services, marketplaces'
+                    ],
+                    cons: [
+                        '需要3-6个月才能看到效果 Takes 3-6 months to see results',
+                        '需要技术支持 Requires technical support',
+                        '不适合所有行业 Not suitable for all industries'
+                    ]
+                });
+            }
+
+            if (challengeLower.includes('activation') || challengeLower.includes('onboarding') || challengeLower.includes('setup') || challengeLower.includes('激活') || challengeLower.includes('入门')) {
+                strategies.push({
+                    title: '简化入门流程 Simplify Onboarding',
+                    framework: 'Activation',
+                    description: '减少用户首次使用的摩擦，让他们快速体验到产品核心价值。Reduce friction in first use, let users quickly experience core value.',
+                    tactics: [
+                        '将入门步骤减少到最少（建议不超过3步）Reduce onboarding to minimum steps (recommend ≤3)',
+                        '添加进度条显示完成度 Add progress bar to show completion',
+                        '提供默认选项和示例数据 Provide default options and sample data',
+                        '在关键步骤添加微引导和提示 Add micro-guides and tooltips at key steps',
+                        '延迟非必要信息收集 Delay non-essential data collection'
+                    ],
+                    pros: [
+                        '直接提升激活率 Directly improves activation rate',
+                        '减少流失，提高转化 Reduces abandonment, increases conversion',
+                        '改善用户第一印象 Improves first impression'
+                    ],
+                    cons: [
+                        '可能需要重新设计流程 May require redesigning flows',
+                        '需要平衡信息收集需求 Need to balance data collection needs',
+                        '过度简化可能损失重要信息 Over-simplification may lose important info'
+                    ]
+                });
+
+                strategies.push({
+                    title: '设计"啊哈时刻" Design "Aha Moment"',
+                    framework: 'Activation',
+                    description: '确保用户在首次使用时立即看到价值。Ensure users immediately see value on first use.',
+                    tactics: [
+                        '识别你的产品的"啊哈时刻"是什么 Identify your product\'s "aha moment"',
+                        '尽快引导用户到达这个时刻 Guide users to reach this moment ASAP',
+                        '例如：Facebook的"7天内加10个好友" Example: Facebook\'s "10 friends in 7 days"',
+                        '例如：Dropbox的"在设备间同步第一个文件" Example: Dropbox\'s "sync first file across devices"',
+                        '使用示例数据或预填充内容 Use sample data or pre-populated content'
+                    ],
+                    pros: [
+                        '用户立即理解产品价值 Users immediately understand value',
+                        '提高留存和参与 Improves retention and engagement',
+                        '创造情感连接 Creates emotional connection'
+                    ],
+                    cons: [
+                        '需要深入理解用户旅程 Requires deep understanding of user journey',
+                        '可能需要产品重构 May need product restructuring',
+                        '不同用户群体的啊哈时刻可能不同 Different segments may have different aha moments'
+                    ]
+                });
+            }
+
+            if (challengeLower.includes('retention') || challengeLower.includes('churn') || challengeLower.includes('engagement') || challengeLower.includes('return') || challengeLower.includes('留存') || challengeLower.includes('流失') || challengeLower.includes('回来')) {
+                strategies.push({
+                    title: '建立习惯循环 Build Habit Loops',
+                    framework: 'Retention',
+                    description: '通过游戏化、提醒系统和奖励机制，让用户养成使用习惯。Use gamification, notifications, and rewards to build user habits.',
+                    tactics: [
+                        '实施连续打卡系统（Streak） Implement streak system',
+                        '每日挑战和任务 Daily challenges and tasks',
+                        '进度可视化 Progress visualization',
+                        '在最佳时间发送1条个性化通知（不要spam）Send 1 personalized notification at optimal time (no spam)',
+                        '参考：Duolingo, Headspace的策略 Reference: Duolingo, Headspace strategies'
+                    ],
+                    pros: [
+                        '显著提升日活和留存 Significantly improves DAU and retention',
+                        '创造心理承诺 Creates psychological commitment',
+                        '增加产品粘性 Increases product stickiness'
+                    ],
+                    cons: [
+                        '可能让产品感觉"操纵性"如果过度 Can feel manipulative if overdone',
+                        '需要持续内容更新 Requires continuous content updates',
+                        '不适合所有产品类型 Not suitable for all product types'
+                    ]
+                });
+
+                strategies.push({
+                    title: '个性化和细分 Personalization & Segmentation',
+                    framework: 'Retention',
+                    description: '基于用户行为和特征提供个性化体验，提高相关性。Provide personalized experience based on user behavior and characteristics.',
+                    tactics: [
+                        '细分用户群体（按行为、偏好、阶段）Segment users (by behavior, preferences, stage)',
+                        '个性化内容推荐 Personalized content recommendations',
+                        '个性化邮件和通知 Personalized emails and notifications',
+                        '针对不活跃用户的重新激活活动 Re-engagement campaigns for inactive users',
+                        '在用户流失前7天主动干预 Proactively intervene 7 days before churn'
+                    ],
+                    pros: [
+                        '大幅提升打开率和参与度 Dramatically improves open rates and engagement',
+                        '减少流失 Reduces churn',
+                        '用户感觉被理解 Users feel understood'
+                    ],
+                    cons: [
+                        '需要数据和技术支持 Requires data and technical support',
+                        '需要足够的用户基数 Needs sufficient user base',
+                        '隐私考虑 Privacy considerations'
+                    ]
+                });
+
+                strategies.push({
+                    title: '社区和网络效应 Community & Network Effects',
+                    framework: 'Retention',
+                    description: '产品随着更多用户加入变得更有价值。Product becomes more valuable as more users join.',
+                    tactics: [
+                        '构建用户社区（论坛、群组）Build user community (forums, groups)',
+                        '协作功能（多人使用更好）Collaborative features (better with multiple users)',
+                        '用户生成内容 User-generated content',
+                        '排行榜和社交证明 Leaderboards and social proof',
+                        '让用户相互连接 Connect users with each other'
+                    ],
+                    pros: [
+                        '创造强大的护城河 Creates strong moat',
+                        '用户离开成本增加 Switching costs increase',
+                        '有机增长机会 Organic growth opportunities'
+                    ],
+                    cons: [
+                        '需要达到临界质量才有效 Needs critical mass to be effective',
+                        '社区管理需要资源 Community management requires resources',
+                        '负面内容风险 Risk of negative content'
+                    ]
+                });
+            }
+
+            if (challengeLower.includes('revenue') || challengeLower.includes('monetization') || challengeLower.includes('conversion') || challengeLower.includes('paying') || challengeLower.includes('变现') || challengeLower.includes('付费') || challengeLower.includes('转化')) {
+                strategies.push({
+                    title: '情境化销售 Contextual Upselling',
+                    framework: 'Revenue',
+                    description: '在用户最需要的时刻提供升级选项。Offer upgrade options at the moment of highest need.',
+                    tactics: [
+                        '当用户触达免费版限制时弹出升级 Trigger upgrade when hitting free tier limits',
+                        '展示升级后的具体价值 Show specific value after upgrade',
+                        '提供短期折扣促成决策 Offer limited-time discount to prompt decision',
+                        '使用"只需XX元解锁"而非"升级到专业版" Use "Unlock for only $XX" instead of "Upgrade to Pro"',
+                        '参考：Dropbox, Notion的策略 Reference: Dropbox, Notion strategies'
+                    ],
+                    pros: [
+                        '在高意愿时转化 Converts at high-intent moments',
+                        '不打扰未准备好的用户 Doesn\'t bother users not ready',
+                        '提高转化率 Improves conversion rate'
+                    ],
+                    cons: [
+                        '可能让免费用户感觉受限 May frustrate free users',
+                        '需要精心设计限制点 Requires carefully designed limit points',
+                        '过度推销会损害品牌 Overselling damages brand'
+                    ]
+                });
+
+                strategies.push({
+                    title: '价值阶梯定价 Value-Based Pricing Tiers',
+                    framework: 'Revenue',
+                    description: '设计多个价格档位，让不同用户找到合适选项。Design multiple pricing tiers for different user segments.',
+                    tactics: [
+                        '3-4个明确差异化的价格档 3-4 clearly differentiated price tiers',
+                        '突出"最受欢迎"档位引导选择 Highlight "most popular" tier to guide choice',
+                        '使用锚定效应（高价档让中档显得合理）Use anchoring (high tier makes mid-tier seem reasonable)',
+                        '基于使用量/座位数/功能的清晰区分 Clear differentiation by usage/seats/features',
+                        '提供年付折扣提高LTV Offer annual discount to increase LTV'
+                    ],
+                    pros: [
+                        '捕获不同支付意愿 Captures different willingness to pay',
+                        '增加总收入 Increases total revenue',
+                        '引导用户到目标价位 Guides users to target price point'
+                    ],
+                    cons: [
+                        '太多选项导致决策瘫痪 Too many options cause decision paralysis',
+                        '需要清晰的价值区分 Needs clear value differentiation',
+                        '价格太复杂会让人困惑 Overly complex pricing confuses'
+                    ]
+                });
+            }
+
+            if (challengeLower.includes('referral') || challengeLower.includes('viral') || challengeLower.includes('share') || challengeLower.includes('invite') || challengeLower.includes('推荐') || challengeLower.includes('病毒') || challengeLower.includes('分享')) {
+                strategies.push({
+                    title: '产品驱动的病毒性 Product-Driven Virality',
+                    framework: 'Referral',
+                    description: '将邀请机制内置到产品核心功能中。Build invitation mechanism into core product features.',
+                    tactics: [
+                        '产品在多人使用时更好（协作、分享）Product is better with multiple users (collaboration, sharing)',
+                        '例如：Figma的协作、Loom的视频分享 Example: Figma collaboration, Loom video sharing',
+                        '每次使用自然产生曝光机会 Each use naturally creates exposure',
+                        '水印/署名（如果不损害用户体验）Watermark/attribution (if doesn\'t hurt UX)',
+                        '邀请是功能而非附加 Invitation is a feature, not add-on'
+                    ],
+                    pros: [
+                        '最可持续的病毒增长 Most sustainable viral growth',
+                        '不依赖激励 Doesn\'t rely on incentives',
+                        '用户自然分享 Users share naturally'
+                    ],
+                    cons: [
+                        '需要产品重新设计 Requires product redesign',
+                        '不是所有产品都适合 Not all products are suitable',
+                        '需要达到质量阈值 Needs to reach quality threshold'
+                    ]
+                });
+
+                strategies.push({
+                    title: '双边激励推荐 Two-Sided Incentive Referral',
+                    framework: 'Referral',
+                    description: '给推荐人和被推荐人都提供奖励。Reward both referrer and referee.',
+                    tactics: [
+                        '双方都获得价值（如Dropbox的额外空间）Both sides get value (like Dropbox extra space)',
+                        '或者折扣/积分（如Uber的乘车券）Or discounts/credits (like Uber ride credits)',
+                        '确保奖励符合产品价值 Ensure rewards align with product value',
+                        '降低推荐门槛（一键分享）Lower referral barriers (one-click sharing)',
+                        '追踪和优化推荐转化率 Track and optimize referral conversion'
+                    ],
+                    pros: [
+                        '快速扩大用户基数 Rapidly expands user base',
+                        '降低CAC Lowers CAC',
+                        '推荐用户质量通常更高 Referred users usually higher quality'
+                    ],
+                    cons: [
+                        '成本可能很高 Can be expensive',
+                        '可能吸引"羊毛党" May attract reward seekers',
+                        '需要持续优化防止滥用 Needs continuous optimization to prevent abuse'
+                    ]
+                });
+            }
+
+            // If no specific strategies matched, provide general ones
+            if (strategies.length === 0) {
+                strategies.push({
+                    title: '数据驱动的实验文化 Data-Driven Experimentation',
+                    framework: 'All AARRR',
+                    description: '建立快速测试和学习的文化。Build a culture of rapid testing and learning.',
+                    tactics: [
+                        '每周运行2-3个A/B测试 Run 2-3 A/B tests per week',
+                        '设定清晰的成功指标 Set clear success metrics',
+                        '快速失败，快速学习 Fail fast, learn fast',
+                        '记录所有实验结果 Document all experiment results',
+                        '基于数据做决策，不是直觉 Make decisions based on data, not gut'
+                    ],
+                    pros: [
+                        '持续改进 Continuous improvement',
+                        '降低决策风险 Reduces decision risk',
+                        '发现意外机会 Discovers unexpected opportunities'
+                    ],
+                    cons: [
+                        '需要足够的流量 Requires sufficient traffic',
+                        '可能导致短视 Can lead to short-term thinking',
+                        '需要分析能力 Requires analytical capabilities'
+                    ]
+                });
+            }
 
             // Render strategies
             const container = document.getElementById('strategies-container');
             container.innerHTML = strategies.map(s => `
                 <div class="strategy-card">
-                    <div class="strategy-framework">${s.framework}${s.priority === 'high' ? ' - 高优先级 High Priority' : ''}</div>
+                    <div class="strategy-framework">${s.framework}</div>
                     <div class="strategy-title">${s.title}</div>
                     <div class="strategy-desc">${s.description}</div>
                     ${s.tactics ? `
                         <div style="margin: 15px 0;">
-                            <strong>📋 具体策略 Tactics:</strong>
+                            <strong>具体策略 Tactics:</strong>
                             <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
                                 ${s.tactics.map(t => `<li>${t}</li>`).join('')}
                             </ul>
                         </div>
                     ` : ''}
-                    ${s.expectedResults ? `
-                        <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin: 15px 0;">
-                            <strong>📊 预期效果 Expected Results:</strong><br>
-                            ${s.expectedResults}
-                        </div>
-                    ` : ''}
                     <div class="pros-cons">
                         <div class="pros">
-                            <h4>✅ 优势 Pros</h4>
+                            <h4>优势 Pros</h4>
                             <ul>
                                 ${s.pros.map(p => `<li>${p}</li>`).join('')}
                             </ul>
                         </div>
                         <div class="cons">
-                            <h4>⚠️ 注意事项 Cons/Considerations</h4>
+                            <h4>注意事项 Cons/Considerations</h4>
                             <ul>
                                 ${s.cons.map(c => `<li>${c}</li>`).join('')}
                             </ul>
                         </div>
                     </div>
-                    ${s.timeframe || s.budget ? `
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 0.9em;">
-                            ${s.timeframe ? `<div><strong>⏱️ 时间周期:</strong> ${s.timeframe}</div>` : ''}
-                            ${s.budget ? `<div><strong>💰 预算估算:</strong> ${s.budget}</div>` : ''}
-                        </div>
-                    ` : ''}
                 </div>
             `).join('');
 
-            // Show personalized recommendation
-            const recommendationEl = document.getElementById('recommendation');
-            recommendationEl.innerHTML = `
-                <h3>💡 个性化建议 Personalized Recommendation</h3>
-                <p style="line-height: 1.8; margin-bottom: 15px;">
-                    ${recommendation.reasoning}
+            // Add recommendation
+            const recommendation = document.getElementById('recommendation');
+            recommendation.innerHTML = `
+                <h3>💡 建议 Recommendation</h3>
+                <p style="line-height: 1.8;">
+                    基于你的场景，我建议从 <strong>${strategies[0].title}</strong> 开始。这个策略最直接地解决你提到的挑战。<br><br>
+                    Based on your scenario, I recommend starting with <strong>${strategies[0].title}</strong>. This strategy most directly addresses your stated challenge.<br><br>
+                    <strong>实施步骤 Implementation Steps:</strong><br>
+                    1. 设定2-4周的测试周期 Set a 2-4 week test period<br>
+                    2. 定义成功指标（如留存率提升5%）Define success metrics (e.g., 5% retention increase)<br>
+                    3. 小规模测试（10-20%用户）Small-scale test (10-20% of users)<br>
+                    4. 收集数据并分析 Collect data and analyze<br>
+                    5. 如果有效则扩大；如果无效则尝试下一个策略 If effective, scale; if not, try next strategy<br><br>
+                    <em>记住：没有绝对的正确答案，关键是测试、学习、迭代。Remember: No absolute right answer - the key is test, learn, iterate.</em>
                 </p>
-                
-                ${recommendation.contextualAdvice && recommendation.contextualAdvice.length > 0 ? `
-                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 15px 0;">
-                        ${recommendation.contextualAdvice.map(advice => `<div style="margin: 8px 0;">${advice}</div>`).join('')}
-                    </div>
-                ` : ''}
-                
-                <div style="margin-top: 20px;">
-                    <strong>🚀 实施步骤 Implementation Steps:</strong>
-                    <ol style="margin-top: 10px; margin-left: 20px; line-height: 2;">
-                        ${recommendation.implementationSteps.map(step => `<li>${step}</li>`).join('')}
-                    </ol>
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <strong>📝 下一步行动 Next Steps:</strong>
-                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 2; list-style: none;">
-                        ${recommendation.nextSteps.map(step => `<li>${step}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 8px; font-style: italic;">
-                    💭 记住：这些策略没有绝对的对错。关键是选择一个开始尝试，快速测试，基于数据学习和调整。增长是一个持续实验和优化的过程。<br><br>
-                    Remember: These strategies have no absolute right or wrong. The key is choosing one to start with, testing quickly, and learning/adjusting based on data. Growth is a continuous process of experimentation and optimization.
-                </div>
             `;
         }
+
         function generateAIPrompt(company, industry, stage, model, users, revenue, challenge, metrics, goal) {
             const prompt = `我需要针对我的业务场景设计增长策略。请帮我分析并提供3-5个可执行的增长策略建议。
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation System Test</title>
+    <link rel="stylesheet" href="ui-effects.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status { display: inline-block; margin-left: 10px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        button { margin: 5px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Animation System Test Suite</h1>
+
+    <div class="test-section">
+        <h2>1. File Loading Tests</h2>
+        <div id="file-tests"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Core Functions Tests</h2>
+        <div id="function-tests"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Animation Tests</h2>
+        <button onclick="testCountUp()">Test CountUp</button>
+        <button onclick="testMilestone()">Test Milestone</button>
+        <button onclick="testAchievement()">Test Achievement</button>
+        <button onclick="testToast()">Test Toast</button>
+        <div style="margin-top: 20px;">
+            <div class="metric-card" style="width: 200px; padding: 20px; text-align: center;">
+                <div class="metric-label">Test Metric</div>
+                <div class="metric-value" id="test-value">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="animations.js"></script>
+    <script>
+        // File loading tests
+        const fileTests = document.getElementById('file-tests');
+        
+        function testFile(name, condition) {
+            const status = condition ? 
+                '<span class="status pass">✅ PASS</span>' : 
+                '<span class="status fail">❌ FAIL</span>';
+            fileTests.innerHTML += `<div>${name}: ${status}</div>`;
+        }
+
+        testFile('animations.js loaded', typeof gameAnimations !== 'undefined');
+        testFile('GameAnimations class exists', typeof GameAnimations === 'function');
+        testFile('Global instance created', gameAnimations instanceof GameAnimations);
+        testFile('CSS loaded', getComputedStyle(document.body).fontFamily !== '');
+
+        // Function tests
+        const funcTests = document.getElementById('function-tests');
+        
+        function testFunc(name, func) {
+            const exists = typeof gameAnimations[func] === 'function';
+            const status = exists ? 
+                '<span class="status pass">✅ PASS</span>' : 
+                '<span class="status fail">❌ FAIL</span>';
+            funcTests.innerHTML += `<div>${name}: ${status}</div>`;
+        }
+
+        testFunc('countUp', 'countUp');
+        testFunc('checkMilestone', 'checkMilestone');
+        testFunc('showAchievement', 'showAchievement');
+        testFunc('flipCard', 'flipCard');
+        testFunc('highlightCard', 'highlightCard');
+        testFunc('screenShake', 'screenShake');
+        testFunc('showToast', 'showToast');
+        testFunc('initOfficeScene', 'initOfficeScene');
+        testFunc('updateOfficeLevel', 'updateOfficeLevel');
+        testFunc('confettiExplosion', 'confettiExplosion');
+
+        // Animation tests
+        function testCountUp() {
+            const el = document.getElementById('test-value');
+            gameAnimations.countUp(el, 0, 1000, 1500);
+        }
+
+        function testMilestone() {
+            gameAnimations.triggerMilestoneAnimation(10000, 'users');
+        }
+
+        function testAchievement() {
+            gameAnimations.showAchievement({
+                title: 'Test Achievement',
+                description: 'This is a test achievement',
+                icon: '🎉',
+                rarity: 'rare'
+            });
+        }
+
+        function testToast() {
+            gameAnimations.showToast('Test message!', 'success');
+        }
+
+        console.log('✅ All tests completed. Check results above.');
+    </script>
+</body>
+</html>

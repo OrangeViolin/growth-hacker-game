@@ -38,17 +38,20 @@ class GrowthGameEngineV2 {
 
         const settings = this.difficultySettings[this.difficulty];
 
-        // Initialize resources
+        // Initialize resources - Multi-resource management system
         this.metrics = {
             users: config.initialUsers || this.generateInitialUsers(),
             revenue: config.initialRevenue || 0,
             budget: settings.budget,
-            teamEnergy: 100, // Team morale and energy
+            teamEnergy: 100, // Team morale and energy (0-100)
             retention7d: 25,
             activation: 30,
             viralCoefficient: 0.3,
             nps: 20,
-            marketShare: 5 // percentage
+            marketShare: 5, // percentage
+            marketTiming: 100, // Market opportunity window (0-100, decreases over time)
+            userTrust: 50, // User trust score (0-100, affects conversion)
+            brandReputation: 50 // Brand reputation (0-100, affects virality)
         };
 
         this.aiAdvisorUses = settings.aiAdvisorUses;
@@ -59,6 +62,21 @@ class GrowthGameEngineV2 {
         this.achievements = [];
         this.decisions = [];
         this.randomEvents = [];
+
+        // Decision dependency chain system
+        this.decisionHistory = []; // Track all decisions with outcomes
+        this.unlockedOptions = new Set(); // Options unlocked by previous decisions
+        this.lockedOptions = new Set(); // Options locked by previous decisions
+        this.decisionChain = {}; // Map level -> decisions -> impact on future levels
+
+        // Combo system tracking
+        this.comboState = {
+            currentCombo: 0, // Current combo count
+            maxCombo: 0, // Highest combo achieved
+            onFire: false, // Special state when 3+ high-quality decisions
+            lastDecisionQuality: null, // 'poor', 'good', 'excellent'
+            activeSkillSynergies: new Set() // Currently active skill combinations
+        };
 
         // Track history
         this.history = [{ ...this.metrics }];
@@ -86,6 +104,210 @@ class GrowthGameEngineV2 {
         if (this.difficulty === 'easy') return Math.floor(Math.random() * 5000) + 5000; // 5K-10K
         if (this.difficulty === 'medium') return Math.floor(Math.random() * 3000) + 2000; // 2K-5K
         return Math.floor(Math.random() * 1000) + 500; // 500-1500
+    }
+
+    // Multi-resource management system
+    updateResources(changes) {
+        // Update all resources with bounds checking
+        if (changes.budget !== undefined) {
+            this.metrics.budget = Math.max(0, this.metrics.budget + changes.budget);
+        }
+        if (changes.teamEnergy !== undefined) {
+            this.metrics.teamEnergy = Math.max(0, Math.min(100, this.metrics.teamEnergy + changes.teamEnergy));
+        }
+        if (changes.marketTiming !== undefined) {
+            this.metrics.marketTiming = Math.max(0, Math.min(100, this.metrics.marketTiming + changes.marketTiming));
+        }
+        if (changes.userTrust !== undefined) {
+            this.metrics.userTrust = Math.max(0, Math.min(100, this.metrics.userTrust + changes.userTrust));
+        }
+        if (changes.brandReputation !== undefined) {
+            this.metrics.brandReputation = Math.max(0, Math.min(100, this.metrics.brandReputation + changes.brandReputation));
+        }
+
+        // Market timing decreases naturally each week
+        if (changes.weeks) {
+            this.metrics.marketTiming = Math.max(0, this.metrics.marketTiming - (changes.weeks * 2));
+        }
+
+        return this.metrics;
+    }
+
+    checkResourceConstraints(requirements) {
+        // Check if player has enough resources for an action
+        const constraints = [];
+
+        if (requirements.budget && this.metrics.budget < requirements.budget) {
+            constraints.push({
+                resource: 'budget',
+                required: requirements.budget,
+                available: this.metrics.budget,
+                message: `需要预算 $${requirements.budget}，但只有 $${this.metrics.budget}`
+            });
+        }
+
+        if (requirements.teamEnergy && this.metrics.teamEnergy < requirements.teamEnergy) {
+            constraints.push({
+                resource: 'teamEnergy',
+                required: requirements.teamEnergy,
+                available: this.metrics.teamEnergy,
+                message: `需要团队精力 ${requirements.teamEnergy}%，但只有 ${this.metrics.teamEnergy}%`
+            });
+        }
+
+        if (requirements.marketTiming && this.metrics.marketTiming < requirements.marketTiming) {
+            constraints.push({
+                resource: 'marketTiming',
+                required: requirements.marketTiming,
+                available: this.metrics.marketTiming,
+                message: `市场时机窗口不足 (需要 ${requirements.marketTiming}%，当前 ${this.metrics.marketTiming}%)`
+            });
+        }
+
+        if (requirements.userTrust && this.metrics.userTrust < requirements.userTrust) {
+            constraints.push({
+                resource: 'userTrust',
+                required: requirements.userTrust,
+                available: this.metrics.userTrust,
+                message: `用户信任度不足 (需要 ${requirements.userTrust}%，当前 ${this.metrics.userTrust}%)`
+            });
+        }
+
+        return {
+            canProceed: constraints.length === 0,
+            constraints: constraints
+        };
+    }
+
+    // Decision dependency chain system
+    recordDecision(level, skill, choices, outcome) {
+        const decision = {
+            id: `L${level}-${skill.name}-${Date.now()}`,
+            level: level,
+            skill: skill.name,
+            skillAARRR: skill.aarrr,
+            choices: choices,
+            outcome: outcome,
+            quality: this.evaluateDecisionQuality(outcome),
+            week: this.currentWeek,
+            timestamp: Date.now()
+        };
+
+        this.decisionHistory.push(decision);
+
+        // Check if this decision unlocks or locks future options
+        this.processDecisionImpact(decision);
+
+        return decision;
+    }
+
+    evaluateDecisionQuality(outcome) {
+        // Evaluate based on multiple factors
+        let score = 0;
+
+        if (outcome.userChange > 0) score += 2;
+        if (outcome.revenueChange > 0) score += 2;
+        if (outcome.userChange > this.metrics.users * 0.1) score += 2; // 10%+ growth
+        if (outcome.effectiveness && outcome.effectiveness > 1.2) score += 2;
+        if (outcome.teamEnergyChange && outcome.teamEnergyChange > -10) score += 1;
+        if (outcome.costEfficiency && outcome.costEfficiency > 1.0) score += 1;
+
+        if (score >= 7) return 'excellent';
+        if (score >= 4) return 'good';
+        return 'poor';
+    }
+
+    processDecisionImpact(decision) {
+        // Define decision dependency rules
+        const impactRules = {
+            // Level 1 decisions affect Level 3
+            'L1-Product Hunt发布': {
+                ifQuality: 'excellent',
+                then: {
+                    unlocks: ['L3-社区驱动增长', 'L3-用户生成内容UGC'],
+                    bonus: { brandReputation: 10, userTrust: 5 }
+                }
+            },
+            'L1-内容营销+SEO': {
+                ifQuality: 'excellent',
+                then: {
+                    unlocks: ['L3-SEO内容矩阵', 'L5-内容病毒传播'],
+                    bonus: { brandReputation: 15 }
+                }
+            },
+            'L1-社交媒体广告': {
+                ifQuality: 'poor',
+                then: {
+                    locks: ['L4-品牌溢价策略'],
+                    penalty: { userTrust: -5, brandReputation: -5 }
+                }
+            },
+            // Level 2 decisions affect later levels
+            'L2-优化注册流程': {
+                ifQuality: 'excellent',
+                then: {
+                    unlocks: ['L4-增值服务套餐'],
+                    bonus: { userTrust: 10 }
+                }
+            },
+            'L2-打卡系统+游戏化': {
+                ifQuality: 'excellent',
+                then: {
+                    unlocks: ['L5-游戏化推荐系统'],
+                    bonus: { userTrust: 5 }
+                }
+            }
+        };
+
+        const ruleKey = `L${decision.level}-${decision.skill}`;
+        const rule = impactRules[ruleKey];
+
+        if (rule && rule.ifQuality === decision.quality) {
+            // Apply unlocks
+            if (rule.then.unlocks) {
+                rule.then.unlocks.forEach(opt => this.unlockedOptions.add(opt));
+            }
+
+            // Apply locks
+            if (rule.then.locks) {
+                rule.then.locks.forEach(opt => this.lockedOptions.add(opt));
+            }
+
+            // Apply bonuses or penalties
+            if (rule.then.bonus) {
+                this.updateResources(rule.then.bonus);
+            }
+            if (rule.then.penalty) {
+                this.updateResources(rule.then.penalty);
+            }
+        }
+    }
+
+    getAvailableSkills(level) {
+        // Filter skills based on unlock/lock status
+        const levelData = this.levels[level - 1];
+        if (!levelData) return [];
+
+        return levelData.skills.filter(skill => {
+            const skillKey = `L${level}-${skill.name}`;
+
+            // Check if locked
+            if (this.lockedOptions.has(skillKey)) {
+                return false;
+            }
+
+            // Some skills require unlocking
+            if (skill.requiresUnlock && !this.unlockedOptions.has(skillKey)) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    isOptionUnlocked(levelNumber, optionName) {
+        const key = `L${levelNumber}-${optionName}`;
+        return !this.lockedOptions.has(key);
     }
 
     // Get current level with decisions
@@ -456,8 +678,8 @@ class GrowthGameEngineV2 {
         return decisions;
     }
 
-    // Execute skill with user's decision path
-    executeSkillWithDecisions(skillIndex, decisionChoices) {
+    // Execute skill with user's decision path (Enhanced with combo and resource system)
+    executeSkillWithDecisions(skillIndex, decisionChoices, comboSystem = null) {
         const level = this.getCurrentLevel();
         const skill = level.skills[skillIndex];
 
@@ -495,19 +717,17 @@ class GrowthGameEngineV2 {
             }
         });
 
-        // Check if enough budget
-        if (this.metrics.budget < totalCost) {
-            return {
-                success: false,
-                feedback: `预算不足！需要 $${totalCost}，但只有 $${this.metrics.budget}。Insufficient budget! Need $${totalCost} but only have $${this.metrics.budget}.`
-            };
-        }
+        // Check resource constraints
+        const resourceCheck = this.checkResourceConstraints({
+            budget: totalCost,
+            teamEnergy: teamEnergyChange < -20 ? 30 : 20
+        });
 
-        // Check team energy
-        if (this.metrics.teamEnergy < 20 && teamEnergyChange < 0) {
+        if (!resourceCheck.canProceed) {
             return {
                 success: false,
-                feedback: '团队精力不足，需要休息！考虑选择压力较小的策略。Team exhausted! Consider less stressful strategies.',
+                feedback: resourceCheck.constraints.map(c => c.message).join('\n'),
+                constraints: resourceCheck.constraints,
                 warning: true
             };
         }
@@ -515,15 +735,62 @@ class GrowthGameEngineV2 {
         // Random event check (based on difficulty)
         const randomEvent = this.triggerRandomEvent(riskLevel);
 
-        // Calculate results
+        // Calculate base results
         const baseUserGrowth = this.calculateUserGrowth(skill, totalEffectiveness);
-        const result = this.calculateFinalResults(skill, totalEffectiveness, randomEvent, additionalEffects);
+        let result = this.calculateFinalResults(skill, totalEffectiveness, randomEvent, additionalEffects);
 
-        // Apply changes
+        // Apply resource multipliers (new feature)
+        result = this.applyResourceMultipliers(result);
+
+        // Check for synergies and combos
+        let activeSynergies = [];
+        let comboBonus = null;
+
+        if (comboSystem) {
+            // Get recent skills for synergy check
+            const recentSkills = this.skillsUsed.slice(-5);
+
+            // Check synergies
+            activeSynergies = comboSystem.checkSynergies(recentSkills);
+
+            if (activeSynergies.length > 0) {
+                result = comboSystem.applySynergyBonus(result, activeSynergies);
+            }
+
+            // Update combo state
+            const decisionQuality = this.evaluateDecisionQuality(result);
+            comboSystem.updateComboState(decisionQuality);
+
+            // Check for On Fire bonus
+            if (comboSystem.game.comboState.onFire) {
+                comboBonus = comboSystem.getOnFireBonus();
+                if (comboBonus) {
+                    result.userChange = Math.floor(result.userChange * comboBonus.multiplier);
+                    result.revenueChange = Math.floor(result.revenueChange * comboBonus.multiplier);
+                }
+            }
+        }
+
+        // Apply changes to metrics
+        const resourceChanges = {
+            budget: -totalCost,
+            teamEnergy: teamEnergyChange,
+            weeks: totalWeeks
+        };
+
+        // Apply synergy bonuses to resources
+        if (result.synergyBonuses) {
+            Object.assign(resourceChanges, result.synergyBonuses);
+        }
+
+        if (comboBonus && comboBonus.bonus) {
+            Object.assign(resourceChanges, comboBonus.bonus);
+        }
+
+        this.updateResources(resourceChanges);
+
         this.metrics.users += result.userChange;
         this.metrics.revenue += result.revenueChange;
-        this.metrics.budget -= totalCost;
-        this.metrics.teamEnergy = Math.max(0, Math.min(100, this.metrics.teamEnergy + teamEnergyChange));
 
         if (result.retentionChange) this.metrics.retention7d += result.retentionChange;
         if (result.activationChange) this.metrics.activation += result.activationChange;
@@ -536,14 +803,8 @@ class GrowthGameEngineV2 {
         // Competition grows
         this.competition.users = Math.floor(this.competition.users * (1 + this.competition.growthRate * (totalWeeks / 4)));
 
-        // Record decision
-        this.decisions.push({
-            level: level.levelNumber,
-            skill: skill.name,
-            choices: decisionChoices,
-            result: result,
-            week: this.currentWeek
-        });
+        // Record decision in history (enhanced)
+        const decision = this.recordDecision(level.levelNumber, skill, decisionChoices, result);
 
         if (randomEvent) {
             this.randomEvents.push(randomEvent);
@@ -558,7 +819,8 @@ class GrowthGameEngineV2 {
             skill: skill.name,
             week: this.currentWeek,
             aarrr: skill.aarrr,
-            effectiveness: totalEffectiveness
+            effectiveness: totalEffectiveness,
+            quality: decision.quality
         });
 
         // Check achievements
@@ -573,9 +835,38 @@ class GrowthGameEngineV2 {
             result: result,
             randomEvent: randomEvent,
             achievement: achievement,
-            feedback: this.generateFeedback(skill, result, randomEvent, decisionChoices),
+            activeSynergies: activeSynergies,
+            comboBonus: comboBonus,
+            comboState: comboSystem ? comboSystem.game.comboState : null,
+            decision: decision,
+            feedback: this.generateFeedback(skill, result, randomEvent, decisionChoices, activeSynergies, comboBonus),
             changes: this.getMetricChanges(result, totalCost, teamEnergyChange, totalWeeks)
         };
+    }
+
+    // Apply resource-based multipliers to results
+    applyResourceMultipliers(result) {
+        let multiplier = 1.0;
+
+        // Market timing affects all growth
+        multiplier *= (this.metrics.marketTiming / 100);
+
+        // User trust affects conversion and revenue
+        const trustMultiplier = (this.metrics.userTrust / 100);
+        if (result.revenueChange) {
+            result.revenueChange = Math.floor(result.revenueChange * trustMultiplier);
+        }
+
+        // Brand reputation affects viral growth
+        const reputationMultiplier = (this.metrics.brandReputation / 100);
+        if (result.viralChange) {
+            result.viralChange *= reputationMultiplier;
+        }
+        if (result.userChange) {
+            result.userChange = Math.floor(result.userChange * multiplier * (0.8 + reputationMultiplier * 0.4));
+        }
+
+        return result;
     }
 
     calculateUserGrowth(skill, effectiveness) {
@@ -790,8 +1081,25 @@ class GrowthGameEngineV2 {
         return null;
     }
 
-    generateFeedback(skill, result, randomEvent, decisionChoices) {
+    generateFeedback(skill, result, randomEvent, decisionChoices, activeSynergies = [], comboBonus = null) {
         let feedback = '';
+
+        // Combo state display
+        if (comboBonus) {
+            feedback += `🔥 ${comboBonus.name}\n${comboBonus.description}\n\n`;
+        }
+
+        // Synergy bonuses
+        if (activeSynergies && activeSynergies.length > 0) {
+            feedback += `✨ 技能协同效果激活！\n`;
+            activeSynergies.forEach(synergy => {
+                feedback += `${synergy.icon} ${synergy.name} - ${synergy.description}\n`;
+                if (synergy.isHiddenCombo && synergy.justDiscovered) {
+                    feedback += `🎉 发现隐藏组合技！\n`;
+                }
+            });
+            feedback += `\n`;
+        }
 
         // Skill execution feedback
         if (result.userChange > 0) {
@@ -807,16 +1115,31 @@ class GrowthGameEngineV2 {
         });
         feedback += `\n`;
 
-        // Results
+        // Results with multipliers
         if (result.userChange > 0) {
-            feedback += `📈 新增用户 ${result.userChange}人\n`;
+            feedback += `📈 新增用户 ${result.userChange.toLocaleString()}人`;
+            if (result.totalMultiplier && result.totalMultiplier > 1) {
+                feedback += ` (${result.totalMultiplier.toFixed(1)}x 协同加成)`;
+            }
+            feedback += `\n`;
         }
         if (result.revenueChange > 0) {
-            feedback += `💰 收入增加 $${result.revenueChange}\n`;
+            feedback += `💰 收入增加 $${result.revenueChange.toLocaleString()}\n`;
         }
         if (result.retentionChange > 0) {
             feedback += `📊 留存率提升 ${result.retentionChange}%\n`;
         }
+        if (result.activationChange > 0) {
+            feedback += `🎯 激活率提升 ${result.activationChange}%\n`;
+        }
+
+        // Resource changes
+        feedback += `\n资源状态 Resource Status:\n`;
+        feedback += `💼 预算: $${this.metrics.budget.toLocaleString()}\n`;
+        feedback += `⚡ 团队精力: ${this.metrics.teamEnergy}%\n`;
+        feedback += `⏰ 市场时机: ${this.metrics.marketTiming}%\n`;
+        feedback += `🤝 用户信任: ${this.metrics.userTrust}%\n`;
+        feedback += `⭐ 品牌声誉: ${this.metrics.brandReputation}%\n`;
 
         // Random event
         if (randomEvent) {
@@ -899,38 +1222,226 @@ class GrowthGameEngineV2 {
             {
                 label: '用户数 Users',
                 value: this.metrics.users.toLocaleString(),
-                change: this.history.length > 1 ? this.metrics.users - this.history[this.history.length - 2].users : 0
+                change: this.history.length > 1 ? this.metrics.users - this.history[this.history.length - 2].users : 0,
+                icon: '👥'
             },
             {
                 label: '月收入 MRR',
                 value: '$' + this.metrics.revenue.toLocaleString(),
-                change: this.history.length > 1 ? this.metrics.revenue - this.history[this.history.length - 2].revenue : 0
+                change: this.history.length > 1 ? this.metrics.revenue - this.history[this.history.length - 2].revenue : 0,
+                icon: '💰'
             },
             {
                 label: '预算 Budget',
                 value: '$' + this.metrics.budget.toLocaleString(),
-                change: this.history.length > 1 ? this.metrics.budget - this.history[this.history.length - 2].budget : 0
+                change: this.history.length > 1 ? this.metrics.budget - this.history[this.history.length - 2].budget : 0,
+                icon: '💼',
+                warning: this.metrics.budget < 1000
             },
             {
                 label: '团队精力 Team Energy',
                 value: this.metrics.teamEnergy + '%',
-                change: this.history.length > 1 ? this.metrics.teamEnergy - this.history[this.history.length - 2].teamEnergy : 0
+                change: this.history.length > 1 ? this.metrics.teamEnergy - this.history[this.history.length - 2].teamEnergy : 0,
+                icon: '⚡',
+                warning: this.metrics.teamEnergy < 30,
+                color: this.metrics.teamEnergy < 30 ? 'red' : this.metrics.teamEnergy < 50 ? 'orange' : 'green'
+            },
+            {
+                label: '市场时机 Market Timing',
+                value: this.metrics.marketTiming + '%',
+                change: this.history.length > 1 ? this.metrics.marketTiming - this.history[this.history.length - 2].marketTiming : 0,
+                icon: '⏰',
+                warning: this.metrics.marketTiming < 40,
+                color: this.metrics.marketTiming < 40 ? 'red' : this.metrics.marketTiming < 60 ? 'orange' : 'green'
+            },
+            {
+                label: '用户信任 User Trust',
+                value: this.metrics.userTrust + '%',
+                change: this.history.length > 1 ? this.metrics.userTrust - this.history[this.history.length - 2].userTrust : 0,
+                icon: '🤝',
+                color: this.metrics.userTrust < 30 ? 'red' : this.metrics.userTrust < 60 ? 'orange' : 'green'
+            },
+            {
+                label: '品牌声誉 Brand',
+                value: this.metrics.brandReputation + '%',
+                change: this.history.length > 1 ? this.metrics.brandReputation - this.history[this.history.length - 2].brandReputation : 0,
+                icon: '⭐',
+                color: this.metrics.brandReputation < 30 ? 'red' : this.metrics.brandReputation < 60 ? 'orange' : 'green'
             },
             {
                 label: '剩余时间 Time Left',
                 value: this.weeksRemaining + '周',
-                change: 0
+                change: 0,
+                icon: '📅',
+                warning: this.weeksRemaining < 5
             },
             {
                 label: 'AI顾问 AI Advisor',
                 value: this.aiAdvisorUses + '次',
-                change: 0
+                change: 0,
+                icon: '🤖'
             }
         ];
     }
 
+    // Get summary for meta-progression system
+    getGameSummary() {
+        return {
+            won: this.metrics.users >= this.getWinCondition().targetUsers && this.weeksRemaining > 0,
+            finalUsers: this.metrics.users,
+            finalRevenue: this.metrics.revenue,
+            totalDecisions: this.decisionHistory.length,
+            excellentDecisions: this.decisionHistory.filter(d => d.quality === 'excellent').length,
+            maxCombo: this.comboState.maxCombo,
+            achievementsEarned: this.achievements.length,
+            weeksTaken: this.currentWeek,
+            difficulty: this.difficulty,
+            finalScore: this.calculateFinalScore()
+        };
+    }
+
+    getWinCondition() {
+        // Win conditions based on difficulty
+        const conditions = {
+            easy: { targetUsers: 50000, targetRevenue: 10000 },
+            medium: { targetUsers: 30000, targetRevenue: 8000 },
+            hard: { targetUsers: 20000, targetRevenue: 5000 }
+        };
+
+        return conditions[this.difficulty];
+    }
+
+    calculateFinalScore() {
+        let score = 0;
+
+        // Base score from users and revenue
+        score += Math.floor(this.metrics.users / 100);
+        score += Math.floor(this.metrics.revenue / 10);
+
+        // Bonuses
+        score += this.achievements.length * 500;
+        score += this.comboState.maxCombo * 300;
+        score += this.decisionHistory.filter(d => d.quality === 'excellent').length * 200;
+
+        // Time bonus
+        if (this.weeksRemaining > 0) {
+            score += this.weeksRemaining * 100;
+        }
+
+        // Difficulty multiplier
+        const multipliers = { easy: 1.0, medium: 1.5, hard: 2.0 };
+        score = Math.floor(score * multipliers[this.difficulty]);
+
+        return score;
+    }
+
     isGameComplete() {
         return this.currentLevel >= 6 || this.weeksRemaining <= 0;
+    }
+
+    // Initialize combo and meta-progression systems
+    initializeAdvancedSystems() {
+        if (typeof ComboSystem !== 'undefined') {
+            this.comboSystem = new ComboSystem(this);
+        }
+
+        if (typeof MetaProgressionSystem !== 'undefined') {
+            this.metaProgression = new MetaProgressionSystem();
+        }
+
+        return {
+            comboSystem: !!this.comboSystem,
+            metaProgression: !!this.metaProgression
+        };
+    }
+
+    // Execute skill with all advanced systems
+    executeSkillWithAdvancedSystems(skillIndex, decisionChoices) {
+        // Ensure systems are initialized
+        if (!this.comboSystem) {
+            this.initializeAdvancedSystems();
+        }
+
+        // Execute with combo system
+        const result = this.executeSkillWithDecisions(skillIndex, decisionChoices, this.comboSystem);
+
+        return result;
+    }
+
+    // Complete game and record to meta-progression
+    completeGame() {
+        const summary = this.getGameSummary();
+
+        if (this.metaProgression) {
+            const progressResult = this.metaProgression.recordGameCompletion(summary);
+            summary.metaProgression = progressResult;
+        }
+
+        return summary;
+    }
+
+    // Get available skills filtered by meta-progression
+    getAvailableSkillsForLevel(levelIndex) {
+        const level = this.levels[levelIndex];
+        if (!level) return [];
+
+        let skills = this.getAvailableSkills(levelIndex + 1);
+
+        // Filter by meta-progression if available
+        if (this.metaProgression) {
+            skills = skills.filter(skill => {
+                return this.metaProgression.playerProfile.unlockedSkills.has(skill.name);
+            });
+        }
+
+        return skills;
+    }
+
+    // Rest and recovery action
+    restAndRecover(weeks = 1) {
+        const recoveryAmount = 20 * weeks;
+
+        this.updateResources({
+            teamEnergy: recoveryAmount,
+            weeks: weeks
+        });
+
+        this.currentWeek += weeks;
+        this.weeksRemaining -= weeks;
+
+        return {
+            success: true,
+            message: `团队休息了${weeks}周，精力恢复${recoveryAmount}%`,
+            teamEnergy: this.metrics.teamEnergy,
+            weeksUsed: weeks
+        };
+    }
+
+    // Get decision chain insights
+    getDecisionChainInsights() {
+        return {
+            totalDecisions: this.decisionHistory.length,
+            excellentCount: this.decisionHistory.filter(d => d.quality === 'excellent').length,
+            goodCount: this.decisionHistory.filter(d => d.quality === 'good').length,
+            poorCount: this.decisionHistory.filter(d => d.quality === 'poor').length,
+            unlockedOptions: Array.from(this.unlockedOptions),
+            lockedOptions: Array.from(this.lockedOptions),
+            recentDecisions: this.decisionHistory.slice(-3)
+        };
+    }
+
+    // Get combo insights
+    getComboInsights() {
+        if (!this.comboSystem) return null;
+
+        return {
+            currentCombo: this.comboState.currentCombo,
+            maxCombo: this.comboState.maxCombo,
+            onFire: this.comboState.onFire,
+            display: this.comboSystem.getComboDisplay(),
+            discoveredCombos: this.comboSystem.getDiscoveredCombos(),
+            hints: this.comboSystem.getComboHints()
+        };
     }
 
     // Initialize levels (simplified version, will use same structure as V1)
@@ -949,4 +1460,8 @@ class GrowthGameEngineV2 {
 // Export
 if (typeof window !== 'undefined') {
     window.GrowthGameEngineV2 = GrowthGameEngineV2;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = GrowthGameEngineV2;
 }

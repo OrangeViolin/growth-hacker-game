@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长危机：侦探模式 | Detective Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Source Han Serif SC', 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            color: #E8DCC4;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B0000 0%, #4A0000 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #C9A961;
+            margin-bottom: 20px;
+        }
+
+        .crisis-title {
+            font-size: 2em;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            color: #FF4444;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .main-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 场景描述区 - 线索藏在这里 */
+        .scene-box {
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .scene-title {
+            font-size: 1.3em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scene-content {
+            line-height: 2;
+            white-space: pre-wrap;
+        }
+
+        /* 线索高亮（但不明显） */
+        .clue {
+            color: #C9A961;
+            cursor: help;
+            border-bottom: 1px dotted #C9A961;
+            position: relative;
+        }
+
+        .clue:hover {
+            color: #FFD700;
+        }
+
+        /* 调查按钮区 */
+        .investigate-box {
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .investigate-title {
+            font-size: 1.2em;
+            color: #FFD700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #C9A961;
+            padding-bottom: 10px;
+        }
+
+        .investigate-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .investigate-btn {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #8B7355;
+            color: #E8DCC4;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+        }
+
+        .investigate-btn:hover:not(:disabled) {
+            border-color: #C9A961;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 169, 97, 0.3);
+        }
+
+        .investigate-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .investigate-btn.unlocked {
+            border-color: #4A9A6A;
+            background: linear-gradient(135deg, #1A3A2A 0%, #0A2A1A 100%);
+        }
+
+        .btn-icon {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .btn-label {
+            font-size: 0.95em;
+        }
+
+        .btn-cost {
+            font-size: 0.75em;
+            color: #A08040;
+            margin-top: 5px;
+        }
+
+        /* 决策区 */
+        .decision-box {
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .decision-title {
+            font-size: 1.2em;
+            color: #FFD700;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #C9A961;
+            padding-bottom: 10px;
+        }
+
+        .question {
+            font-size: 1.1em;
+            color: #FFD700;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #3A2010 0%, #2A1810 100%);
+            border: 2px solid #C9A961;
+            color: #E8DCC4;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            border-color: #FFD700;
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 反馈区 */
+        .feedback {
+            background: linear-gradient(135deg, #1A3A2A 0%, #0A2A1A 100%);
+            border: 2px solid #4A9A6A;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            animation: slideIn 0.5s;
+        }
+
+        .feedback.wrong {
+            background: linear-gradient(135deg, #3A1A1A 0%, #2A0A0A 100%);
+            border-color: #FF4444;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-icon {
+            font-size: 2.5em;
+        }
+
+        .feedback-title {
+            font-size: 1.5em;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .feedback-text {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .reveal-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+            margin: 20px 0;
+        }
+
+        .reveal-title {
+            color: #FFD700;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .reveal-item {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .reveal-item::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #C9A961;
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        /* 右侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-box {
+            background: linear-gradient(135deg, #1A1410 0%, #0A0A08 100%);
+            border: 2px solid #C9A961;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            color: #FFD700;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #C9A961;
+        }
+
+        .clue-item {
+            background: rgba(201, 169, 97, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #C9A961;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .clue-item.locked {
+            opacity: 0.3;
+        }
+
+        .clue-label {
+            color: #C9A961;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+
+        .hint-box {
+            background: rgba(139, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #8B0000;
+            font-size: 0.85em;
+        }
+
+        /* 信息弹窗 */
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            animation: fadeIn 0.3s;
+        }
+
+        .info-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .info-content {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #2C1810 0%, #1A0F0A 100%);
+            border: 3px solid #C9A961;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .info-header {
+            background: linear-gradient(135deg, #8B0000 0%, #4A0000 100%);
+            padding: 25px;
+            border-bottom: 2px solid #C9A961;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-title {
+            font-size: 1.5em;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-close {
+            background: none;
+            border: 2px solid #C9A961;
+            color: #C9A961;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-close:hover {
+            background: #C9A961;
+            color: #000;
+            transform: rotate(90deg);
+        }
+
+        .info-body {
+            padding: 30px;
+            line-height: 2;
+            white-space: pre-wrap;
+            font-size: 1.05em;
+            color: #E8DCC4;
+        }
+
+        .info-footer {
+            padding: 20px 30px;
+            border-top: 2px solid #C9A961;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-time {
+            color: #C9A961;
+            font-size: 0.9em;
+        }
+
+        .info-ok-btn {
+            background: linear-gradient(135deg, #C9A961 0%, #A08040 100%);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .info-ok-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(201, 169, 97, 0.5);
+        }
+
+        @media (max-width: 968px) {
+            .main-area {
+                grid-template-columns: 1fr;
+            }
+            .investigate-actions {
+                grid-template-columns: 1fr;
+            }
+            .info-content {
+                max-width: 95%;
+                max-height: 90vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="crisis-title">⚠️ 案例#1：用户暴跌危机</div>
+            <div class="timer">⏰ 剩余时间：13天 22小时</div>
+        </div>
+
+        <div class="main-area">
+            <div class="left-panel">
+                <!-- 场景描述 - 线索藏在这里 -->
+                <div class="scene-box">
+                    <div class="scene-title">📋 当前情况</div>
+                    <div class="scene-content" id="scene-content"><div style="color:#FFD700;font-size:1.1em;margin-bottom:15px;">星期一，早上9:17</div>
+
+你的手机响了三次。是CEO Sarah。
+
+"会议室，现在。Tom（投资人）也在。"
+
+你快步走进去，白板上用红笔写着：
+<span class="clue" title="记住这个">昨晚8点：10,000人</span>
+<span class="clue" title="记住这个">今早8点：5,000人（-50%）</span>
+<span class="clue" title="这是关键">当前流失速度：15%/天</span>
+
+Tom看起来很焦虑："FitnessPro昨晚宣布永久免费了。"
+
+Sarah补充："我们的<span class="clue" title="什么产品？">健身App订阅</span>是<span class="clue" title="价格">$20/月</span>。"
+
+财务总监Lisa走进来，递给你一张纸：
+"账户余额：<span class="clue" title="仅剩">$10,000</span>"
+"团队6人，月工资：<span class="clue" title="烧钱速度">$18,000</span>"
+
+Tom站起来："2周。我给你们2周时间证明这个产品还有价值。"
+
+他走到门口，回头："下次见面，我要看到数据。"
+
+现在只有你、Sarah和Lisa在会议室。
+
+Sarah看着你："你觉得...我们还能撑过去吗？"
+
+<div style="color:#FFD700;margin-top:15px;">你需要先搞清楚状况。</div></div>
+                </div>
+
+                <!-- 调查区 -->
+                <div class="investigate-box">
+                    <div class="investigate-title">🔍 调查行动（点击解锁更多信息）</div>
+                    <div class="investigate-actions">
+                        <button class="investigate-btn" onclick="investigate('users')" id="btn-users">
+                            <div class="btn-icon">👥</div>
+                            <div class="btn-label">查看用户数据</div>
+                            <div class="btn-cost">耗时：30分钟</div>
+                        </button>
+                        <button class="investigate-btn" onclick="investigate('finance')" id="btn-finance">
+                            <div class="btn-icon">💰</div>
+                            <div class="btn-label">查看财务报表</div>
+                            <div class="btn-cost">耗时：20分钟</div>
+                        </button>
+                        <button class="investigate-btn" onclick="investigate('retention')" id="btn-retention">
+                            <div class="btn-icon">📊</div>
+                            <div class="btn-label">分析留存数据</div>
+                            <div class="btn-cost">耗时：1小时</div>
+                        </button>
+                        <button class="investigate-btn" onclick="investigate('competitor')" id="btn-competitor">
+                            <div class="btn-icon">🎯</div>
+                            <div class="btn-label">调研竞品动态</div>
+                            <div class="btn-cost">耗时：45分钟</div>
+                        </button>
+                        <button class="investigate-btn" onclick="investigate('team')" id="btn-team">
+                            <div class="btn-icon">💬</div>
+                            <div class="btn-label">访谈团队成员</div>
+                            <div class="btn-cost">耗时：1.5小时</div>
+                        </button>
+                        <button class="investigate-btn" onclick="investigate('cost')" id="btn-cost">
+                            <div class="btn-icon">📈</div>
+                            <div class="btn-label">计算运营成本</div>
+                            <div class="btn-cost">耗时：40分钟</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 决策区 -->
+                <div class="decision-box">
+                    <div class="decision-title">🎯 关键决策</div>
+                    <div class="question">
+                        Sarah问："以现在的情况，我们能撑过2周吗？"
+                    </div>
+                    <div class="choices">
+                        <button class="choice-btn" onclick="makeDecision('yes')">
+                            能撑过去，我们有付费用户收入
+                        </button>
+                        <button class="choice-btn" onclick="makeDecision('no')">
+                            撑不过去，用户流失太快了
+                        </button>
+                        <button class="choice-btn" onclick="makeDecision('maybe')">
+                            不确定，取决于具体数字
+                        </button>
+                    </div>
+                    <div id="feedback-container"></div>
+                </div>
+            </div>
+
+            <!-- 右侧栏 -->
+            <div class="sidebar">
+                <div class="sidebar-box">
+                    <div class="sidebar-title">📝 已收集线索</div>
+                    <div id="clues-list">
+                        <div class="clue-item locked">
+                            <div class="clue-label">用户构成</div>
+                            ？？？ 需要调查
+                        </div>
+                        <div class="clue-item locked">
+                            <div class="clue-label">收入状况</div>
+                            ？？？ 需要调查
+                        </div>
+                        <div class="clue-item locked">
+                            <div class="clue-label">留存分析</div>
+                            ？？？ 需要调查
+                        </div>
+                        <div class="clue-item locked">
+                            <div class="clue-label">竞品对比</div>
+                            ？？？ 需要调查
+                        </div>
+                        <div class="clue-item locked">
+                            <div class="clue-label">团队反馈</div>
+                            ？？？ 需要调查
+                        </div>
+                        <div class="clue-item locked">
+                            <div class="clue-label">现金流</div>
+                            ？？？ 需要调查
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-box">
+                    <div class="sidebar-title">💡 思考方向</div>
+                    <div class="hint-box">
+                        要判断能否撑过2周，你需要知道什么？
+                    </div>
+                    <div class="hint-box">
+                        收入和支出，哪个更重要？
+                    </div>
+                    <div class="hint-box">
+                        不要被"用户流失"吓到，关键是什么用户在流失？
+                    </div>
+                </div>
+
+                <div class="sidebar-box">
+                    <div class="sidebar-title">⏱️ 时间消耗</div>
+                    <div id="time-spent" style="font-size: 1.2em; color: #FFD700;">
+                        已用：0分钟<br>
+                        剩余：3小时
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 信息弹窗 -->
+        <div class="info-modal" id="info-modal">
+            <div class="info-backdrop" onclick="closeInfoModal()"></div>
+            <div class="info-content">
+                <div class="info-header">
+                    <div class="info-title" id="modal-title">
+                        <span id="modal-icon">📊</span>
+                        <span id="modal-title-text">调查结果</span>
+                    </div>
+                    <button class="info-close" onclick="closeInfoModal()">×</button>
+                </div>
+                <div class="info-body" id="modal-body">
+                    信息加载中...
+                </div>
+                <div class="info-footer">
+                    <div class="info-time" id="modal-time">耗时：30分钟</div>
+                    <button class="info-ok-btn" onclick="closeInfoModal()">明白了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let discoveredClues = {
+            users: false,
+            finance: false,
+            retention: false,
+            competitor: false,
+            team: false,
+            cost: false
+        };
+
+        let timeSpent = 0;
+        const timeLimit = 180; // 3小时
+
+        // 显示信息弹窗
+        function showInfoModal(title, icon, body, time) {
+            document.getElementById('modal-icon').textContent = icon;
+            document.getElementById('modal-title-text').textContent = title;
+            document.getElementById('modal-body').textContent = body;
+            document.getElementById('modal-time').textContent = time;
+            document.getElementById('info-modal').classList.add('show');
+        }
+
+        // 关闭信息弹窗
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.remove('show');
+        }
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeInfoModal();
+            }
+        });
+
+        // 调查行动
+        function investigate(type) {
+
+            const investigations = {
+                users: {
+                    time: 30,
+                    title: '用户数据分析',
+                    icon: '👥',
+                    info: `用户数据分析完成
+
+你导出了后台数据CSV：
+
+【时间线】
+昨晚20:00 - FitnessPro宣布免费
+昨晚20:00 - 总用户：10,000人
+今早08:00 - 总用户：5,000人（12小时损失50%）
+
+【按类型分】
+用户类型        初始    当前    流失    流失率
+免费试用        9,200   4,220   4,980   54.1%
+Premium会员     800     780     20      2.5%
+--------------------------------------------
+合计           10,000   5,000   5,000   50%
+
+【流失时间分布】（过去12小时）
+20:00-22:00  →  -800人  （消息传播期）
+22:00-02:00  →  -2,600人（恐慌高峰）
+02:00-06:00  →  -1,200人（持续流失）
+06:00-08:00  →  -400人  （趋于稳定）
+
+【当前趋势】
+过去2小时流失：150人（约15%/天的速度）
+
+注：Premium月费$20，免费试用7天，历史转化率8%`,
+                    clue: {
+                        index: 0,
+                        content: `<div class="clue-label">用户构成</div>
+总用户：5000人（-50%）<br>
+Premium：780人（-20人）<br>
+试用用户：4220人<br>
+<div style="color:#FFD700;margin-top:5px;">需要细看流失率</div>`
+                    }
+                },
+                finance: {
+                    time: 20,
+                    title: '财务报表',
+                    icon: '💰',
+                    info: `财务损益表（上月）
+
+【收入端】
+Premium订阅收入       $15,600
+企业定制服务          $2,400
+应用内广告收入        $800
+----------------------------------
+总收入                $18,800
+
+【支出端】
+研发人员工资(4人)     $12,000
+市场/运营(2人)        $6,000
+云服务器              $1,200
+CDN & 存储            $300
+客服系统              $200
+办公软件订阅          $100
+----------------------------------
+总支出                $19,800
+
+【净利润】            -$1,000
+
+注：本月因危机，广告收入预计下降80%`,
+                    clue: {
+                        index: 1,
+                        content: `<div class="clue-label">收入状况</div>
+订阅MRR：$15,600<br>
+总收入：$18,800<br>
+总支出：$19,800<br>
+<div style="color:#FF6B6B;margin-top:5px;">⚠️ 广告收入会暴跌</div>`
+                    }
+                },
+                retention: {
+                    time: 60,
+                    title: '留存数据分析',
+                    icon: '📊',
+                    info: `留存分析
+
+你深挖了留存数据：
+
+付费用户留存：
+├─ D7：92%
+├─ D30：85%
+└─ 平均留存周期：8个月
+
+免费用户留存：
+└─ D7：12%（基本都走了）
+
+结论：付费用户粘性很强！`,
+                    clue: {
+                        index: 2,
+                        content: `<div class="clue-label">用户价值</div>
+付费用户留存8个月<br>
+LTV = $20 × 8 = $160<br>
+<div style="color:#FFD700;margin-top:5px;">核心资产！</div>`
+                    }
+                },
+                competitor: {
+                    time: 45,
+                    title: '竞品调研',
+                    icon: '🎯',
+                    info: `竞品调研
+
+你快速浏览了FitnessPro：
+
+他们的免费策略：
+- 所有功能免费开放
+- 靠广告盈利
+- 但体验差（广告多）
+
+社交媒体评论：
+- "免费是好，但广告太烦"
+- "还是更喜欢FitGo的专业内容"
+- "付费版体验确实更好"
+
+你们的差异化还在！`,
+                    clue: {
+                        index: 3,
+                        content: `<div class="clue-label">竞争态势</div>
+竞品：免费但广告多<br>
+我们：付费但体验好<br>
+<div style="color:#FFD700;margin-top:5px;">价值差异明显</div>`
+                    }
+                },
+                team: {
+                    time: 90,
+                    title: '团队访谈',
+                    icon: '💬',
+                    info: `团队访谈
+
+你和团队聊了聊：
+
+工程师Tom："其实付费用户的需求反馈质量很高。"
+
+设计师Amy："高端用户愿意为品质付费。"
+
+客服Nina："付费用户投诉少，满意度高。"
+
+团队建议：专注服务付费用户！`,
+                    clue: {
+                        index: 4,
+                        content: `<div class="clue-label">团队洞察</div>
+付费用户价值高<br>
+满意度高<br>
+<div style="color:#FFD700;margin-top:5px;">应该深耕高端市场</div>`
+                    }
+                },
+                cost: {
+                    time: 40,
+                    title: '运营成本详情',
+                    icon: '📈',
+                    info: `运营成本结构分析
+
+【人员成本】
+职位          人数    月薪      小计
+CEO/创始人    1      $0       $0（拿期权）
+CTO          1      $4,000   $4,000
+工程师        2      $3,500   $7,000
+产品经理      1      $3,000   $3,000
+市场         1      $2,500   $2,500
+客服         1      $1,500   $1,500
+--------------------------------
+人员小计      6人              $18,000
+
+【技术成本】
+AWS云服务器                    $1,200/月
+CDN加速                        $300/月
+数据库备份                     $150/月
+监控告警                       $50/月
+
+【其他成本】
+SaaS工具订阅                   $100/月
+-------------------------
+总计                           $19,800/月
+
+【现金流】
+银行账户余额：$10,000
+上月应收账款：$3,200（本月15日到账）
+
+注：如果裁掉市场和客服，可省$4,000/月`,
+                    clue: {
+                        index: 5,
+                        content: `<div class="clue-label">现金流</div>
+月亏损：$3,900<br>
+现金：$10,000<br>
+<div style="color:#FFD700;margin-top:5px;">可撑2.6个月</div>`
+                    }
+                }
+            };
+
+            const data = investigations[type];
+
+            // 首次调查
+            if (!discoveredClues[type]) {
+                timeSpent += data.time;
+
+                // 更新按钮状态
+                const btn = document.getElementById(`btn-${type}`);
+                btn.classList.add('unlocked');
+                const costDiv = btn.querySelector('.btn-cost');
+                costDiv.innerHTML = '✓ 已调查 · 点击重看';
+                costDiv.style.color = '#4A9A6A';
+
+                // 更新线索
+                const cluesList = document.getElementById('clues-list').children;
+                cluesList[data.clue.index].classList.remove('locked');
+                cluesList[data.clue.index].innerHTML = data.clue.content;
+
+                // 更新时间
+                document.getElementById('time-spent').innerHTML = `
+                    已用：${timeSpent}分钟<br>
+                    剩余：${timeLimit - timeSpent}分钟
+                `;
+
+                discoveredClues[type] = true;
+
+                // 检查时间
+                if (timeSpent >= timeLimit) {
+                    setTimeout(() => {
+                        showInfoModal('时间到了', '⏰', '已用完3小时调查时间！\n必须做出决策了！', '');
+                    }, 500);
+                }
+            }
+
+            // 显示信息弹窗
+            showInfoModal(
+                data.title,
+                data.icon,
+                data.info,
+                discoveredClues[type] ? '复习中' : `耗时：${data.time}分钟`
+            );
+        }
+
+        // 做决策
+        function makeDecision(choice) {
+            // 禁用所有按钮
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+
+            const feedbackContainer = document.getElementById('feedback-container');
+
+            // 计算调查了多少
+            const investigated = Object.values(discoveredClues).filter(v => v).length;
+
+            if (choice === 'yes') {
+                if (discoveredClues.finance && discoveredClues.cost) {
+                    // 正确答案，且做了足够调查
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback">
+                            <div class="feedback-header">
+                                <div class="feedback-icon">🎉</div>
+                                <div class="feedback-title">完美分析！</div>
+                            </div>
+                            <div class="feedback-text">
+                                你做了充分的调查，得出了正确结论！
+                            </div>
+                            <div class="reveal-section">
+                                <div class="reveal-title">📊 完整计算（陷阱揭秘）：</div>
+                                <div class="reveal-item"><strong>陷阱1：总收入≠核心收入</strong><br>
+                                财报显示总收入$18,800，但广告收入会暴跌！<br>
+                                真实MRR：780人 × $20 = $15,600</div>
+                                <div class="reveal-item"><strong>陷阱2：支出比看起来的多</strong><br>
+                                详细拆分后总支出：$19,800/月<br>
+                                不是简单的"工资+服务器"</div>
+                                <div class="reveal-item"><strong>陷阱3：应收账款≠现金</strong><br>
+                                虽然有$3,200应收，但还没到账<br>
+                                实际可用现金：$10,000</div>
+                                <div class="reveal-item"><strong>真实计算：</strong><br>
+                                月缺口 = $19,800 - $15,600 = $4,200<br>
+                                能撑时间 = $10,000 / $4,200 ≈ 2.4个月<br>
+                                2周需要：$4,200 × 0.5 ≈ $2,100</div>
+                                <div class="reveal-item" style="margin-top:15px;padding:15px;background:rgba(74,154,106,0.2);border-radius:8px;">
+                                    <strong>结论：能撑过2周！</strong><br>
+                                    $10,000 > $2,100，可以撑过2周<br>
+                                    <br>
+                                    但如果你被表面数据迷惑，可能会得出错误结论！
+                                </div>
+                            </div>
+                            <div class="feedback-text" style="margin-top:20px;">
+                                Sarah松了口气："太好了！那我们接下来该怎么增长？"
+                            </div>
+                            <button class="continue-btn" onclick="nextStep()">进入下一阶段 →</button>
+                        </div>
+                    `;
+                } else if (investigated < 2) {
+                    // 答对了，但调查不足
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback">
+                            <div class="feedback-header">
+                                <div class="feedback-icon">⚠️</div>
+                                <div class="feedback-title">运气好，但不够严谨</div>
+                            </div>
+                            <div class="feedback-text">
+                                你猜对了答案，但你只调查了${investigated}项数据。<br>
+                                在真实创业中，基于不充分信息做决策很危险！
+                            </div>
+                            <div class="reveal-section">
+                                <div class="reveal-title">❌ 你遗漏的关键信息：</div>
+                                ${!discoveredClues.finance ? '<div class="reveal-item">付费用户收入：$15,600/月</div>' : ''}
+                                ${!discoveredClues.cost ? '<div class="reveal-item">运营成本：$19,500/月</div>' : ''}
+                                ${!discoveredClues.users ? '<div class="reveal-item">付费用户只流失5%</div>' : ''}
+                                <div class="reveal-item" style="margin-top:15px;color:#FFD700;">
+                                    没有数据支撑的决策 = 赌博！
+                                </div>
+                            </div>
+                            <button class="continue-btn" onclick="retry()">重新来过</button>
+                        </div>
+                    `;
+                } else {
+                    // 答对了，调查充分
+                    feedbackContainer.innerHTML = `
+                        <div class="feedback">
+                            <div class="feedback-header">
+                                <div class="feedback-icon">✅</div>
+                                <div class="feedback-title">正确！</div>
+                            </div>
+                            <div class="feedback-text">
+                                你做了${investigated}项调查，基于数据得出结论！
+                            </div>
+                            <div class="reveal-section">
+                                <div class="reveal-title">📊 关键数据：</div>
+                                <div class="reveal-item">月收入：$15,600（780用户 × $20）</div>
+                                <div class="reveal-item">月支出：$19,500</div>
+                                <div class="reveal-item">月亏损：$3,900</div>
+                                <div class="reveal-item">现金：$10,000</div>
+                                <div class="reveal-item" style="margin-top:10px;">
+                                    <strong>能撑2.6个月 > 2周 ✓</strong>
+                                </div>
+                            </div>
+                            <button class="continue-btn" onclick="nextStep()">继续 →</button>
+                        </div>
+                    `;
+                }
+            } else if (choice === 'no') {
+                feedbackContainer.innerHTML = `
+                    <div class="feedback wrong">
+                        <div class="feedback-header">
+                            <div class="feedback-icon">❌</div>
+                            <div class="feedback-title">过于悲观了</div>
+                        </div>
+                        <div class="feedback-text">
+                            你被"用户流失50%"吓到了，但忽略了一个关键事实：
+                        </div>
+                        <div class="reveal-section">
+                            <div class="reveal-title">💡 你掉进了这些陷阱：</div>
+                            <div class="reveal-item">
+                                <strong>被"用户暴跌50%"吓到了</strong><br>
+                                看总用户数：10,000 → 5,000（-50%）<br>
+                                但流失的95%是免费试用用户！<br>
+                                付费用户只流失了20人（2.5%）
+                            </div>
+                            <div class="reveal-item">
+                                <strong>忽略了真实的收入结构</strong><br>
+                                不是所有收入都稳定<br>
+                                核心MRR：$15,600（订阅收入）<br>
+                                广告收入会因危机暴跌
+                            </div>
+                            <div class="reveal-item">
+                                <strong>没有做现金流计算</strong><br>
+                                月支出：$19,800<br>
+                                核心收入：$15,600<br>
+                                月缺口：$4,200<br>
+                                现金$10,000可撑：2.4个月 > 2周
+                            </div>
+                            <div class="reveal-item" style="margin-top:15px;padding:15px;background:rgba(139,0,0,0.2);border-radius:8px;">
+                                <strong>致命教训：</strong><br>
+                                真实创业中，很多人死于恐慌性决策<br>
+                                被表面数据吓到，做出错误判断<br>
+                                <br>
+                                要学会：冷静看数据，区分核心指标和噪音
+                            </div>
+                        </div>
+                        <button class="continue-btn" onclick="retry()">重新思考</button>
+                    </div>
+                `;
+            } else {
+                feedbackContainer.innerHTML = `
+                    <div class="feedback wrong">
+                        <div class="feedback-header">
+                            <div class="feedback-icon">⏰</div>
+                            <div class="feedback-title">没时间犹豫了</div>
+                        </div>
+                        <div class="feedback-text">
+                            在创业中，"不确定"不是答案。<br>
+                            你需要基于现有数据做出判断！
+                        </div>
+                        <div class="reveal-section">
+                            <div class="reveal-title">🔍 你应该看到的数据：</div>
+                            <div class="reveal-item">
+                                场景中已经给了关键信息：<br>
+                                - 订阅价格：$20/月<br>
+                                - 现金：$10,000<br>
+                                - 工资：$18,000/月
+                            </div>
+                            <div class="reveal-item">
+                                如果你做了"用户数据"调查：<br>
+                                - 付费用户：780人<br>
+                                - MRR = 780 × $20 = $15,600
+                            </div>
+                            <div class="reveal-item">
+                                简单计算：<br>
+                                月亏损 ≈ $3,900<br>
+                                能撑 ≈ 2.6个月 > 2周！
+                            </div>
+                        </div>
+                        <button class="continue-btn" onclick="retry()">重新决策</button>
+                    </div>
+                `;
+            }
+
+            // 滚动到反馈
+            setTimeout(() => {
+                feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function nextStep() {
+            // 显示完整的通关和学习总结
+            const feedbackContainer = document.getElementById('feedback-container');
+            feedbackContainer.innerHTML = `
+                <div class="feedback" style="margin-top:30px;">
+                    <div class="feedback-header">
+                        <div class="feedback-icon">🎓</div>
+                        <div class="feedback-title">第一关通过！你学到了什么？</div>
+                    </div>
+                    <div class="reveal-section">
+                        <div class="reveal-title">📚 关键教训：</div>
+                        <div class="reveal-item">
+                            <strong>数据优先于直觉</strong><br>
+                            不要被"用户暴跌50%"吓到，要看具体数据
+                        </div>
+                        <div class="reveal-item">
+                            <strong>区分虚荣指标和核心指标</strong><br>
+                            总用户数是虚荣指标，付费用户和MRR才是核心
+                        </div>
+                        <div class="reveal-item">
+                            <strong>Unit Economics是生命线</strong><br>
+                            收入、成本、现金流 - 这三个数字决定生死
+                        </div>
+                        <div class="reveal-item" style="margin-top:15px;padding:15px;background:rgba(201,169,97,0.2);border-radius:8px;">
+                            <strong>💡 真实创业中：</strong><br>
+                            很多创始人被表面数据误导（用户数、下载量），<br>
+                            忽略了真正重要的指标（留存、收入、利润）。<br>
+                            <br>
+                            这就是为什么有的公司看起来火爆，却突然倒闭。
+                        </div>
+                    </div>
+                    <div class="feedback-text" style="margin-top:20px;text-align:center;font-size:1.1em;">
+                        准备好进入更难的第二关了吗？
+                    </div>
+                    <div style="text-align:center;margin-top:20px;">
+                        <button class="continue-btn" onclick="location.reload()">再玩一次</button>
+                    </div>
+                </div>
+            `;
+
+            // 滚动到反馈
+            setTimeout(() => {
+                feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function retry() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

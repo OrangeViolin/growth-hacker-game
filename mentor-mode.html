@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>增长黑客导师模式 | Growth Hacker Mentor Mode</title>
+    <link rel="stylesheet" href="elegant-game.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Source Han Serif SC', 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #E8DCC4 0%, #D4C4AB 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #8B7355;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 顶部标题 */
+        .header {
+            background: linear-gradient(135deg, #C9A961 0%, #A0937C 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        /* 主要游戏区域 */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        /* 左侧挑战区 */
+        .challenge-section {
+            background: #F5F0E8;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #D4C4AB;
+        }
+
+        .challenge-title {
+            font-size: 1.8em;
+            color: #C9A961;
+        }
+
+        .challenge-difficulty {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .difficulty-easy { background: #E8F5E9; color: #2E7D32; }
+        .difficulty-medium { background: #FFF3E0; color: #E65100; }
+        .difficulty-hard { background: #FFEBEE; color: #C62828; }
+        .difficulty-expert { background: #E1BEE7; color: #6A1B9A; }
+
+        /* 挑战内容 */
+        .challenge-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #C9A961;
+            line-height: 1.8;
+        }
+
+        .challenge-scenario {
+            font-size: 1.05em;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+
+        .challenge-requirements {
+            background: #FFF9E6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .challenge-requirements h4 {
+            color: #C9A961;
+            margin-bottom: 10px;
+        }
+
+        .challenge-requirements ul {
+            margin-left: 20px;
+        }
+
+        .challenge-requirements li {
+            margin: 5px 0;
+        }
+
+        /* 答题区 */
+        .answer-section {
+            margin-top: 25px;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid #D4C4AB;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            line-height: 1.6;
+            resize: vertical;
+            background: white;
+        }
+
+        .answer-textarea:focus {
+            outline: none;
+            border-color: #C9A961;
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+        }
+
+        .answer-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: Georgia, serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #C9A961 0%, #A0937C 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
+        }
+
+        .btn-secondary {
+            background: #E8DCC4;
+            color: #8B7355;
+        }
+
+        .btn-secondary:hover {
+            background: #D4C4AB;
+        }
+
+        .hint-info {
+            color: #A0937C;
+            font-size: 0.9em;
+        }
+
+        /* 右侧状态面板 */
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-card {
+            background: #F5F0E8;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+        }
+
+        .panel-card h3 {
+            color: #C9A961;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #D4C4AB;
+            padding-bottom: 10px;
+        }
+
+        /* 进度条 */
+        .progress-bar-container {
+            background: #E8DCC4;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #C9A961 0%, #8B7355 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+
+        /* 统计卡片 */
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #E8DCC4;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #A0937C;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #8B7355;
+        }
+
+        /* 等级徽章 */
+        .grade-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .grade-A-plus { background: #FFD700; color: #8B7355; }
+        .grade-A { background: #90EE90; color: #2E7D32; }
+        .grade-B { background: #87CEEB; color: #0D47A1; }
+        .grade-C { background: #FFA500; color: white; }
+        .grade-F { background: #FF6347; color: white; }
+
+        /* 导师反馈区 */
+        .mentor-feedback {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #C9A961;
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mentor-feedback.show {
+            display: block;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mentor-avatar {
+            font-size: 3em;
+        }
+
+        .feedback-title {
+            font-size: 1.5em;
+            color: #C9A961;
+        }
+
+        .feedback-score {
+            margin-left: auto;
+            font-size: 2em;
+            font-weight: bold;
+            color: #8B7355;
+        }
+
+        .feedback-content {
+            line-height: 1.8;
+            margin: 15px 0;
+        }
+
+        .feedback-breakdown {
+            background: #FFF9E6;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #E8DCC4;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .hint-box {
+            background: #E3F2FD;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #2196F3;
+            margin-top: 15px;
+        }
+
+        .hint-box h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        /* 关卡列表 */
+        .challenge-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .challenge-item {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .challenge-item:hover {
+            background: #E8DCC4;
+        }
+
+        .challenge-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .challenge-item.completed {
+            background: #E8F5E9;
+        }
+
+        .challenge-item.current {
+            background: #FFF3E0;
+            border: 2px solid #C9A961;
+        }
+
+        /* 定时器 */
+        .timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .timer.warning {
+            background: #FFEBEE;
+            color: #C62828;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+
+            .status-panel {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .panel-card {
+                flex: 1;
+                min-width: 300px;
+            }
+        }
+
+        /* 成功/失败提示 */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .result-overlay.show {
+            display: flex;
+        }
+
+        .result-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            animation: scaleIn 0.5s;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .result-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #8B7355;
+        }
+
+        .result-message {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题 -->
+        <div class="header">
+            <h1>🎓 增长黑客导师模式</h1>
+            <p class="subtitle">Growth Hacker Mentor Mode - 严格闯关，真正掌握</p>
+        </div>
+
+        <!-- 主游戏区域 -->
+        <div class="game-area">
+            <!-- 左侧挑战区 -->
+            <div class="challenge-section">
+                <!-- 挑战标题 -->
+                <div class="challenge-header">
+                    <div>
+                        <div class="challenge-title" id="challenge-title">第1关：LTV基础计算</div>
+                        <div style="color: #A0937C; margin-top: 5px;">Challenge 1: LTV Basics</div>
+                    </div>
+                    <span class="challenge-difficulty difficulty-easy" id="challenge-difficulty">简单 Easy</span>
+                </div>
+
+                <!-- 挑战内容 -->
+                <div class="challenge-content" id="challenge-content">
+                    <div class="challenge-scenario" id="challenge-scenario">
+正在加载挑战...
+                    </div>
+
+                    <div class="challenge-requirements" id="challenge-requirements">
+                        <h4>✓ 答题要求：</h4>
+                        <ul id="requirements-list">
+                            <li>显示完整计算过程</li>
+                            <li>解释每个变量的含义</li>
+                            <li>给出最终答案</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 答题区 -->
+                <div class="answer-section">
+                    <h3 style="margin-bottom: 15px; color: #C9A961;">📝 你的答案：</h3>
+                    <textarea
+                        class="answer-textarea"
+                        id="user-answer"
+                        placeholder="在这里输入你的答案...
+
+请包含：
+1. 完整的计算过程
+2. 使用的公式
+3. 每一步的推理
+4. 最终答案
+
+示例：
+LTV = ARPU × 平均留存月数 × Gross Margin
+   = $50 × 12 × 0.7
+   = $420
+
+因为...
+"></textarea>
+
+                    <div class="answer-actions">
+                        <button class="btn btn-primary" onclick="submitAnswer()">
+                            ⚡ 提交答案
+                        </button>
+                        <button class="btn btn-secondary" onclick="requestHint()">
+                            💡 需要提示 (<span id="hints-remaining">3</span>)
+                        </button>
+                        <span class="hint-info">
+                            ⏱️ 剩余时间: <span id="timer-display">10:00</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 导师反馈 -->
+                <div class="mentor-feedback" id="mentor-feedback">
+                    <div class="feedback-header">
+                        <div class="mentor-avatar">🤖</div>
+                        <div>
+                            <div class="feedback-title">导师评价 Mentor Feedback</div>
+                            <div style="color: #A0937C; font-size: 0.9em;">Growth Hacking Mentor</div>
+                        </div>
+                        <div class="feedback-score" id="feedback-score">--</div>
+                    </div>
+
+                    <div class="feedback-content" id="feedback-text">
+                        等待评分...
+                    </div>
+
+                    <div class="feedback-breakdown" id="feedback-breakdown">
+                        <h4 style="margin-bottom: 10px; color: #C9A961;">📊 评分细节：</h4>
+                        <div class="breakdown-item">
+                            <span>数据准确性 (30分)</span>
+                            <span id="score-data">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>逻辑完整性 (25分)</span>
+                            <span id="score-logic">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>计算准确性 (20分)</span>
+                            <span id="score-calc">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>概念理解 (15分)</span>
+                            <span id="score-concept">--</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span>策略可行性 (10分)</span>
+                            <span id="score-strategy">--</span>
+                        </div>
+                        <div class="breakdown-item" style="border-top: 2px solid #C9A961; margin-top: 10px; padding-top: 10px; font-weight: bold;">
+                            <span>总分 Total</span>
+                            <span id="score-total">--/100</span>
+                        </div>
+                    </div>
+
+                    <div id="hint-container"></div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="nextChallenge()" id="next-button" style="display: none;">
+                            ➡️ 下一关 Next Challenge
+                        </button>
+                        <button class="btn btn-secondary" onclick="retryChallenge()" id="retry-button" style="display: none;">
+                            🔄 重试 Retry
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧状态面板 -->
+            <div class="status-panel">
+                <!-- 进度卡片 -->
+                <div class="panel-card">
+                    <h3>📈 学习进度</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="overall-progress" style="width: 2%;">
+                            1 / 50
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">当前关卡</span>
+                        <span class="stat-value" id="current-level">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">已完成</span>
+                        <span class="stat-value" id="completed-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">平均分数</span>
+                        <span class="stat-value" id="average-score">--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">当前等级</span>
+                        <span class="stat-value grade-badge" id="current-grade">初学者</span>
+                    </div>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="panel-card">
+                    <h3>📊 答题统计</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">尝试次数</span>
+                        <span class="stat-value" id="attempt-count">0 / 3</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">剩余提示</span>
+                        <span class="stat-value" id="hint-count">3</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">用时</span>
+                        <span class="stat-value" id="time-spent">00:00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">连胜</span>
+                        <span class="stat-value" id="win-streak">0</span>
+                    </div>
+                </div>
+
+                <!-- 成就卡片 -->
+                <div class="panel-card">
+                    <h3>🏆 成就解锁</h3>
+                    <div id="achievements-list">
+                        <div style="text-align: center; color: #A0937C; padding: 20px;">
+                            完成挑战解锁成就
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 关卡列表 -->
+                <div class="panel-card">
+                    <h3>🎯 关卡列表</h3>
+                    <div class="challenge-list" id="challenge-list">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div class="result-overlay" id="result-overlay">
+        <div class="result-box">
+            <div class="result-icon" id="result-icon">🎉</div>
+            <div class="result-title" id="result-title">恭喜通关！</div>
+            <div class="result-message" id="result-message">你已经掌握了这个知识点！</div>
+            <button class="btn btn-primary" onclick="closeResultOverlay()">继续</button>
+        </div>
+    </div>
+
+    <!-- 引入所有系统文件 -->
+    <script src="ai-mentor-system.js"></script>
+    <script src="knowledge-base.js"></script>
+    <script src="mentor-dialogue-templates.js"></script>
+    <script src="challenge-system.js"></script>
+    <script src="difficulty-engine.js"></script>
+    <script src="validation-rules.js"></script>
+    <script src="growth-hacking-curriculum.js"></script>
+    <script src="real-case-studies.js"></script>
+    <script src="common-mistakes-db.js"></script>
+
+    <script>
+        // 游戏状态
+        let mentorSystem;
+        let challengeSystem;
+        let difficultyEngine;
+        let currentChallenge;
+        let currentChallengeId = 'calc_001_ltv_basic';
+        let attemptCount = 0;
+        let hintsUsed = 0;
+        let startTime;
+        let timerInterval;
+        let gameProgress = {
+            completedChallenges: [],
+            scores: [],
+            totalAttempts: 0,
+            winStreak: 0
+        };
+
+        // 初始化游戏
+        function initGame() {
+            try {
+                // 初始化系统
+                mentorSystem = new AIMentorSystem();
+                challengeSystem = new ChallengeSystem();
+                difficultyEngine = new DifficultyEngine();
+
+                console.log('✅ 导师系统初始化成功');
+
+                // 生成关卡列表
+                generateChallengeList();
+
+                // 加载第一个挑战
+                loadChallenge(currentChallengeId);
+
+            } catch (error) {
+                console.error('初始化失败:', error);
+                alert('系统初始化失败，请刷新页面重试');
+            }
+        }
+
+        // 生成关卡列表
+        function generateChallengeList() {
+            const listContainer = document.getElementById('challenge-list');
+            const challenges = challengeSystem.getAllChallenges();
+
+            listContainer.innerHTML = challenges.map((challenge, index) => {
+                const isCompleted = gameProgress.completedChallenges.includes(challenge.id);
+                const isCurrent = challenge.id === currentChallengeId;
+                const isLocked = index > 0 && !gameProgress.completedChallenges.includes(challenges[index - 1].id);
+
+                return `
+                    <div class="challenge-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}"
+                         onclick="${!isLocked ? `loadChallenge('${challenge.id}')` : ''}">
+                        <div>
+                            <div style="font-weight: bold;">${index + 1}. ${challenge.title || challenge.name}</div>
+                            <div style="font-size: 0.85em; color: #A0937C;">${challenge.difficulty}</div>
+                        </div>
+                        <div>
+                            ${isCompleted ? '✅' : isLocked ? '🔒' : '⭕'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 加载挑战
+        function loadChallenge(challengeId) {
+            currentChallengeId = challengeId;
+            currentChallenge = challengeSystem.getChallenge(challengeId);
+
+            if (!currentChallenge) {
+                alert('挑战加载失败');
+                return;
+            }
+
+            // 更新UI
+            document.getElementById('challenge-title').textContent = currentChallenge.title || currentChallenge.name;
+            document.getElementById('challenge-difficulty').textContent = currentChallenge.difficulty;
+            document.getElementById('challenge-difficulty').className =
+                `challenge-difficulty difficulty-${currentChallenge.difficulty.toLowerCase()}`;
+            document.getElementById('challenge-scenario').textContent = currentChallenge.scenario;
+
+            // 更新要求列表
+            const reqList = document.getElementById('requirements-list');
+            const requirements = currentChallenge.requirements || [
+                '显示完整计算过程',
+                '解释每个变量的含义',
+                '给出最终答案'
+            ];
+            reqList.innerHTML = requirements.map(req =>
+                `<li>${req}</li>`
+            ).join('');
+
+            // 重置状态
+            attemptCount = 0;
+            hintsUsed = 0;
+            document.getElementById('user-answer').value = '';
+            document.getElementById('mentor-feedback').classList.remove('show');
+            document.getElementById('hints-remaining').textContent = 3 - hintsUsed;
+            document.getElementById('attempt-count').textContent = `${attemptCount} / 3`;
+
+            // 启动计时器
+            startTimer(currentChallenge.timeLimit || 600);
+
+            // 更新关卡列表
+            generateChallengeList();
+        }
+
+        // 启动计时器
+        function startTimer(seconds) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            startTime = Date.now();
+            let remaining = seconds;
+
+            const updateTimer = () => {
+                remaining--;
+                const minutes = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                document.getElementById('timer-display').textContent =
+                    `${minutes}:${secs.toString().padStart(2, '0')}`;
+
+                if (remaining <= 60) {
+                    document.getElementById('timer-display').style.color = '#C62828';
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert('时间到！请提交答案或申请延时。');
+                }
+            };
+
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        // 提交答案
+        async function submitAnswer() {
+            const answer = document.getElementById('user-answer').value.trim();
+
+            if (!answer) {
+                alert('请先输入答案');
+                return;
+            }
+
+            if (attemptCount >= 3) {
+                alert('已达到最大尝试次数');
+                return;
+            }
+
+            attemptCount++;
+            document.getElementById('attempt-count').textContent = `${attemptCount} / 3`;
+
+            // 显示加载状态
+            const feedbackEl = document.getElementById('mentor-feedback');
+            feedbackEl.classList.add('show');
+            document.getElementById('feedback-text').textContent = '导师正在批改...';
+
+            try {
+                // 调用导师系统评估
+                const result = await mentorSystem.evaluateAnswer(answer, currentChallenge);
+
+                // 显示结果
+                displayFeedback(result);
+
+                // 更新统计
+                gameProgress.totalAttempts++;
+                gameProgress.scores.push(result.score);
+                updateStats();
+
+            } catch (error) {
+                console.error('评估失败:', error);
+                document.getElementById('feedback-text').textContent =
+                    '评估系统遇到错误，请重试';
+            }
+        }
+
+        // 显示反馈
+        function displayFeedback(result) {
+            // 显示分数
+            document.getElementById('feedback-score').textContent = result.score;
+
+            // 显示等级徽章
+            const gradeClass = `grade-${result.grade.level.replace('+', '-plus')}`;
+            document.getElementById('feedback-score').className = `feedback-score grade-badge ${gradeClass}`;
+
+            // 显示反馈文本
+            document.getElementById('feedback-text').innerHTML = result.feedback;
+
+            // 显示评分细节
+            if (result.breakdown) {
+                document.getElementById('score-data').textContent = result.breakdown.dataAccuracy || 0;
+                document.getElementById('score-logic').textContent = result.breakdown.logicCompleteness || 0;
+                document.getElementById('score-calc').textContent = result.breakdown.calculationCorrect || 0;
+                document.getElementById('score-concept').textContent = result.breakdown.conceptUnderstanding || 0;
+                document.getElementById('score-strategy').textContent = result.breakdown.feasibility || 0;
+                document.getElementById('score-total').textContent = `${result.score}/100`;
+            }
+
+            // 显示提示（如果有）
+            if (result.hint) {
+                const hintContainer = document.getElementById('hint-container');
+                hintContainer.innerHTML = `
+                    <div class="hint-box">
+                        <h4>💡 导师提示：</h4>
+                        <div>${result.hint}</div>
+                    </div>
+                `;
+            }
+
+            // 显示按钮
+            if (result.grade.pass) {
+                // 通过
+                document.getElementById('next-button').style.display = 'inline-block';
+                document.getElementById('retry-button').style.display = 'none';
+
+                // 更新进度
+                if (!gameProgress.completedChallenges.includes(currentChallengeId)) {
+                    gameProgress.completedChallenges.push(currentChallengeId);
+                    gameProgress.winStreak++;
+                }
+
+                // 显示结果弹窗
+                showResultOverlay(true, result.grade.level, result.score);
+
+            } else if (attemptCount >= 3) {
+                // 失败
+                document.getElementById('next-button').style.display = 'none';
+                document.getElementById('retry-button').style.display = 'inline-block';
+                gameProgress.winStreak = 0;
+
+                // 显示失败弹窗
+                showResultOverlay(false, 'F', result.score);
+
+            } else {
+                // 可以继续尝试
+                document.getElementById('retry-button').style.display = 'inline-block';
+            }
+        }
+
+        // 请求提示
+        function requestHint() {
+            if (hintsUsed >= 3) {
+                alert('提示次数已用完');
+                return;
+            }
+
+            const hint = mentorSystem.provideClue(hintsUsed + 1, currentChallenge);
+            hintsUsed++;
+
+            document.getElementById('hints-remaining').textContent = 3 - hintsUsed;
+
+            // 显示提示
+            const hintContainer = document.getElementById('hint-container');
+            hintContainer.innerHTML = `
+                <div class="hint-box">
+                    <h4>💡 导师提示 ${hintsUsed}/3：</h4>
+                    <div>${hint.hint || hint.text || '思考方向：这个问题的核心概念是什么？'}</div>
+                    ${hint.keywords ? `<div style="margin-top: 10px;"><strong>关键词：</strong>${hint.keywords.join(', ')}</div>` : ''}
+                </div>
+            `;
+
+            document.getElementById('mentor-feedback').classList.add('show');
+        }
+
+        // 下一关
+        function nextChallenge() {
+            const challenges = challengeSystem.getAllChallenges();
+            const currentIndex = challenges.findIndex(c => c.id === currentChallengeId);
+
+            if (currentIndex < challenges.length - 1) {
+                loadChallenge(challenges[currentIndex + 1].id);
+            } else {
+                alert('恭喜！你已完成所有挑战！');
+            }
+        }
+
+        // 重试
+        function retryChallenge() {
+            loadChallenge(currentChallengeId);
+        }
+
+        // 更新统计
+        function updateStats() {
+            const avgScore = gameProgress.scores.length > 0
+                ? (gameProgress.scores.reduce((a, b) => a + b, 0) / gameProgress.scores.length).toFixed(1)
+                : '--';
+
+            document.getElementById('current-level').textContent = gameProgress.completedChallenges.length + 1;
+            document.getElementById('completed-count').textContent = gameProgress.completedChallenges.length;
+            document.getElementById('average-score').textContent = avgScore;
+            document.getElementById('win-streak').textContent = gameProgress.winStreak;
+
+            const progress = (gameProgress.completedChallenges.length / 50 * 100).toFixed(0);
+            document.getElementById('overall-progress').style.width = progress + '%';
+            document.getElementById('overall-progress').textContent =
+                `${gameProgress.completedChallenges.length} / 50`;
+
+            // 更新等级
+            let grade = '初学者';
+            if (avgScore >= 90) grade = '大师';
+            else if (avgScore >= 80) grade = '专家';
+            else if (avgScore >= 70) grade = '熟练';
+            document.getElementById('current-grade').textContent = grade;
+        }
+
+        // 显示结果弹窗
+        function showResultOverlay(success, grade, score) {
+            const overlay = document.getElementById('result-overlay');
+            const icon = document.getElementById('result-icon');
+            const title = document.getElementById('result-title');
+            const message = document.getElementById('result-message');
+
+            if (success) {
+                icon.textContent = grade === 'A+' ? '🏆' : grade === 'A' ? '🎉' : '✅';
+                title.textContent = grade === 'A+' ? '完美通关！' : grade === 'A' ? '优秀！' : '通过！';
+                message.textContent = `你获得了 ${grade} 等级，得分 ${score} 分！`;
+            } else {
+                icon.textContent = '😞';
+                title.textContent = '未通过';
+                message.textContent = `得分 ${score} 分（需要70分及格）。建议复习相关知识后再试。`;
+            }
+
+            overlay.classList.add('show');
+        }
+
+        // 关闭结果弹窗
+        function closeResultOverlay() {
+            document.getElementById('result-overlay').classList.remove('show');
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', initGame);
+
+        // 页面卸载时保存进度
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('mentorGameProgress', JSON.stringify(gameProgress));
+        });
+
+        // 加载保存的进度
+        const savedProgress = localStorage.getItem('mentorGameProgress');
+        if (savedProgress) {
+            gameProgress = JSON.parse(savedProgress);
+        }
+    </script>
+</body>
+</html>
