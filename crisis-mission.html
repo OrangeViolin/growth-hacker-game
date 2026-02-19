@@ -1582,23 +1582,104 @@ Tom站起来："我12点有电话会，到时候问你一个问题。"
         </div>
     </div>
 
+    <!-- 依赖加载检测 -->
+    <script>
+        // 显示加载提示
+        window.addEventListener('DOMContentLoaded', () => {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, #0F172A 0%, #020617 100%);
+                z-index: 99999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            `;
+            loadingOverlay.innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+                    <div style="font-size: 1.5em; color: #A855F7; margin-bottom: 10px;">加载游戏资源...</div>
+                    <div style="font-size: 0.9em; color: #94A3B8;" id="loading-status">正在初始化</div>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+        });
+
+        // 依赖检测函数
+        function checkDependencies() {
+            const dependencies = [
+                { name: 'LEVELS_DATA', check: () => typeof LEVELS_DATA !== 'undefined', file: 'levels-data.js' },
+                { name: 'OnboardingSystem', check: () => typeof OnboardingSystem !== 'undefined', file: 'onboarding.js' },
+                { name: 'ResourceSystem', check: () => typeof ResourceSystem !== 'undefined', file: 'resource-system.js' },
+                { name: 'EventSystem', check: () => typeof EventSystem !== 'undefined', file: 'event-system.js' }
+            ];
+
+            const missing = dependencies.filter(dep => !dep.check());
+
+            if (missing.length > 0) {
+                const errorMsg = `
+                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #0F172A 0%, #020617 100%); z-index: 999999; display: flex; align-items: center; justify-content: center;">
+                        <div style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border: 3px solid #EF4444; border-radius: 20px; padding: 40px; max-width: 600px; text-align: center;">
+                            <div style="font-size: 4em; margin-bottom: 20px;">⚠️</div>
+                            <div style="font-size: 2em; color: #EF4444; margin-bottom: 20px; font-weight: bold;">资源加载失败</div>
+                            <div style="font-size: 1.1em; line-height: 1.6; margin-bottom: 20px; color: #E2E8F0;">
+                                以下游戏资源未能加载：<br><br>
+                                ${missing.map(dep => `❌ ${dep.file}`).join('<br>')}
+                            </div>
+                            <div style="font-size: 0.9em; color: #94A3B8; margin-bottom: 30px;">
+                                这可能是由于：<br>
+                                • 网络连接问题<br>
+                                • 浏览器缓存问题<br>
+                                • CDN加载失败
+                            </div>
+                            <button onclick="location.reload()" style="background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%); color: #FFF; border: none; padding: 15px 40px; border-radius: 10px; font-size: 1.1em; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);">
+                                🔄 重新加载页面
+                            </button>
+                            <div style="margin-top: 20px;">
+                                <button onclick="clearCache()" style="background: transparent; color: #94A3B8; border: 2px solid #475569; padding: 12px 30px; border-radius: 8px; font-size: 1em; cursor: pointer;">
+                                    🗑️ 清除缓存并重试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.innerHTML = errorMsg;
+
+                // 添加清除缓存函数
+                window.clearCache = function() {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    location.reload(true);
+                };
+
+                return false;
+            }
+            return true;
+        }
+    </script>
+
     <!-- 加载关卡数据 -->
-    <script src="levels-data.js"></script>
+    <script src="levels-data.js" onerror="console.error('Failed to load levels-data.js')"></script>
 
     <!-- 加载新手引导系统 -->
-    <script src="onboarding.js"></script>
+    <script src="onboarding.js" onerror="console.error('Failed to load onboarding.js')"></script>
 
     <!-- 加载资源系统 -->
-    <script src="resource-system.js"></script>
+    <script src="resource-system.js" onerror="console.error('Failed to load resource-system.js')"></script>
 
     <!-- 加载事件系统 -->
-    <script src="event-system.js"></script>
+    <script src="event-system.js" onerror="console.error('Failed to load event-system.js')"></script>
 
     <script>
-        // 确保数据加载完成
-        if (typeof LEVELS_DATA === 'undefined') {
-            alert('关卡数据加载失败，请刷新页面');
-            throw new Error('LEVELS_DATA not loaded');
+        // 确保所有依赖加载完成
+        if (!checkDependencies()) {
+            throw new Error('Required dependencies not loaded');
         }
 
         // 关卡进度
@@ -2136,8 +2217,24 @@ Tom站起来："我12点有电话会，到时候问你一个问题。"
 
         // 页面加载时启动
         window.addEventListener('DOMContentLoaded', () => {
+            // 更新加载状态
+            const loadingStatus = document.getElementById('loading-status');
+            if (loadingStatus) loadingStatus.textContent = '初始化关卡...';
+
             // 初始化关卡
             initLevel();
+
+            // 移除加载提示
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay) {
+                    loadingOverlay.style.opacity = '0';
+                    loadingOverlay.style.transition = 'opacity 0.3s';
+                    setTimeout(() => {
+                        loadingOverlay.remove();
+                    }, 300);
+                }
+            }, 500);
 
             // 检查是否需要新手引导
             const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
